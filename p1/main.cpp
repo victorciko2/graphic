@@ -1,6 +1,7 @@
 #include <iostream>
 #include "point.h"
 #include "direction.h"
+#include "sphere.h"
 
 using namespace std;
 
@@ -39,9 +40,14 @@ int main(){
 	char c;
 	int seleccion;
 	float x, y, z, s;
-	Point p, p1, p2;
-	Direction d, d1, d2;
-	showMenu();
+	Point p(1,1,1), p1(2,2,2), p2(3,3,3);
+	p1.show();
+	p1 = p;
+	p1.show();
+	Direction d(3,3,3), d1, d2;
+	Sphere sphere(p, p1, d);
+	sphere.show();
+	/*showMenu();
 	cin >> seleccion;
 	while(seleccion != 0){
 		switch(seleccion){
@@ -298,7 +304,7 @@ int main(){
 				cout << "La z es: " << d.getZ() << endl;
 				break;
 			case 18:
-				cout << "Calculando modulo" << endl;
+				cout << "Calculando modulus" << endl;
 				cout << "Introduce x y z: " << flush;
 				cin >> x >> y >> z;
 				d.setX(x);
@@ -307,7 +313,7 @@ int main(){
 				cout << "Direction creada: " << flush;
 				d.show();
 				cout << endl;
-				cout << "El modulo es " << d.modulo();
+				cout << "El modulus es " << d.modulus();
 				break;
 			case 19:
 				cout << "Sumando direction + direction" << endl;
@@ -432,6 +438,6 @@ int main(){
 		cin >> c;
 		showMenu();
 		cin >> seleccion;
-	}
+	}*/
 	return 0;
 }

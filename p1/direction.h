@@ -41,6 +41,8 @@ public:
 	Direction operator*(float s);
 
 	Direction operator/(float s);
+
+	Direction operator=(Direction d);
 };
 
 float dotProduct(Direction d1, Direction d2);

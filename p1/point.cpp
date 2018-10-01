@@ -51,4 +51,10 @@ Direction Point::operator-(Point p2){
 	return Direction(this->x - p2.getX(), this->y - p2.getY(), this->z - p2.getZ());
 }
 
+Point Point::operator=(Point p){
+	this->x = p.getX(); 
+	this->y = p.getY();
+	this->z = p.getZ();
+	return *this;
+}
 

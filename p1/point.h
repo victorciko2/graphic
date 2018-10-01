@@ -34,6 +34,8 @@ public:
 
 	Direction operator-(Point p2);
 
+	Point operator=(Point p);
+
 };
 
 #endif

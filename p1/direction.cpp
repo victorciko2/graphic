@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cmath>
-#include "direccion.h"
+#include "direction.h"
 
 using namespace std;
 
@@ -39,12 +39,12 @@ float Direction::getZ(){
 	return this->z;
 }
 
-void Direction::mostrar(){
+void Direction::show(){
 	cout << "{ " << this->x << ", " << this->y << ", " << this->z << "}" << flush;
 }
 
-Punto Direction::operator+(Punto p){
-	return Punto(this->x + p.getX(), this->y + p.getY(), this->z + p.getZ());
+Point Direction::operator+(Point p){
+	return Point(this->x + p.getX(), this->y + p.getY(), this->z + p.getZ());
 }
 
 Direction Direction::operator+(Direction d2){
@@ -63,7 +63,14 @@ Direction Direction::operator/(float s){
 	return Direction(this->x / s, this->y / s, this->z / s);
 }
 
-float Direction::modulo(){
+Direction Direction::operator=(Direction d){
+	this->x = d.getX();
+	this->y = d.getY();
+	this->z = d.getY();
+	return *this;
+}
+
+float Direction::modulus(){
 	return sqrt(this->x * this->x + this->y * this->y + this->z * this->z);
 }
 
