@@ -83,3 +83,10 @@ Direction crossProduct(Direction d1, Direction d2){
 			d1.getZ() * d2.getX() - d1.getX() * d2.getZ(),
 			d1.getX() * d2.getY() - d1.getY() * d2.getX());
 }
+
+
+string Direction::toString(){
+	string d= "[" + this->x + "," + this->y + "," + this->z + "]";
+	return d;
+
+}

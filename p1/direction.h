@@ -32,6 +32,8 @@ public:
 
 	void show();
 
+	string toString();
+
 	Point operator+(Point p);
 
 	Direction operator+(Direction d2);

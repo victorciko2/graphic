@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 #include "point.h"
 
 using namespace std;
@@ -56,5 +57,11 @@ Point Point::operator=(Point p){
 	this->y = p.getY();
 	this->z = p.getZ();
 	return *this;
+}
+
+string Point::toString(){
+	string p= "[" + this->x + "," + this->y + "," + this->z + "]";
+	return p;
+
 }
 

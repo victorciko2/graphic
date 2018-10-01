@@ -30,6 +30,8 @@ public:
 
 	void show();
 
+	void toString();
+
 	Point operator+(Direction d);
 
 	Direction operator-(Point p2);
