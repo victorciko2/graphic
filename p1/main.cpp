@@ -2,6 +2,7 @@
 #include "point.h"
 #include "direction.h"
 #include "sphere.h"
+#include "planetaryStation.h"
 
 using namespace std;
 
