@@ -28,7 +28,7 @@ public:
 
 	float getZ();
 
-	void mostrar();
+	void show();
 
 	Point operator+(Direction d);
 
