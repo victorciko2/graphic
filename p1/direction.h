@@ -1,6 +1,7 @@
 #ifndef DIRECTION_H
 #define DIRECTION_H
 #include <iostream>
+#include <cstring>
 #include "point.h"
 
 using namespace std;
