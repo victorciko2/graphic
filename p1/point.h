@@ -30,7 +30,7 @@ public:
 
 	void show();
 
-	void toString();
+	string toString();
 
 	Point operator+(Direction d);
 
