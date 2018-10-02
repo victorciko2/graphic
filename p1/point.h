@@ -31,6 +31,11 @@ public:
 
 	void show();
 
+<<<<<<< HEAD
+=======
+	string toString();
+
+>>>>>>> b4f3ba29071dcd71b8c166cf82d7c94bae12ff32
 	Point operator+(Direction d);
 
 	Direction operator-(Point p2);
