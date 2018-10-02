@@ -1,10 +1,12 @@
 #include <iostream>
 #include <cstring>
+#include <stdio.h>
+#include <array>
 #include "point.h"
 #include "direction.h"
 #include "sphere.h"
 #include "planetaryStation.h"
-
+#include "coordinateSystem.h"
 using namespace std;
 
 void showMenu(){
@@ -33,12 +35,15 @@ void showMenu(){
 	cout << "21. Multiplicar direction * escalar" << endl;
 	cout << "22. Dividir direction / escalar" << endl;
 	cout << "23. Producto escalar direction . direction" << endl;
-	cout << "24. Producto vectorial direction x direction" << endl;
+	cout << "24. Producto arrayial direction x direction" << endl;
 	cout << "---------------------------------------------------" << endl;
 	cout << endl << "Que quieres hacer prim? " << flush;
 }
 
 int main(){
+	Sphere s(Point(5, 5, 5), Point(6, 5, 5), Direction(0,0,-1));
+	s.show();
+	/*
 	char c;
 	int seleccion;
 	float x, y, z, s = 20;
@@ -46,7 +51,7 @@ int main(){
 	Direction d(0, 0, 2), d1, d2;
 	Sphere sphere(p, p1, d);
 	sphere.show();
-	/*showMenu();
+	showMenu();
 	cin >> seleccion;
 	while(seleccion != 0){
 		switch(seleccion){
@@ -411,7 +416,7 @@ int main(){
 				cout << "El producto escalar es: " << dotProduct(d1, d2) << endl;;
 				break;
 			case 24:
-				cout << "Calculando producto vectorial" << endl;
+				cout << "Calculando producto arrayial" << endl;
 				cout << "Introduce x y z: " << flush;
 				cin >> x >> y >> z;
 				d1.setX(x);
@@ -428,7 +433,7 @@ int main(){
 				cout << "Direction creada: " << flush;
 				d2.show();
 				cout << endl;
-				cout << "El producto vectorial es: " << flush;
+				cout << "El producto arrayial es: " << flush;
 				d = crossProduct(d1, d2);
 				d.show();
 				break;

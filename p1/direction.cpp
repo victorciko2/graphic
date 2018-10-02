@@ -44,6 +44,17 @@ void Direction::show(){
 	cout << "{ " << this->x << ", " << this->y << ", " << this->z << "}" << flush;
 }
 
+float Direction::modulus(){
+	return sqrt(this->x * this->x + this->y * this->y + this->z * this->z);
+}
+
+void Direction::normalize(){
+	float m = this->modulus();
+	this->x /= m;
+	this->y /= m;
+	this->z /= m;
+}
+
 Point Direction::operator+(Point p){
 	return Point(this->x + p.getX(), this->y + p.getY(), this->z + p.getZ());
 }
@@ -69,10 +80,6 @@ Direction Direction::operator=(Direction d){
 	this->y = d.getY();
 	this->z = d.getZ();
 	return *this;
-}
-
-float Direction::modulus(){
-	return sqrt(this->x * this->x + this->y * this->y + this->z * this->z);
 }
 
 float dotProduct(Direction d1, Direction d2){

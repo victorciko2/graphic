@@ -23,6 +23,17 @@ Sphere::Sphere(Point center, Point referencePoint, Direction axis){
 		cout << "The distance between the center and the reference "
 			 <<	"city is not the same as the axis divided by two." << endl;
 	}
+	Direction k = axis;
+	k.normalize(); 
+	Direction aux = this->referencePoint - this->center;
+	Direction j = crossProduct(k, aux);
+	j.normalize();
+	Direction i = crossProduct(k, j);
+	i.normalize();
+	this->coordinates.setI(i);
+	this->coordinates.setJ(j);
+	this->coordinates.setK(k);
+	this->coordinates.setO(this->center);
 }
 
 void Sphere::setCenter(Point center){
@@ -61,12 +72,12 @@ string Sphere::showAsString(){
 	string s = "Center: " + this->center.showAsString() + "\nReferencePoint: " 
 			+ this->referencePoint.showAsString() 
 			+ "\nAxis: " + this->axis.showAsString()
-			+ "\n Coordinates: " + this->coordinates.showAsString();
+			+ "\n Coordinates:\n" + this->coordinates.showAsString();
 	return s;
 }
 
 void Sphere::show(){
-	cout << this->showAsString() << flush;
+	cout << this->showAsString() << endl;
 }
 
 Sphere Sphere::operator=(Sphere s){

@@ -2,6 +2,7 @@
 #define COORDINATESYSTEM_H_
 #include <iostream>
 #include <cstring>
+#include <array>
 #include "direction.h"
 
 using namespace std;
@@ -10,11 +11,13 @@ class Direction;
 
 class CoordinateSystem{
 private:
-	Direction i, j, k;
+	array <array<float, 4>, 4> matrix;
 public:
 	CoordinateSystem();
 
-	CoordinateSystem(Direction i, Direction j, Direction k);
+	CoordinateSystem(array <array<float, 4>, 4> matrix);
+
+	void setMatrix(array <array<float, 4>, 4> matrix);
 
 	void setI(Direction i);
 
@@ -22,11 +25,17 @@ public:
 
 	void setK(Direction k);
 
+	void setO(Point o);
+
 	Direction getI();
 
 	Direction getJ();
 
 	Direction getK();
+
+	Point getO();
+
+	array <array<float, 4>, 4> getMatrix();
 
 	string showAsString();
 

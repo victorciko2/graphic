@@ -33,6 +33,8 @@ public:
 
 	void show();
 
+	void normalize();
+
 	string showAsString();
 
 	Point operator+(Point p);

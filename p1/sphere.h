@@ -20,7 +20,7 @@ private:
 public:
 	Sphere();
 
-	Sphere(Point center, Point referencePoint, Direction axis, CoordinateSystem coordinates);
+	Sphere(Point center, Point referencePoint, Direction axis);
 
 	void setCenter(Point center);
 
