@@ -1,6 +1,7 @@
 #ifndef DIRECTION_H
 #define DIRECTION_H
 #include <iostream>
+#include <cstring>
 #include "point.h"
 
 using namespace std;
@@ -32,7 +33,7 @@ public:
 
 	void show();
 
-	string toString();
+	string showAsString();
 
 	Point operator+(Point p);
 

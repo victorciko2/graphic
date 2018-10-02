@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 #include "point.h"
 #include "direction.h"
 #include "sphere.h"
@@ -40,12 +41,9 @@ void showMenu(){
 int main(){
 	char c;
 	int seleccion;
-	float x, y, z, s;
-	Point p(1,1,1), p1(2,2,2), p2(3,3,3);
-	p1.show();
-	p1 = p;
-	p1.show();
-	Direction d(3,3,3), d1, d2;
+	float x, y, z, s = 20;
+	Point p(0, 0, 0), p1(0, 0, 1), p2(3,3,3);
+	Direction d(0, 0, 2), d1, d2;
 	Sphere sphere(p, p1, d);
 	sphere.show();
 	/*showMenu();

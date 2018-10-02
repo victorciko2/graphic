@@ -59,8 +59,9 @@ Point Point::operator=(Point p){
 	return *this;
 }
 
-string Point::toString(){
-	string p= "[" + this->x + "," + this->y + "," + this->z + "]";
+string Point::showAsString(){
+	string p = "[" + to_string(this->x) + "," 
+		+ to_string(this->y) + "," + to_string(this->z) + "]";
 	return p;
 
 }

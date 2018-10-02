@@ -1,18 +1,28 @@
 #include <iostream>
+#include <cstring>
+#include <cmath>
+#include <stdlib.h>
 #include "sphere.h"
 
 using namespace std;
 
 Sphere::Sphere(){
-	this->center = Point(0,0,0);
-	this->referencePoint = Point(0,0,0);
-	this->axis = Direction(0,0,0);
+	this->center = Point();
+	this->referencePoint = Point();
+	this->axis = Direction();
+	this->coordinates = CoordinateSystem();
 }
 
 Sphere::Sphere(Point center, Point referencePoint, Direction axis){
 	this->center = center;
 	this->referencePoint = referencePoint;
 	this->axis = axis;
+	Direction d = referencePoint - center;
+	float modulus = d.modulus();
+	if(abs(this->axis.modulus()/2.0 - modulus) >= pow(10, -6)){
+		cout << "The distance between the center and the reference "
+			 <<	"city is not the same as the axis divided by two." << endl;
+	}
 }
 
 void Sphere::setCenter(Point center){
@@ -23,8 +33,12 @@ void Sphere::setReferencePoint(Point referencePoint){
 	this->referencePoint = referencePoint;
 }
 
-void Sphere::setDirection(Direction axis){
+void Sphere::setAxis(Direction axis){
 	this->axis = axis;
+}
+
+void Sphere::setCoordinates(CoordinateSystem coordinates){
+	this->coordinates = coordinates;
 }
 
 Point Sphere::getCenter(){
@@ -39,18 +53,26 @@ Direction Sphere::getAxis(){
 	return this->axis;
 }
 
+CoordinateSystem Sphere::getCoordinates(){
+	return this->coordinates;
+}
+
+string Sphere::showAsString(){
+	string s = "Center: " + this->center.showAsString() + "\nReferencePoint: " 
+			+ this->referencePoint.showAsString() 
+			+ "\nAxis: " + this->axis.showAsString()
+			+ "\n Coordinates: " + this->coordinates.showAsString();
+	return s;
+}
+
 void Sphere::show(){
-	cout << "Center: " << flush;
-	this->center.show(); 
-	cout << endl << "ReferencePoint: " << flush;
-	this->referencePoint.show();
-	cout << endl << "Axis: " << flush;
-	this->axis.show();
+	cout << this->showAsString() << flush;
 }
 
 Sphere Sphere::operator=(Sphere s){
 	this->center = s.getCenter();
 	this->referencePoint = s.getReferencePoint();
 	this->axis = s.getAxis();
+	this->coordinates = s.getCoordinates();
 	return *this;
 }

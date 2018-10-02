@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <cstring>
 #include "direction.h"
 
 using namespace std;
@@ -66,7 +67,7 @@ Direction Direction::operator/(float s){
 Direction Direction::operator=(Direction d){
 	this->x = d.getX();
 	this->y = d.getY();
-	this->z = d.getY();
+	this->z = d.getZ();
 	return *this;
 }
 
@@ -85,8 +86,9 @@ Direction crossProduct(Direction d1, Direction d2){
 }
 
 
-string Direction::toString(){
-	string d= "[" + this->x + "," + this->y + "," + this->z + "]";
+string Direction::showAsString(){
+	string d = "[" + to_string(this->x) + "," 
+			+ to_string(this->y) + "," + to_string(this->z) + "]";
 	return d;
 
 }

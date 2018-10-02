@@ -3,22 +3,29 @@
 #include <iostream>
 #include "sphere.h"
 #include "point.h"
+#include "direction.h"
+#include "coordinateSystem.h"
 
 using namespace std;
 
 class Sphere;
 
+class CoordinateSystem;
+
 class PlanetaryStation{
 
 private:
-	Sphere s;
+	Sphere sphere;
 	float inclination, azimuth;
+	Point position;
+	CoordinateSystem coordinates;
 
 public:
 	PlanetaryStation();
-	PlanetaryStation(Sphere s, float inclination, float azimuth);
+	
+	PlanetaryStation(Sphere sphere, float inclination, float azimuth);
 
-	void setS(Sphere s);
+	void setS(Sphere sphere);
 
 	void setInclination(float inclination);
 
@@ -29,6 +36,8 @@ public:
 	float getInclination();
 
 	float getAzimuth();
+
+	string showAsString();
 
 	void show();
 
