@@ -19,14 +19,9 @@ PlanetaryStation::PlanetaryStation(Sphere sphere, float inclination, float azimu
 	this->inclination = inclination;
 	this->azimuth = azimuth;
 	Direction radius = sphere.getReferencePoint() - sphere.getCenter();
-	/*this->position = Point(sphere.getCenter().getX() +  radius.getX() * sin(inclination) * sin(azimuth),
+	this->position = Point(sphere.getCenter().getX() +  radius.getX() * sin(inclination) * sin(azimuth),
 			sphere.getCenter().getY() + radius.getY() * sin(inclination) * cos(azimuth),
 			sphere.getCenter().getZ() + radius.getZ() * cos(inclination));
-	Direction vectorK = position - sphere.getCenter();
-	float modulusK = vectorK.modulus();
-	vectorK = vectorK / modulusK;
-	Direction vectorI = 
-	Direction vectorJ =*/ 
 }
 
 void PlanetaryStation::setS(Sphere sphere){
@@ -56,7 +51,8 @@ float PlanetaryStation::getAzimuth(){
 string PlanetaryStation::showAsString(){
 	string s = "{ planet " + this->sphere.showAsString() + ", inclination "
 		+ to_string(this->inclination) + ", azimuth" 
-		+ to_string(this->azimuth) + "} ";
+		+ to_string(this->azimuth) + "\nPosistion: "
+		+ position + "} ";
 	return s;
 }
 

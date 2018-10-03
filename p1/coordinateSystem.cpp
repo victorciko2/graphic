@@ -88,3 +88,154 @@ CoordinateSystem CoordinateSystem::operator=(CoordinateSystem c){
 	this->matrix = c.getMatrix();
 	return *this;
 }
+
+array <array<float, 4>, 4> CoordinateSystem::invert(bool& hasInverse){
+    array <array<float, 4>, 4> inv;
+    float det;
+
+    inv[0][0] = matrix[1][1]  * matrix[2][2] * matrix[3][3] - 
+             matrix[1][1]  * matrix[2][3] * matrix[3][2] - 
+             matrix[2][1]  * matrix[1][2]  * matrix[3][3] + 
+             matrix[2][1]  * matrix[1][3]  * matrix[3][2] +
+             matrix[3][1] * matrix[1][2]  * matrix[2][3] - 
+             matrix[3][1] * matrix[1][3]  * matrix[2][2];
+
+    inv[1][0] = -matrix[1][0]  * matrix[2][2] * matrix[3][3] + 
+              matrix[1][0]  * matrix[2][3] * matrix[3][2] + 
+              matrix[2][0]  * matrix[1][2]  * matrix[3][3] - 
+              matrix[2][0]  * matrix[1][3]  * matrix[3][2] - 
+              matrix[3][0] * matrix[1][2]  * matrix[2][3] + 
+              matrix[3][0] * matrix[1][3]  * matrix[2][2];
+
+    inv[2][0] = matrix[1][0]  * matrix[2][1] * matrix[3][3] - 
+             matrix[1][0]  * matrix[2][3] * matrix[3][1] - 
+             matrix[2][0]  * matrix[1][1] * matrix[3][3] + 
+             matrix[2][0]  * matrix[1][3] * matrix[3][1] + 
+             matrix[3][0] * matrix[1][1] * matrix[2][3] - 
+             matrix[3][0] * matrix[1][3] * matrix[2][1];
+
+    inv[3][0] = -matrix[1][0]  * matrix[2][1] * matrix[3][2] + 
+               matrix[1][0]  * matrix[2][2] * matrix[3][1] +
+               matrix[2][0]  * matrix[1][1] * matrix[3][2] - 
+               matrix[2][0]  * matrix[1][2] * matrix[3][1] - 
+               matrix[3][0] * matrix[1][1] * matrix[2][2] + 
+               matrix[3][0] * matrix[1][2] * matrix[2][1];
+
+    inv[0][1] = -matrix[0][1]  * matrix[2][2] * matrix[3][3] + 
+              matrix[0][1]  * matrix[2][3] * matrix[3][2] + 
+              matrix[2][1]  * matrix[0][2] * matrix[3][3] - 
+              matrix[2][1]  * matrix[0][3] * matrix[3][2] - 
+              matrix[3][1] * matrix[0][2] * matrix[2][3] + 
+              matrix[3][1] * matrix[0][3] * matrix[2][2];
+
+    inv[1][1] = matrix[0][0]  * matrix[2][2] * matrix[3][3] - 
+             matrix[0][0]  * matrix[2][3] * matrix[3][2] - 
+             matrix[2][0]  * matrix[0][2] * matrix[3][3] + 
+             matrix[2][0]  * matrix[0][3] * matrix[3][2] + 
+             matrix[3][0] * matrix[0][2] * matrix[2][3] - 
+             matrix[3][0] * matrix[0][3] * matrix[2][2];
+
+    inv[2][1] = -matrix[0][0]  * matrix[2][1] * matrix[3][3] + 
+              matrix[0][0]  * matrix[2][3] * matrix[3][1] + 
+              matrix[2][0]  * matrix[0][1] * matrix[3][3] - 
+              matrix[2][0]  * matrix[0][3] * matrix[3][1] - 
+              matrix[3][0] * matrix[0][1] * matrix[2][3] + 
+              matrix[3][0] * matrix[0][3] * matrix[2][1];
+
+    inv[3][1] = matrix[0][0]  * matrix[2][1] * matrix[3][2] - 
+              matrix[0][0]  * matrix[2][2] * matrix[3][1] - 
+              matrix[2][0]  * matrix[0][1] * matrix[3][2] + 
+              matrix[2][0]  * matrix[0][2] * matrix[3][1] + 
+              matrix[3][0] * matrix[0][1] * matrix[2][2] - 
+              matrix[3][0] * matrix[0][2] * matrix[2][1];
+
+    inv[0][2] = matrix[0][1]  * matrix[1][2] * matrix[3][3] - 
+             matrix[0][1]  * matrix[1][3] * matrix[3][2] - 
+             matrix[1][1]  * matrix[0][2] * matrix[3][3] + 
+             matrix[1][1]  * matrix[0][3] * matrix[3][2] + 
+             matrix[3][1] * matrix[0][2] * matrix[1][3] - 
+             matrix[3][1] * matrix[0][3] * matrix[1][2];
+
+    inv[1][2] = -matrix[0][0]  * matrix[1][2] * matrix[3][3] + 
+              matrix[0][0]  * matrix[1][3] * matrix[3][2] + 
+              matrix[1][0]  * matrix[0][2] * matrix[3][3] - 
+              matrix[1][0]  * matrix[0][3] * matrix[3][2] - 
+              matrix[3][0] * matrix[0][2] * matrix[1][3] + 
+              matrix[3][0] * matrix[0][3] * matrix[1][2];
+
+    inv[2][2] = matrix[0][0]  * matrix[1][1] * matrix[3][3] - 
+              matrix[0][0]  * matrix[1][3] * matrix[3][1] - 
+              matrix[1][0]  * matrix[0][1] * matrix[3][3] + 
+              matrix[1][0]  * matrix[0][3] * matrix[3][1] + 
+              matrix[3][0] * matrix[0][1] * matrix[1][3] - 
+              matrix[3][0] * matrix[0][3] * matrix[1][1];
+
+    inv[3][2] = -matrix[0][0]  * matrix[1][1] * matrix[3][2] + 
+               matrix[0][0]  * matrix[1][2] * matrix[3][1] + 
+               matrix[1][0]  * matrix[0][1] * matrix[3][2] - 
+               matrix[1][0]  * matrix[0][2] * matrix[3][1] - 
+               matrix[3][0] * matrix[0][1] * matrix[1][2] + 
+               matrix[3][0] * matrix[0][2] * matrix[1][1];
+
+    inv[0][3] = -matrix[0][1] * matrix[1][2] * matrix[2][3] + 
+              matrix[0][1] * matrix[1][3] * matrix[2][2] + 
+              matrix[1][1] * matrix[0][2] * matrix[2][3] - 
+              matrix[1][1] * matrix[0][3] * matrix[2][2] - 
+              matrix[2][1] * matrix[0][2] * matrix[1][3] + 
+              matrix[2][1] * matrix[0][3] * matrix[1][2];
+
+    inv[1][3] = matrix[0][0] * matrix[1][2] * matrix[2][3] - 
+             matrix[0][0] * matrix[1][3] * matrix[2][2] - 
+             matrix[1][0] * matrix[0][2] * matrix[2][3] + 
+             matrix[1][0] * matrix[0][3] * matrix[2][2] + 
+             matrix[2][0] * matrix[0][2] * matrix[1][3] - 
+             matrix[2][0] * matrix[0][3] * matrix[1][2];
+
+    inv[2][3] = -matrix[0][0] * matrix[1][1] * matrix[2][3] + 
+               matrix[0][0] * matrix[1][3] * matrix[2][1] + 
+               matrix[1][0] * matrix[0][1] * matrix[2][3] - 
+               matrix[1][0] * matrix[0][3] * matrix[2][1] - 
+               matrix[2][0] * matrix[0][1] * matrix[1][3] + 
+               matrix[2][0] * matrix[0][3] * matrix[1][1];
+
+    inv[3][3] = matrix[0][0] * matrix[1][1] * matrix[2][2] - 
+              matrix[0][0] * matrix[1][2] * matrix[2][1] - 
+              matrix[1][0] * matrix[0][1] * matrix[2][2] + 
+              matrix[1][0] * matrix[0][2] * matrix[2][1] + 
+              matrix[2][0] * matrix[0][1] * matrix[1][2] - 
+              matrix[2][0] * matrix[0][2] * matrix[1][1];
+
+    det = matrix[0][0] * inv[0][0] + matrix[0][1] * inv[1][0] 
+    	+ matrix[0][2] * inv[2][0] + matrix[0][3] * inv[3][0];
+
+    if (det == 0){
+       hasInverse = false;
+    }
+    else{
+    	det = 1.0 / det;
+    	hasInverse = true;
+    }
+    if(hasInverse){
+	    for (int i = 0; i < 4; i++){
+	    	for(int j = 0; j < 4; j++){
+	    		inv[i][j] = inv[i][j] * det;
+	    	}
+	    }
+	}
+    return inv;
+}
+
+Point CoordinateSystem::operator*(Point p){
+	array <float, 4> aux, result;
+	aux[0] = p.getX();
+	aux[1] = p.getY();
+	aux[2] = p.getZ();
+	aux[3] = 1;
+	for(int i = 0; i < 4; i++){
+		result[i] = aux[0] * matrix[i][0] + 
+					aux[1] * matrix[i][1] + 
+					aux[2] * matrix[i][2] + 
+					aux[3] * matrix[i][3];
+	}
+	return Point(result[0], result[1], result[2]);
+}

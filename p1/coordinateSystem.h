@@ -4,10 +4,13 @@
 #include <cstring>
 #include <array>
 #include "direction.h"
+#include "point.h"
 
 using namespace std;
 
 class Direction;
+
+class Point;
 
 class CoordinateSystem{
 private:
@@ -43,6 +46,9 @@ public:
 
 	CoordinateSystem operator=(CoordinateSystem c);
 
+	array <array<float, 4>, 4> invert(bool& hasInverse);
+
+	Point operator*(Point p);
 };
 
 #endif
