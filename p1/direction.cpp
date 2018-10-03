@@ -94,8 +94,11 @@ Direction crossProduct(Direction d1, Direction d2){
 
 
 string Direction::showAsString(){
-	string d = "[" + to_string(this->x) + "," 
+	string d = "DIRECTION:\n[" + to_string(this->x) + "," 
 			+ to_string(this->y) + "," + to_string(this->z) + "]";
 	return d;
+}
 
+bool Direction::operator==(Direction d){
+	return this->x == d.getX() && this->y == d.getY() && this->z == d.getZ();
 }

@@ -69,7 +69,7 @@ array <array<float, 4>, 4> CoordinateSystem::getMatrix(){
 }
 
 string CoordinateSystem::showAsString(){
-	string s;
+	string s = "COORDINATESYSTEM\n";
 	for(int i = 0; i < 4; i++){
 		s += "{ ";
 		for(int j = 0; j < 4; j++){

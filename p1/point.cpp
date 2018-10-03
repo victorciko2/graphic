@@ -60,7 +60,7 @@ Point Point::operator=(Point p){
 }
 
 string Point::showAsString(){
-	string p = "[" + to_string(this->x) + "," 
+	string p = "POINT:\n[" + to_string(this->x) + "," 
 		+ to_string(this->y) + "," + to_string(this->z) + "]";
 	return p;
 

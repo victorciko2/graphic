@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 #include "planetaryStation.h"
 
 using namespace std;
@@ -48,11 +49,15 @@ float PlanetaryStation::getAzimuth(){
 	return this->azimuth;
 }
 
+Point PlanetaryStation::getPosition(){
+	return this->position;
+}
+
 string PlanetaryStation::showAsString(){
-	string s = "{ planet " + this->sphere.showAsString() + ", inclination "
-		+ to_string(this->inclination) + ", azimuth" 
+	string s = "PLANETARYSTATION\n { Sphere: " + this->sphere.showAsString() + ", inclination: "
+		+ to_string(this->inclination) + ", azimuth: " 
 		+ to_string(this->azimuth) + "\nPosistion: "
-		+ position + "} ";
+		+ position.showAsString() + "} ";
 	return s;
 }
 

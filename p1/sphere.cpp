@@ -26,9 +26,9 @@ Sphere::Sphere(Point center, Point referencePoint, Direction axis){
 	Direction k = axis;
 	k.normalize(); 
 	Direction aux = this->referencePoint - this->center;
-	Direction j = crossProduct(k, aux);
+	Direction j = crossProduct(aux, k);
 	j.normalize();
-	Direction i = crossProduct(k, j);
+	Direction i = crossProduct(j, k);
 	i.normalize();
 	this->coordinates.setI(i);
 	this->coordinates.setJ(j);
@@ -69,7 +69,7 @@ CoordinateSystem Sphere::getCoordinates(){
 }
 
 string Sphere::showAsString(){
-	string s = "Center: " + this->center.showAsString() + "\nReferencePoint: " 
+	string s = "SPHERE:\n Center: " + this->center.showAsString() + "\nReferencePoint: " 
 			+ this->referencePoint.showAsString() 
 			+ "\nAxis: " + this->axis.showAsString()
 			+ "\n Coordinates:\n" + this->coordinates.showAsString();

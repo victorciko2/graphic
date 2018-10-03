@@ -37,6 +37,8 @@ public:
 
 	float getAzimuth();
 
+	Point getPosition();
+
 	string showAsString();
 
 	void show();
