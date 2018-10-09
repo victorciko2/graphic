@@ -31,6 +31,8 @@ public:
 
 	void setAzimuth(float azimuth);
 
+	void setCoordinates(CoordinateSystem c);
+	
 	Sphere getS();
 
 	float getInclination();
@@ -38,6 +40,8 @@ public:
 	float getAzimuth();
 
 	Point getPosition();
+
+	CoordinateSystem getCoordinates();
 
 	string showAsString();
 

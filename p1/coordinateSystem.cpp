@@ -89,6 +89,27 @@ CoordinateSystem CoordinateSystem::operator=(CoordinateSystem c){
 	return *this;
 }
 
+/*dividir por vw cada coordenada??*/
+Point CoordinateSystem::operator*(Point p){
+	float vw =  p.getX() * this->matrix[3][0] + p.getY() * this->matrix[3][1] 
+				 + p.getZ() * this->matrix[3][2] + 1 * this->matrix[3][3];
+	return Point((p.getX() * this->matrix[0][0] + p.getY() * this->matrix[0][1] 
+				 + p.getZ() * this->matrix[0][2] + 1 * this->matrix[0][3]) / vw,
+				 (p.getX() * this->matrix[1][0] + p.getY() * this->matrix[1][1] 
+				 + p.getZ() * this->matrix[1][2] + 1 * this->matrix[1][3]) / vw,
+				 (p.getX() * this->matrix[2][0] + p.getY() * this->matrix[2][1] 
+				 + p.getZ() * this->matrix[2][2] + 1 * this->matrix[2][3]) / vw);
+}
+
+Direction CoordinateSystem::operator*(Direction d){
+	return Direction((d.getX() * this->matrix[0][0] + d.getY() * this->matrix[0][1] 
+				 + d.getZ() * this->matrix[0][2]),
+				 (d.getX() * this->matrix[1][0] + d.getY() * this->matrix[1][1] 
+				 + d.getZ() * this->matrix[1][2]),
+				 (d.getX() * this->matrix[2][0] + d.getY() * this->matrix[2][1] 
+				 + d.getZ() * this->matrix[2][2]));
+}
+
 array <array<float, 4>, 4> CoordinateSystem::invert(bool& hasInverse){
     array <array<float, 4>, 4> inv;
     float det;
@@ -223,19 +244,4 @@ array <array<float, 4>, 4> CoordinateSystem::invert(bool& hasInverse){
 	    }
 	}
     return inv;
-}
-
-Point CoordinateSystem::operator*(Point p){
-	array <float, 4> aux, result;
-	aux[0] = p.getX();
-	aux[1] = p.getY();
-	aux[2] = p.getZ();
-	aux[3] = 1;
-	for(int i = 0; i < 4; i++){
-		result[i] = aux[0] * matrix[i][0] + 
-					aux[1] * matrix[i][1] + 
-					aux[2] * matrix[i][2] + 
-					aux[3] * matrix[i][3];
-	}
-	return Point(result[0], result[1], result[2]);
 }

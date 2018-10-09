@@ -3,10 +3,13 @@
 #include <iostream>
 #include <cstring>
 #include "direction.h"
+#include "coordinateSystem.h"
 
 using namespace std;
 
 class Direction;
+
+class CoordinateSystem;
 
 class Point{
 private:
@@ -36,6 +39,8 @@ public:
 	Direction operator-(Point p2);
 
 	Point operator=(Point p);
+
+	Point operator*(CoordinateSystem c);
 
 	string showAsString();
 };

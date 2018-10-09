@@ -9,10 +9,9 @@ PlanetaryStation::PlanetaryStation(){
 	this->inclination = 0;
 	this->azimuth = 0;
 	Direction radius = sphere.getReferencePoint() - sphere.getCenter();
-	/*this->position = Point(sphere.getCenter().getX() +  radius.getX() * sin(inclination) * sin(azimuth),
-			sphere.getCenter().getY() + radius.getY() * sin(inclination) * cos(azimuth),
-			sphere.getCenter().getZ() + radius.getZ() * cos(inclination));
-	*/
+	this->position = Point(sphere.getCenter().getX() +  radius.modulus() * (sin(inclination) * sin(azimuth)),
+			sphere.getCenter().getY() + radius.modulus() * (sin(inclination) * cos(azimuth)),
+			sphere.getCenter().getZ() + radius.modulus() * cos(inclination));
 }
 
 PlanetaryStation::PlanetaryStation(Sphere sphere, float inclination, float azimuth){
@@ -20,10 +19,10 @@ PlanetaryStation::PlanetaryStation(Sphere sphere, float inclination, float azimu
 	this->inclination = inclination;
 	this->azimuth = azimuth;
 	Direction radius = sphere.getReferencePoint() - sphere.getCenter();
-	this->position = Point(sphere.getCenter().getX() +  radius.getX() * sin(inclination) * sin(azimuth),
-			sphere.getCenter().getY() + radius.getY() * sin(inclination) * cos(azimuth),
-			sphere.getCenter().getZ() + radius.getZ() * cos(inclination));
-}
+	this->position = Point(sphere.getCenter().getX() +  radius.modulus() * (sin(inclination) * cos(azimuth)),
+			sphere.getCenter().getY() + radius.modulus() * (sin(inclination) * sin(azimuth)),
+			sphere.getCenter().getZ() + radius.modulus() * cos(inclination));
+}	
 
 void PlanetaryStation::setS(Sphere sphere){
 	this->sphere = sphere;
@@ -35,6 +34,10 @@ void PlanetaryStation::setInclination(float inclination){
 
 void PlanetaryStation::setAzimuth(float azimuth){
 	this->azimuth = azimuth;	
+}
+
+void PlanetaryStation::setCoordinates(CoordinateSystem c){
+	this->coordinates = c;
 }
 
 Sphere PlanetaryStation::getS(){
@@ -53,11 +56,15 @@ Point PlanetaryStation::getPosition(){
 	return this->position;
 }
 
+CoordinateSystem PlanetaryStation::getCoordinates(){
+	return this->coordinates;
+}
+
 string PlanetaryStation::showAsString(){
 	string s = "PLANETARYSTATION\n { Sphere: " + this->sphere.showAsString() + ", inclination: "
 		+ to_string(this->inclination) + ", azimuth: " 
 		+ to_string(this->azimuth) + "\nPosistion: "
-		+ position.showAsString() + "} ";
+		+ this->position.showAsString() + "} ";
 	return s;
 }
 

@@ -46,9 +46,12 @@ public:
 
 	CoordinateSystem operator=(CoordinateSystem c);
 
+	Point operator*(Point p);
+
+	Direction operator*(Direction d);
+
 	array <array<float, 4>, 4> invert(bool& hasInverse);
 
-	Point operator*(Point p);
 };
 
 #endif

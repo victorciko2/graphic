@@ -82,6 +82,16 @@ Direction Direction::operator=(Direction d){
 	return *this;
 }
 
+Direction Direction::operator*(CoordinateSystem c){
+	array <array <float, 4> ,4> matrix = c.getMatrix();
+	return Direction((this->x * matrix[0][0] + this->y * matrix[1][0] 
+				 + this->z * matrix[2][0]),
+				 (this->x * matrix[0][1] + this->y * matrix[1][1] 
+				 + this->z * matrix[2][1]),
+				 (this->x * matrix[0][2] + this->y * matrix[1][2] 
+				 + this->z * matrix[2][2]));
+}
+
 float dotProduct(Direction d1, Direction d2){
 	return d1.getX() * d2.getX() + d1.getY() * d2.getY() + d1.getZ() * d2.getZ();
 }

@@ -59,6 +59,19 @@ Point Point::operator=(Point p){
 	return *this;
 }
 
+/*dividir por vw cada coordenada??*/
+Point Point::operator*(CoordinateSystem c){
+	array <array<float, 4>, 4> matrix = c.getMatrix();
+	float vw =  this->x * matrix[0][3] + this->y * matrix[1][3] 
+				 + this->z * matrix[2][3] + 1 * matrix[3][3];
+	return Point((this->x * matrix[0][0] + this->y * matrix[1][0] 
+				 + this->z * matrix[2][0] + 1 * matrix[3][0]) / vw,
+				 (this->x * matrix[0][1] + this->y * matrix[1][1] 
+				 + this->z * matrix[2][1] + 1 * matrix[3][1]) / vw,
+				 (this->x * matrix[0][2] + this->y * matrix[1][2] 
+				 + this->z * matrix[2][2] + 1 * matrix[3][2]) / vw);
+}
+
 string Point::showAsString(){
 	string p = "POINT:\n[" + to_string(this->x) + "," 
 		+ to_string(this->y) + "," + to_string(this->z) + "]";
