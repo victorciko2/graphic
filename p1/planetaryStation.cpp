@@ -85,9 +85,8 @@ void PlanetaryStation::show(){
 
 //p1: launching, p2: receiver
 bool launchingCollision(PlanetaryStation p1, PlanetaryStation p2){
-	Direction d = p1.getPosition() - p2.getPosition(); //ray
+	Direction d = p2.getPosition() - p1.getPosition(); //ray
 	d.normalize();
-	d.show();
 	Point o = p1.getPosition();
 	Point center = p1.getSphere().getCenter();
 	Direction radius = p1.getSphere().getAxis() / 2;
@@ -98,13 +97,13 @@ bool launchingCollision(PlanetaryStation p1, PlanetaryStation p2){
 	float t0, t1;
 	bool sol = solveQuadratic(a, b, c, t0, t1);
 	if(sol){
-		cout << "LAUNCHING RESULTS: " << t0 << ", " << t1 << endl;
-		cout << "COLLISION POINTS" << endl;
+		/*cout << "LAUNCHING RESULTS: " << t0 << ", " << t1 << endl;
+		cout << "COLLISION POINTS" << endl;*/
 		Point point1 = p1.getPosition() + d * t0;
 		Point point2 = p1.getPosition() + d * t1;
-		cout << "1: " <<  point1.showAsString() << endl;
-		cout << "2: " << point2.showAsString() << endl;
-		if(t0 < 0){
+		/*cout << "1: " <<  point1.showAsString() << endl;
+		cout << "2: " << point2.showAsString() << endl;*/
+		if(t1 > 0){
 			cout << "Collision with launching planet" << endl;
 			return true;
 		}
@@ -117,7 +116,7 @@ bool launchingCollision(PlanetaryStation p1, PlanetaryStation p2){
 
 //p1: launching, p2: receiver
 bool receiverCollision(PlanetaryStation p1, PlanetaryStation p2){
-	Direction d = p2.getPosition() - p1.getPosition(); //ray
+	Direction d = p1.getPosition() - p2.getPosition(); //ray
 	d.normalize();
 	Point o = p2.getPosition();
 	Point center = p2.getSphere().getCenter();
@@ -129,13 +128,13 @@ bool receiverCollision(PlanetaryStation p1, PlanetaryStation p2){
 	float t0, t1;
 	bool sol = solveQuadratic(a, b, c, t0, t1);
 	if(sol){
-		cout << "RECEIVER RESULTS: " << t0 << ", " << t1 << endl;
-		cout << "COLLISION POINTS" << endl;
+		/*cout << "RECEIVER RESULTS: " << t0 << ", " << t1 << endl;
+		cout << "COLLISION POINTS" << endl;*/
 		Point point1 = p2.getPosition() + d * t0;
 		Point point2 = p2.getPosition() + d * t1;
-		cout << "1: " <<  point1.showAsString() << endl;
-		cout << "2: " << point2.showAsString() << endl;
-		if(t0 < 0){
+		/*cout << "1: " <<  point1.showAsString() << endl;
+		cout << "2: " << point2.showAsString() << endl;*/
+		if(t1 > 0){
 			cout << "Collision with receiver planet" << endl;
 			return true;
 		}
