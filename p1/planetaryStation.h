@@ -25,7 +25,7 @@ public:
 	
 	PlanetaryStation(Sphere sphere, float inclination, float azimuth);
 
-	void setS(Sphere sphere);
+	void setSphere(Sphere sphere);
 
 	void setInclination(float inclination);
 
@@ -33,7 +33,7 @@ public:
 
 	void setCoordinates(CoordinateSystem c);
 	
-	Sphere getS();
+	Sphere getSphere();
 
 	float getInclination();
 
@@ -48,6 +48,12 @@ public:
 	void show();
 
 };
+
+bool launchingCollision(PlanetaryStation p1, PlanetaryStation p2);
+
+bool receiverCollision(PlanetaryStation p1, PlanetaryStation p2);
+
+bool solveQuadratic(float a, float b, float c, float& t0, float& t1);
 
 #endif
 

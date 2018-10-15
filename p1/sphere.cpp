@@ -26,9 +26,9 @@ Sphere::Sphere(Point center, Point referencePoint, Direction axis){
 	Direction k = axis;
 	k.normalize(); 
 	Direction aux = this->referencePoint - this->center;
-	Direction j = crossProduct(aux, k);
+	Direction j = aux ^ k;
 	j.normalize();
-	Direction i = crossProduct(j, k);
+	Direction i = k ^ j;
 	i.normalize();
 	this->coordinates.setI(i);
 	this->coordinates.setJ(j);

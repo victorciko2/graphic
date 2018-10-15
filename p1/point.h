@@ -42,6 +42,8 @@ public:
 
 	Point operator*(CoordinateSystem c);
 
+	bool operator==(Point p);
+
 	string showAsString();
 };
 

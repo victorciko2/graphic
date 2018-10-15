@@ -92,16 +92,15 @@ Direction Direction::operator*(CoordinateSystem c){
 				 + this->z * matrix[2][2]));
 }
 
-float dotProduct(Direction d1, Direction d2){
-	return d1.getX() * d2.getX() + d1.getY() * d2.getY() + d1.getZ() * d2.getZ();
+float Direction::operator*(Direction d){
+	return this->x * d.getX() + this->y * d.getY() + this->z * d.getZ();
 }
 
-Direction crossProduct(Direction d1, Direction d2){
-	return Direction(d1.getY() * d2.getZ() - d1.getZ() * d2.getY(),
-			d1.getZ() * d2.getX() - d1.getX() * d2.getZ(),
-			d1.getX() * d2.getY() - d1.getY() * d2.getX());
+Direction Direction::operator^(Direction d){
+	return Direction(this->y * d.getZ() - this->z * d.getY(),
+			this->z * d.getX() - this->x * d.getZ(),
+			this->x * d.getY() - this->y * d.getX());
 }
-
 
 string Direction::showAsString(){
 	string d = "DIRECTION:\n[" + to_string(this->x) + "," 

@@ -59,7 +59,6 @@ Point Point::operator=(Point p){
 	return *this;
 }
 
-/*dividir por vw cada coordenada??*/
 Point Point::operator*(CoordinateSystem c){
 	array <array<float, 4>, 4> matrix = c.getMatrix();
 	float vw =  this->x * matrix[0][3] + this->y * matrix[1][3] 
@@ -72,6 +71,9 @@ Point Point::operator*(CoordinateSystem c){
 				 + this->z * matrix[2][2] + 1 * matrix[3][2]) / vw);
 }
 
+bool Point::operator==(Point p){
+	return this->x == p.getX() && this->y == p.getY() && this->z == p.getZ();
+}
 string Point::showAsString(){
 	string p = "POINT:\n[" + to_string(this->x) + "," 
 		+ to_string(this->y) + "," + to_string(this->z) + "]";

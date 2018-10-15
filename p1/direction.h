@@ -54,6 +54,10 @@ public:
 	Direction operator*(CoordinateSystem c);
 
 	bool operator==(Direction d);
+
+	float operator*(Direction d); //dot product
+
+	Direction operator^(Direction d); // cross product
 };
 
 float dotProduct(Direction d1, Direction d2);
