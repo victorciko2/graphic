@@ -88,11 +88,51 @@ private:
 	}
 };
 
+class xyY{
+	float x, y, yLum;
+	
+public:
+	void xyY(){
+		this->x = -1;
+		this->y = -1;
+		this->yLum = -1;
+	}
 
+	void xyY(float x, float y, float yLum){
+		this->x = x;
+		this->y = y;
+		this->yLum = yLum;
+	}
 
+	float getX(){
+		return this->x; 
+	}
 
+	float getY(){
+		return this->y;
+	}
 
+	float getYLum(){
+		return this->yLum;
+	}
 
+	XYZ toXYZ(){
+		XYZ result();
+		result.setX() = this->x*(this->yLum / this->y);
+		result.setY() = this->y;
+		result.setZ() = (1 - this->x - this->y)*(this->yLum / this->y);
+		
+		return result;
+	}
+
+	RGB toRGB(){
+		XYZ result() = toXYZ();
+		RGB rgb = XYZ.toRGB();
+		
+		return rgb;
+	}
+
+};
 
 long int rows, columns, c;
 float  MAX = -1;
