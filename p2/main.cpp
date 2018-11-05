@@ -76,7 +76,15 @@ private:
 
 
 	xyY toxyY(){
-		
+		float temp =this->X + this->Y + this->Z;
+		float yLum = this->Y;
+		float x = (temp==0) ? 0 : (this->X / temp);
+		float y = (temp==0) ? 0 : (this->Y / temp);
+
+		xyY color(x,y,yLum);
+
+		return color;
+
 	}
 };
 
