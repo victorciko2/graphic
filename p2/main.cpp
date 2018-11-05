@@ -14,6 +14,78 @@ class RGB{
 	
 };
 
+class XYZ{
+private:
+	float X, Y, Z;
+
+	XYZ(){
+		this->X=-1;
+		this->Y=-1;
+		this->Z=-1;
+	}
+
+	XYZ(float X, float Y, float Z){
+		this->X=X;
+		this->Y=Y;
+		this->Z=Z;
+
+	}
+
+	void setX(float X){
+		this->X=X;
+	}
+
+	void setX(float Y){
+		this->Y=Y;
+	}
+
+	void setX(float Z){
+		this->Z=Z;
+	}
+
+	float getX(){
+		return this->X;
+	}
+
+	float getY(){
+		return this->Y;
+	}
+
+	float getZ(){
+		return this->Z;
+	}
+
+	RGB toRGB(){
+		float x = this->X / 100.0;
+		float y = this->Y / 100.0;
+		float z = this->Z / 100.0;
+
+		float r = x * 3.2404542 + y * -1.5371385 + z * -0.4985314;
+		float g = x * -0.9692660 + y * 1.8760108 + z * 0.0415560;
+		float b = x * 0.0556434 + y * -0.2040259 + z * 1.0572252;
+
+		r = ((r > 0.0031308) ? (1.055*pow(r, 1 / 2.4) - 0.055) : (12.92*r)) * 255.0;
+		g = ((g > 0.0031308) ? (1.055*pow(g, 1 / 2.4) - 0.055) : (12.92*g)) * 255.0;
+		b = ((b > 0.0031308) ? (1.055*pow(b, 1 / 2.4) - 0.055) : (12.92*b)) * 255.0;
+		
+
+		RGB color(r,g,b);
+
+		return color;
+	}
+
+
+	xyY toxyY(){
+		
+	}
+};
+
+
+
+
+
+
+
 long int rows, columns, c;
 float  MAX = -1;
 vector<vector<float>> matrix;
