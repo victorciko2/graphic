@@ -4,146 +4,23 @@
 #include <vector>
 #include <cmath>
 #include <limits>
+#include "rgb.h"
+#include "xyz.h"
+#include "xyy.h"
 
 using namespace std;
 
-class RGB{
-	float r, g, b;
-	RGB();
-	RGB(float r, float g, float b);
-	
-};
-
-class XYZ{
-private:
-	float X, Y, Z;
-
-	XYZ(){
-		this->X=-1;
-		this->Y=-1;
-		this->Z=-1;
-	}
-
-	XYZ(float X, float Y, float Z){
-		this->X=X;
-		this->Y=Y;
-		this->Z=Z;
-
-	}
-
-	void setX(float X){
-		this->X=X;
-	}
-
-	void setX(float Y){
-		this->Y=Y;
-	}
-
-	void setX(float Z){
-		this->Z=Z;
-	}
-
-	float getX(){
-		return this->X;
-	}
-
-	float getY(){
-		return this->Y;
-	}
-
-	float getZ(){
-		return this->Z;
-	}
-
-	RGB toRGB(){
-		float x = this->X / 100.0;
-		float y = this->Y / 100.0;
-		float z = this->Z / 100.0;
-
-		float r = x * 3.2404542 + y * -1.5371385 + z * -0.4985314;
-		float g = x * -0.9692660 + y * 1.8760108 + z * 0.0415560;
-		float b = x * 0.0556434 + y * -0.2040259 + z * 1.0572252;
-
-		r = ((r > 0.0031308) ? (1.055*pow(r, 1 / 2.4) - 0.055) : (12.92*r)) * 255.0;
-		g = ((g > 0.0031308) ? (1.055*pow(g, 1 / 2.4) - 0.055) : (12.92*g)) * 255.0;
-		b = ((b > 0.0031308) ? (1.055*pow(b, 1 / 2.4) - 0.055) : (12.92*b)) * 255.0;
-		
-
-		RGB color(r,g,b);
-
-		return color;
-	}
-
-
-	xyY toxyY(){
-		float temp =this->X + this->Y + this->Z;
-		float yLum = this->Y;
-		float x = (temp==0) ? 0 : (this->X / temp);
-		float y = (temp==0) ? 0 : (this->Y / temp);
-
-		xyY color(x,y,yLum);
-
-		return color;
-
-	}
-};
-
-class xyY{
-	float x, y, yLum;
-	
-public:
-	void xyY(){
-		this->x = -1;
-		this->y = -1;
-		this->yLum = -1;
-	}
-
-	void xyY(float x, float y, float yLum){
-		this->x = x;
-		this->y = y;
-		this->yLum = yLum;
-	}
-
-	float getX(){
-		return this->x; 
-	}
-
-	float getY(){
-		return this->y;
-	}
-
-	float getYLum(){
-		return this->yLum;
-	}
-
-	XYZ toXYZ(){
-		XYZ result();
-		result.setX() = this->x*(this->yLum / this->y);
-		result.setY() = this->y;
-		result.setZ() = (1 - this->x - this->y)*(this->yLum / this->y);
-		
-		return result;
-	}
-
-	RGB toRGB(){
-		XYZ result() = toXYZ();
-		RGB rgb = XYZ.toRGB();
-		
-		return rgb;
-	}
-
-};
-
 long int rows, columns, c;
 float  MAX = -1;
-vector<vector<float>> matrix;
+vector<vector<RGB>> matrix;
 vector<vector<float>> matrixLDR;
 string path = "";
 float minValue = std::numeric_limits<float>::infinity(), maxValue = 0;
 
 void fillMatrix(ifstream& f){
 	string s, s2, s3;
-	long int number;
+	long int r, g, b;
+	RGB rgb();
 	getline(f, s);
 	getline(f, s);
 	while(s.at(0) == '#'){
@@ -158,30 +35,27 @@ void fillMatrix(ifstream& f){
 	f >> c;
 	matrix.resize(rows);
 	for(int i = 0; i < rows; i++){
-		matrix[i].resize(columns * 3);	
+		matrix[i].resize(columns);	
 	}
 	for(int i = 0; i < rows; i++){
-		for(int j = 0; j < columns * 3; j++){
-			f >> number;
-			matrix[i][j] = (float) number / c;
+		for(int j = 0; j < columns; j++){
+			f >> r; f >> g; f >> b;
+			matrix[i][j].setR((float) (r / c));
+			matrix[i][j].setG((float) (g / c));
+			matrix[i][j].setB((float) (b / c));
 			if(MAX != -1){
-				matrix[i][j] *= MAX;
-			}
-			if(matrix[i][j] < minValue){
-				minValue = matrix[i][j];
-			}
-			if(matrix[i][j] > maxValue){
-				maxValue = matrix[i][j];
+				matrix[i][j].setR(matrix[i][j].getR()*MAX);
+				matrix[i][j].setG(matrix[i][j].getG()*MAX);
+				matrix[i][j].setB(matrix[i][j].getB()*MAX);
 			}
 		}
 	}
-	cout << "min = " << minValue << " max = " << maxValue << endl;
 }
 
 void showMatrix(){
 	for(int i = 0; i < rows; i++){
-		for(int j = 0; j < columns * 3; j++){
-			cout << matrix[i][j] << " ";
+		for(int j = 0; j < columns; j++){
+			cout << matrix[i][j].getR() << " " << matrix[i][j].getG() << " " << matrix[i][j].getB() << "     ";
 		}
 		cout << endl;
 	}
@@ -190,9 +64,9 @@ void showMatrix(){
 void clamp(){
 	for(int i = 0; i < rows; i++){
 		for(int j = 0; j < columns * 3; j++){
-			if(matrixLDR[i][j] > 15000){
+			/*if(matrixLDR[i][j] > 15000){
 				matrixLDR[i][j] = 15000;
-			}
+			}*/
 		}
 	}
 }
@@ -213,7 +87,7 @@ void saveMatrix(){
 	//o << c << endl;
 	for(int i = 0; i < rows; i++){
 		for(int j = 0; j < columns * 3; j++){
-			o << (long int) ((matrixLDR[i][j] * 255	) / 15000) << " ";
+			//o << (long int) ((matrixLDR[i][j] * 255	) / 15000) << " ";
 			//o << (long int) ((matrixLDR[i][j])) << " ";
 		}
 		o << endl;
@@ -222,7 +96,7 @@ void saveMatrix(){
 }
 
 int main(){
-	cout << "Choose tone mapper" << endl;
+	/*cout << "Choose tone mapper" << endl;
 	cout << "Input path to image: " << flush;
 	cout << endl;
 	path = "../../hdr-ppm/seymour_park";
@@ -231,12 +105,18 @@ int main(){
 	f.open(path+".ppm");
 	if(f.is_open()){
 		fillMatrix(f);
-		matrixLDR = matrix;
+		//matrixLDR = matrix;
 		clamp();
 		saveMatrix();
 		f.close();
 	}
 	else{
 		cout << "ERROR: couldnt access to file " << path << endl;
-	}
+	}*/
+	RGB rgb(201, 102, 58);
+	XYZ xyz = rgb.toXYZ();
+	xyY xyy = rgb.toXYY();
+	cout << "RGB\n" << " r = " << rgb.getR() << ", g = " << rgb.getG() << ", b = " << rgb.getB() << endl;
+	cout << "XYZ\n" << " x = " << xyz.getX() << ", y = " << xyz.getY() << ", Z = " << xyz.getZ() << endl;
+	cout << "XYY\n" << " x = " << xyy.getX() << ", y = " << xyy.getY() << ", Y = " << xyy.getYLum() << endl;
 }
