@@ -42,7 +42,7 @@ void xyY::setYLum(float yLum){
 XYZ xyY::toXYZ(){
 	XYZ result;
 	result.setX(this->x * (this->yLum / this->y));
-	result.setY(this->y);
+	result.setY(this->yLum);
 	result.setZ((1 - this->x - this->y) * (this->yLum / this->y));
 	
 	return result;
