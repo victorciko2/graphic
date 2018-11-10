@@ -25,6 +25,12 @@ public:
 
 	float getYLum();
 
+	void setX(float x);
+
+	void setY(float y);
+
+	void setYLum(float yLum);
+
 	XYZ toXYZ();
 
 	RGB toRGB();

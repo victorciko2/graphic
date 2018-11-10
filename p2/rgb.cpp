@@ -42,9 +42,14 @@ float RGB::getB(){
 
 XYZ RGB::toXYZ(){
 	XYZ result;
-	float r = this->r / 255.0;
+	/*float r = this->r / 255.0;
 	float g = this->g / 255.0;
 	float b = this->b / 255.0;
+	*/
+	float r = this->r / 65535.0;
+	float g = this->g / 65535.0;
+	float b = this->b / 65535.0;
+	
 
 	r = ((r > 0.04045) ? powf((r + 0.055) / 1.055, 2.4) : (r / 12.92));
 	g = ((g > 0.04045) ? powf((g + 0.055) / 1.055, 2.4) : (g / 12.92));

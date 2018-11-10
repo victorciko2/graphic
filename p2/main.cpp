@@ -12,8 +12,9 @@ using namespace std;
 
 long int rows, columns, c;
 float  MAX = -1;
-vector<vector<RGB>> matrix;
-vector<vector<float>> matrixLDR;
+vector<vector<RGB> > matrix;
+vector<vector<RGB> > matrixLDR;
+vector<vector<xyY> > matrixXYY;
 string path = "";
 float minValue = std::numeric_limits<float>::infinity(), maxValue = 0;
 
@@ -34,8 +35,12 @@ void fillMatrix(ifstream& f){
 	columns = stol(s.substr(s.find(' ') + 1, s.size() - s.find(' ') + 1));
 	f >> c;
 	matrix.resize(rows);
+	matrixLDR.resize(rows);
+	matrixXYY.resize(rows);
 	for(int i = 0; i < rows; i++){
-		matrix[i].resize(columns);	
+		matrix[i].resize(columns);
+		matrixLDR[i].resize(rows);
+		matrixXYY[i].resize(rows);
 	}
 	for(int i = 0; i < rows; i++){
 		for(int j = 0; j < columns; j++){
@@ -61,12 +66,29 @@ void showMatrix(){
 	}
 }
 
+void changeToXYY(){
+	for(int i = 0; i < rows; i++){
+		for(int j = 0; j < columns; j++){
+			matrixXYY[i][j] = matrix[i][j].toXYY(); 
+		}
+	}
+}
+
+
+void changeToRGB(){
+	for(int i = 0; i < rows; i++){
+		for(int j = 0; j < columns; j++){
+			matrixLDR[i][j] = matrixXYY[i][j].toRGB(); 
+		}
+	}
+}
+
 void clamp(){
 	for(int i = 0; i < rows; i++){
-		for(int j = 0; j < columns * 3; j++){
-			/*if(matrixLDR[i][j] > 15000){
-				matrixLDR[i][j] = 15000;
-			}*/
+		for(int j = 0; j < columns; j++){
+			if(matrixXYY[i][j].getYLum() > 1.0){
+				matrixXYY[i][j].setYLum(1.0);
+			}
 		}
 	}
 }
@@ -86,8 +108,10 @@ void saveMatrix(){
 	o << "255" << endl;
 	//o << c << endl;
 	for(int i = 0; i < rows; i++){
-		for(int j = 0; j < columns * 3; j++){
-			//o << (long int) ((matrixLDR[i][j] * 255	) / 15000) << " ";
+		for(int j = 0; j < columns; j++){
+			o << (long int) ((matrixLDR[i][j].getR() * 255	)) << " ";
+			o << (long int) ((matrixLDR[i][j].getG() * 255	)) << " ";
+			o << (long int) ((matrixLDR[i][j].getB() * 255	)) << "\t";
 			//o << (long int) ((matrixLDR[i][j])) << " ";
 		}
 		o << endl;
@@ -105,18 +129,29 @@ int main(){
 	f.open(path+".ppm");
 	if(f.is_open()){
 		fillMatrix(f);
-		//matrixLDR = matrix;
+		matrixLDR = matrix;
+		changeToXYY();
 		clamp();
+		changeToRGB();
 		saveMatrix();
 		f.close();
 	}
 	else{
 		cout << "ERROR: couldnt access to file " << path << endl;
 	}*/
-	RGB rgb(201, 102, 58);
+	//long int a = 8559853, b = 10000000, c = 10000000;
+	long int a = 4466926, b =  6521248, c = 7678644;
+	a = (a / b) * 65535;
+	b = (b / c) * 65535;
+	c = (c / 10000000) * 65535;
+	
+	RGB rgb(a, b, c);
 	XYZ xyz = rgb.toXYZ();
 	xyY xyy = rgb.toXYY();
+	RGB rgb1 = xyy.toRGB();
 	cout << "RGB\n" << " r = " << rgb.getR() << ", g = " << rgb.getG() << ", b = " << rgb.getB() << endl;
 	cout << "XYZ\n" << " x = " << xyz.getX() << ", y = " << xyz.getY() << ", Z = " << xyz.getZ() << endl;
 	cout << "XYY\n" << " x = " << xyy.getX() << ", y = " << xyy.getY() << ", Y = " << xyy.getYLum() << endl;
+	cout << "RGB\n" << " r = " << rgb1.getR() << ", g = " << rgb1.getG() << ", b = " << rgb1.getB() << endl;
+	
 }

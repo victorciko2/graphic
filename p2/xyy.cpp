@@ -27,6 +27,18 @@ float xyY::getYLum(){
 	return this->yLum;
 }
 
+void xyY::setX(float x){
+	this->x = x;
+}
+
+void xyY::setY(float y){
+	this->y = y;
+}
+
+void xyY::setYLum(float yLum){
+	this->yLum = yLum;
+}
+
 XYZ xyY::toXYZ(){
 	XYZ result;
 	result.setX(this->x * (this->yLum / this->y));
