@@ -33,6 +33,10 @@ public:
 	XYZ toXYZ();
 
 	xyY toXYY();
+
+	string showAsString();
+	
+	void show();
 };
 
 #endif

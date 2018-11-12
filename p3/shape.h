@@ -1,0 +1,100 @@
+#ifndef SHAPE_H_
+#define SHAPE_H_
+#include <iostream>
+#include <cstring>
+#include "point.h"
+#include "direction.h"
+#include "coordinateSystem.h"
+#include "rgb.h"
+
+class Point;
+
+class Direction;
+
+class CoordinateSystem;
+
+class Shape{
+protected:
+	RGB color;
+public:
+	Shape();
+
+	Shape(RGB color);
+
+	virtual void setColor(RGB color);
+
+	virtual RGB getColor();
+
+	virtual float collision(Direction d, Point o);
+
+	virtual string showAsString();
+
+	virtual void show();
+};
+
+class Sphere : public Shape{
+private:
+	Point center;
+	Direction radius;
+	CoordinateSystem coordinates;
+public:
+	Sphere();
+
+	Sphere(Point center, Direction radius, RGB color);
+
+	void setCenter(Point center);
+
+	void setRadius(Direction radius);
+
+	void setCoordinates(CoordinateSystem coordinates);
+
+	void setColor(RGB color);
+
+	RGB getColor();
+
+	Point getCenter();
+
+	Direction getRadius();
+
+	CoordinateSystem getCoordinates();
+
+	float collision(Direction d, Point o);
+
+	string showAsString();
+	
+	void show();
+
+	Sphere operator=(Sphere s);
+};
+
+class Plane : public Shape{
+private:
+	Direction normal;
+	Point o;
+public:
+	Plane();
+
+	Plane(Direction normal, Point o, RGB color);
+
+	void setO(Point o);
+
+	void setNormal(Direction normal);
+
+	RGB getColor();
+
+	Point getO();
+
+	Direction getNormal();
+
+	float collision(Direction d, Point o);
+
+	string showAsString();
+	
+	void show();
+
+	Sphere operator=(Sphere s);
+};
+
+bool solveQuadratic(float a, float b, float c, float& t0, float& t1);
+
+#endif

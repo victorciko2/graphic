@@ -67,10 +67,10 @@ xyY RGB::toXYY(){
 }
 
 string RGB::showAsString(){
-	string result = "R: " + this->r + " G: " + this->g + " B: " + this->b;
+	string result = "R: " + to_string(this->r) + " G: " + to_string(this->g) + " B: " + to_string(this->b);
 	return result;
 }
 
-void show(){
+void RGB::show(){
 	cout << this->showAsString() << endl;
 }
