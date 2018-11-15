@@ -80,6 +80,8 @@ public:
 
 	void setNormal(Direction normal);
 
+	void setColor(RGB color);
+
 	RGB getColor();
 
 	Point getO();
@@ -92,7 +94,7 @@ public:
 	
 	void show();
 
-	Sphere operator=(Sphere s);
+	Plane operator=(Plane p);
 };
 
 bool solveQuadratic(float a, float b, float c, float& t0, float& t1);

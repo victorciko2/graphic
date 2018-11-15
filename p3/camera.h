@@ -10,12 +10,15 @@ class Camera{
 private:
 	Point o;
 	CoordinateSystem c; //i = l, j = f, k = u
-	long int x, y;
+	Direction l, f, u;
+	int x, y;
 public:
 	Camera();
 
 	Camera(Point o, CoordinateSystem c, long int x, long int y);
 
+	Camera(Point o, Direction f, Direction l, Direction u, long int x);
+	
 	Point getOrigin();
 
 	CoordinateSystem getCoordinateSystem();
@@ -23,6 +26,18 @@ public:
 	long int getX();
 
 	long int getY();
+
+	Direction getL();
+
+	Direction getF();
+
+	Direction getU();
+
+	void setL(Direction l);
+
+	void setF(Direction f);
+
+	void setU(Direction u);
 
 	void setOrigin(Point o);
 

@@ -35,7 +35,7 @@ void Shape::show(){
 
 Sphere::Sphere(){
 	this->center = Point();
-	this->radius = Direction();
+	this->radius = Direction(); //poner un float
 	this->coordinates = CoordinateSystem();
 	this->color = RGB();
 }
@@ -91,25 +91,19 @@ CoordinateSystem Sphere::getCoordinates(){
 	return this->coordinates;
 }
 
-float Sphere::collision(Direction d, Point o){
+float Sphere::collision(Direction d, Point o){  // cambiar radio por float
 	d.normalize();
-	//Point o = p2.getPosition();
-	//Direction radius = p2.getSphere().getAxis() / 2;
 	float r = radius.modulus();
-	float a = 1;
+	float a = d * d;
 	float b = 2 * (d * (o - this->center));
 	float c = (o - this->center)*(o - this->center) - r * r;
 	float t0, t1;
 	bool sol = solveQuadratic(a, b, c, t0, t1);
 	if(sol){
-		Point point1 = o + d * t0;
-		Point point2 = o + d * t1;
-		if(t1 > 0){
-			//cout << "Collision with receiver planet" << endl;
-			return t1;
+		if(t0 > 0){
+			return t0;
 		}
 		else{
-			//cout << "There's no collision with receiver planet" << endl;
 			return -1;
 		}
 	}
@@ -174,31 +168,18 @@ Direction Plane::getNormal(){
 	return this->normal;
 }
 
-float Plane::collision(Direction d, Point o){
+float Plane::collision(Direction d, Point o){ // devolver null o booleano pr ref
+	float t;
 	d.normalize();
-	//Point o = p2.getPosition();
-	//Direction radius = p2.getSphere().getAxis() / 2;
-	float r = radius.modulus();
-	float a = 1;
-	float b = 2 * (d * (o - this->center));
-	float c = (o - this->center)*(o - this->center) - r * r;
-	float t0, t1;
-	bool sol = solveQuadratic(a, b, c, t0, t1);
-	if(sol){
-		Point point1 = o + d * t0;
-		Point point2 = o + d * t1;
-		if(t1 > 0){
-			//cout << "Collision with receiver planet" << endl;
-			return t1;
-		}
-		else{
-			//cout << "There's no collision with receiver planet" << endl;
-			return -1;
-		}
+	Direction n = this->normal;
+	n.normalize();
+	float aux = d * n;
+	if(abs(aux) > 0.00000001f){
+		Direction l = this->o - o;
+		t = (l * normal) / aux;
+		return t;
 	}
-	else{
-		return -1;
-	}
+	return -1;
 }
 
 string Plane::showAsString(){
