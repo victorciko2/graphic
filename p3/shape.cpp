@@ -248,7 +248,7 @@ float Triangle::collision(Direction d, Point o, bool& collision){
 		Direction C2 = (o+d*dist) - this->c; 
 		if (p.getNormal()*(edge0^C0) > 0 && p.getNormal()*(edge1^C1) > 0 && p.getNormal()*(edge2^C2) > 0){
 			collision = true;
-			return 1;
+			return dist;
 		}
 		else{
 			collision = false;

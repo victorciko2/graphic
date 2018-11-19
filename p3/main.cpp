@@ -37,9 +37,9 @@ int main(){
 	list.push_back(shape);
 	shape = new Plane(Direction(0, 0, 1), Point(0, 0, 40), RGB(191, 191, 191)); //BACK
 	list.push_back(shape);
-	Point a (0,3,10);
-	Point b (3,0,10);
-	Point c (-3,0,10);
+	Point a (-12,-13,27);
+	Point b (12,-13,27);
+	Point c (-3,0,27);
 
 	shape = new Triangle(a,b,c,Plane((a-b)^(a-c),a, RGB(255,255,255)), RGB(255,255,255));
 	
