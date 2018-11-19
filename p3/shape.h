@@ -92,6 +92,46 @@ public:
 	Plane operator=(Plane p);
 };
 
+class Triangle : public Shape{
+private:
+	Point a;
+	Point b;
+	Point c;
+	Plane p;
+public:
+	Triangle();
+
+	Triangle(Point a, Point b, Point c, Plane p, RGB color);
+
+	void setA(Point a);
+
+	void setB(Point b);
+
+	void setC(Point c);
+
+	void setP(Plane p);
+
+	void setColor(RGB color);
+
+	RGB getColor();
+
+	Point getA();
+
+	Point getB();
+
+	Point getC();
+
+	Plane getP();
+
+	float collision(Direction d, Point o, bool& collision);
+
+	string showAsString();
+
+	void show();
+
+	Triangle operator=(Triangle t);
+};
+
 bool solveQuadratic(float a, float b, float c, float& t0, float& t1);
 
 #endif
