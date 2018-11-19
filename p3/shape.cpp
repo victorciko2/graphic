@@ -20,7 +20,7 @@ RGB Shape::getColor(){
 	return this->color;
 }
 
-float Shape::collision(Direction d, Point o){
+float Shape::collision(Direction d, Point o, bool& collision){
 	cout << "Failed to calculate collision" << endl;
 	return -1;
 }
@@ -35,40 +35,23 @@ void Shape::show(){
 
 Sphere::Sphere(){
 	this->center = Point();
-	this->radius = Direction(); //poner un float
-	this->coordinates = CoordinateSystem();
+	this->radius = -1; //poner un float
 	this->color = RGB();
 }
 
 //A LO MEJOR EL COORDINATE SYSTEM ESTA MAL CALCULADO POR LA CIUDAD DE REFERENCIA
-Sphere::Sphere(Point center, Direction radius, RGB color){
+Sphere::Sphere(Point center, float radius, RGB color){
 	this->center = center;
 	this->color = color;
 	this->radius = radius;
-	Direction k = radius;
-	k.normalize(); 
-	Point referencePoint = center + Direction(radius.modulus(), 0, 0); 
-	Direction aux = referencePoint - this->center;
-	Direction j = aux ^ k;
-	j.normalize();
-	Direction i = k ^ j;
-	i.normalize();
-	this->coordinates.setI(i);
-	this->coordinates.setJ(j);
-	this->coordinates.setK(k);
-	this->coordinates.setO(this->center);
 }
 
 void Sphere::setCenter(Point center){
 	this->center = center; 
 }
 
-void Sphere::setRadius(Direction radius){
+void Sphere::setRadius(float radius){
 	this->radius = radius;
-}
-
-void Sphere::setCoordinates(CoordinateSystem coordinates){
-	this->coordinates = coordinates;
 }
 
 void Sphere::setColor(RGB color){
@@ -83,23 +66,18 @@ Point Sphere::getCenter(){
 	return this->center;
 }
 
-Direction Sphere::getRadius(){
+float Sphere::getRadius(){
 	return this->radius;
 }
 
-CoordinateSystem Sphere::getCoordinates(){
-	return this->coordinates;
-}
-
-float Sphere::collision(Direction d, Point o){  // cambiar radio por float
+float Sphere::collision(Direction d, Point o, bool& collision){  // cambiar radio por float
 	d.normalize();
-	float r = radius.modulus();
 	float a = d * d;
 	float b = 2 * (d * (o - this->center));
-	float c = (o - this->center)*(o - this->center) - r * r;
+	float c = (o - this->center)*(o - this->center) - radius * radius;
 	float t0, t1;
-	bool sol = solveQuadratic(a, b, c, t0, t1);
-	if(sol){
+	collision = solveQuadratic(a, b, c, t0, t1);
+	if(collision){
 		if(t0 > 0){
 			return t0;
 		}
@@ -114,8 +92,7 @@ float Sphere::collision(Direction d, Point o){  // cambiar radio por float
 
 string Sphere::showAsString(){
 	string s = "SPHERE:\n Center: " + this->center.showAsString()
-			+ "\nradius: " + this->radius.showAsString()
-			+ "\n Coordinates:\n" + this->coordinates.showAsString() 
+			+ "\nradius: " + to_string(this->radius)
 			+ "\n Color:\n" + this->color.showAsString();
 	return s;
 }
@@ -127,7 +104,6 @@ void Sphere::show(){
 Sphere Sphere::operator=(Sphere s){
 	this->center = s.getCenter();
 	this->radius = s.getRadius();
-	this->coordinates = s.getCoordinates();
 	this->color = s.getColor();	
 	return *this;
 }
@@ -168,7 +144,7 @@ Direction Plane::getNormal(){
 	return this->normal;
 }
 
-float Plane::collision(Direction d, Point o){ // devolver null o booleano pr ref
+float Plane::collision(Direction d, Point o, bool& collision){
 	float t;
 	d.normalize();
 	Direction n = this->normal;
@@ -176,9 +152,11 @@ float Plane::collision(Direction d, Point o){ // devolver null o booleano pr ref
 	float aux = d * n;
 	if(abs(aux) > 0.00000001f){
 		Direction l = this->o - o;
-		t = (l * normal) / aux;
+		t = (l * n) / aux;
+		collision = true;
 		return t;
 	}
+	collision = false;
 	return -1;
 }
 

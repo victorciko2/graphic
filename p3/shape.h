@@ -25,7 +25,7 @@ public:
 
 	virtual RGB getColor();
 
-	virtual float collision(Direction d, Point o);
+	virtual float collision(Direction d, Point o, bool& collision);
 
 	virtual string showAsString();
 
@@ -35,18 +35,15 @@ public:
 class Sphere : public Shape{
 private:
 	Point center;
-	Direction radius;
-	CoordinateSystem coordinates;
+	float radius;
 public:
 	Sphere();
 
-	Sphere(Point center, Direction radius, RGB color);
+	Sphere(Point center, float radius, RGB color);
 
 	void setCenter(Point center);
 
-	void setRadius(Direction radius);
-
-	void setCoordinates(CoordinateSystem coordinates);
+	void setRadius(float radius);
 
 	void setColor(RGB color);
 
@@ -54,11 +51,9 @@ public:
 
 	Point getCenter();
 
-	Direction getRadius();
+	float getRadius();
 
-	CoordinateSystem getCoordinates();
-
-	float collision(Direction d, Point o);
+	float collision(Direction d, Point o, bool& collision);
 
 	string showAsString();
 	
@@ -88,7 +83,7 @@ public:
 
 	Direction getNormal();
 
-	float collision(Direction d, Point o);
+	float collision(Direction d, Point o, bool& collision);
 
 	string showAsString();
 	
