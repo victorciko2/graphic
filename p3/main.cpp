@@ -8,25 +8,8 @@
 using namespace std;
 
 int main(){	
-#if 0
-	Shape *shape = new Sphere(Point(), Direction(), RGB());
 	vector<Shape*> list;
-	Shape *shape2 = new Shape();
-	list.push_back(shape);
-	list.push_back(shape2);
-	for (int i = 0; i < list.size(); i++){
-		list[i]->show();
-	}
-#else
-	vector<Shape*> list;
-	Shape *shape = new Sphere(Point(-12, -13, 33), 7, RGB(255, 0, 255));//LEFT BALL
-	list.push_back(shape);
-	shape = new Sphere(Point(12, -13, 33), 7, RGB(0, 0, 255)); //RIGHT BALL
-	list.push_back(shape);
-	shape = new Sphere(Point(0, -13, 33-7), 7, RGB(255, 255, 0));//FRONT BALL
-	list.push_back(shape);
-	Camera camera = Camera(Point(0, 0, 0), Direction(0, 0, 10), Direction(10, 0, 0), 720, 720);	camera.setL(camera.getL() * -1);
-	//camera.show();
+	Shape *shape = nullptr;
 	shape = new Plane(Direction(1, 0, 0), Point(-20, 0, 0), RGB(255, 0, 0)); //LEFT
 	list.push_back(shape);
 	shape = new Plane(Direction(1, 0, 0), Point(20, 0, 0), RGB(0, 255, 0)); //RIGHT
@@ -37,7 +20,44 @@ int main(){
 	list.push_back(shape);
 	shape = new Plane(Direction(0, 0, 1), Point(0, 0, 40), RGB(191, 191, 191)); //BACK
 	list.push_back(shape);
-
+#if 1	
+	/*shape = new Sphere(Point(-12, -13, 33), 7, RGB(255, 0, 255));//LEFT BALL
+	list.push_back(shape);
+	shape = new Sphere(Point(12, -13, 33), 7, RGB(0, 0, 255)); //RIGHT BALL
+	list.push_back(shape);
+	shape = new Sphere(Point(0, -13, 26), 7, RGB(255, 255, 0));//FRONT BALL
+	list.push_back(shape);
+	shape = new InfiniteCylinder(Direction(0, 1, 0), Point(0, 0, 20), 2, RGB(255, 255, 255)); //cylinder
+	list.push_back(shape);
+	shape = new Cylinder(Plane(Direction(0, 1, 0), Point(0, -10, 0), RGB(230, 230, 230)),
+				Plane(Direction(0, 1, 0), Point(0, 10, 0), RGB(230, 230, 230)), 1.2, Direction(0, 1, 0), Point(0, -20, 10), RGB(170, 19, 175));
+	shape = new Disc(Direction(0, 0, 1), Point(0, 0, 5), 3.2, RGB(255, 255, 255));
+	list.push_back(shape);
+	shape = new Cylinder(Disc(Direction(0, 1, 0), Point(0, -3, 10), 2, RGB(255, 255, 255)), 
+				Disc(Direction(0,1,0), Point(0, 5, 10), 2, RGB(255,255,255)), RGB(170, 19, 175));
+	list.push_back(shape);	
+	shape = new Cylinder(Disc(Direction(0, 1, 0), Point(0, -6, 12), 2, RGB(255, 255, 255)), 
+				Disc(Direction(0,1,0), Point(0, 6, 12), 2, RGB(255,255,255)), RGB(170, 0, 0));
+	list.push_back(shape);	
+	shape = new Cylinder(Disc(Direction(0, 0, 1), Point(7, 0, 10), 2, RGB(255, 255, 255)), 
+				Disc(Direction(0,0,1), Point(7, 0, 25), 2, RGB(255,255,255)), RGB(0, 0, 255));
+	list.push_back(shape);*/
+	shape = new Cylinder(Disc(Direction(1, 1, 0), Point(-4, -4, 10), 4, RGB(255, 255, 255)), 
+				Disc(Direction(1, 1, 0), Point(4, 4, 10), 4, RGB(255,255,255)), RGB(0, 0, 255));
+	list.push_back(shape);
+#else //EL MARAVILLOSO PENE
+	shape = new Sphere(Point(5, -13.5, 35), 7, RGB(252, 123, 220)); //RIGHT BALL
+	list.push_back(shape);
+	shape = new Sphere(Point(-5, -13.5, 35), 7, RGB(252, 123, 220)); //LEFT BALL
+	list.push_back(shape);
+	shape = new Cylinder(Disc(Direction(0, 1, 0), Point(0, -13, 35), 6, RGB(255, 255, 255)), 
+				Disc(Direction(0,1,0), Point(0, 15, 35), 6, RGB(255,255,255)), RGB(214, 104, 187));
+	list.push_back(shape);
+	shape = new Sphere(Point(0, 15, 35), 6, RGB(173, 83, 151)); //TOP
+	list.push_back(shape);
+	
+#endif
+	Camera camera = Camera(Point(0, 0, 0), Direction(0, 0, 10), Direction(10, 0, 0), 720, 720);	camera.setL(camera.getL() * -1);
 	ofstream o("prueba.ppm");
 	o << "P3" << endl;
 	o << camera.getX() << " " << camera.getY() << endl;
@@ -60,7 +80,6 @@ int main(){
 				if(currentDist < minDist && collision && currentDist > 0){
 					index = k;
 					minDist = currentDist;
-					//cout << "collision con " << k << " a distancia " << currentDist << endl;
 				}
 			}
 			if(index != -1){
@@ -76,6 +95,5 @@ int main(){
 		o << endl;
 	}
 	o.close();
-#endif
 	return 0;
 }

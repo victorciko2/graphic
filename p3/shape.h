@@ -4,14 +4,11 @@
 #include <cstring>
 #include "point.h"
 #include "direction.h"
-#include "coordinateSystem.h"
 #include "rgb.h"
 
 class Point;
 
 class Direction;
-
-class CoordinateSystem;
 
 class Shape{
 protected:
@@ -63,7 +60,7 @@ public:
 };
 
 class Plane : public Shape{
-private:
+protected:
 	Direction normal;
 	Point o;
 public:
@@ -90,6 +87,103 @@ public:
 	void show();
 
 	Plane operator=(Plane p);
+};
+
+class Disc : public Plane {
+protected:
+	float radius;
+public:
+	Disc();
+
+	Disc(Direction normal, Point o, float r, RGB color);
+	
+	Point getO();
+
+	float getRadius();
+
+	Direction getNormal();
+
+	RGB getColor();
+
+	void setO(Point o);
+
+	void setRadius(float radius);
+
+	void setColor(RGB color);
+
+	void setNormal(Direction normal);
+
+	float collision(Direction d, Point o, bool& collision);
+};
+
+class InfiniteCylinder : public Shape{
+protected:
+	Direction d; // Cylinder direction
+	Point p; // point origin of d
+	float radius;
+public:
+	InfiniteCylinder();
+
+	InfiniteCylinder(Direction d, Point p, float r, RGB color);
+
+	Direction getDirection();
+
+	Point getPoint();
+
+	float getRadius();
+
+	RGB getColor();
+
+	void setDirection(Direction d);
+
+	void setPoint(Point p);
+
+	void setRadius(float radius);
+
+	void setColor(RGB color);
+
+	float collision(Direction d, Point o, bool& collision);
+};
+
+class Cylinder : public InfiniteCylinder{
+private:
+	Plane sup;
+	Plane inf;
+	Disc top, bot;
+public:
+	Cylinder();
+
+	Cylinder(Plane inf, float h, float radius, Direction d, Point p, RGB color);
+
+	Cylinder(Plane inf, Plane sup, float radius, Direction d, Point p, RGB color);	
+
+	Cylinder(Disc bot, Disc top, RGB color);
+
+	Direction getDirection();
+
+	Point getPoint();
+
+	float getRadius();
+
+	RGB getColor();
+
+	Plane getSup();
+
+	Plane getInf();
+
+	void setSup(Plane sup);
+
+	void setInf(Plane inf);
+
+	void setDirection(Direction d);
+
+	void setPoint(Point p);
+
+	void setRadius(float radius);
+
+	void setColor(RGB color);
+
+	float collision(Direction d, Point o, bool& collision);
 };
 
 bool solveQuadratic(float a, float b, float c, float& t0, float& t1);
