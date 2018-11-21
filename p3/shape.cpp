@@ -497,6 +497,79 @@ float Cylinder::collision(Direction d, Point o, bool& collision){
 		else if(distBot <= distTop){
 			collision = true;
 			return distBot;
+
+Triangle::Triangle() {
+	this->a = Point();
+	this->b = Point();
+	this->c = Point();
+	this->p = Plane();
+	this->color = RGB();
+}
+
+Triangle::Triangle(Point a, Point b, Point c, Plane p, RGB color) {
+	this->a = a;
+	this->b = b;
+	this->c = c;
+	this->p = p;
+	this->color = color;
+}
+
+
+void Triangle::setA(Point a){
+	this->a = a;
+}
+
+void Triangle::setB(Point b){
+	this->b = b;
+}
+
+void Triangle::setC(Point c){
+	this->c = c;
+}
+
+void Triangle::setP(Plane p){
+	this->p = p;
+}
+
+void Triangle::setColor(RGB color){
+	this->color = color;
+}
+
+
+
+RGB Triangle::getColor(){
+	return this->color;
+}
+
+Point Triangle::getA(){
+	return this->a;
+}
+
+Point Triangle::getB(){
+	return this->b;
+}
+
+Point Triangle::getC(){
+	return this->c;
+}
+
+Plane Triangle::getP(){
+	return this->p;
+}
+
+float Triangle::collision(Direction d, Point o, bool& collision){
+	float dist=this->p.collision(d,o,collision);
+	if(dist > 0){
+		//cout << " colisiona con el plano" << endl;
+		Direction edge0 = this->b - this->a; 
+		Direction edge1 = this->c - this->b; 
+		Direction edge2 = this->a - this->c; 
+		Direction C0 = (o+d*dist) - this->a; 
+		Direction C1 = (o+d*dist) - this->b; 
+		Direction C2 = (o+d*dist) - this->c; 
+		if (p.getNormal()*(edge0^C0) > 0 && p.getNormal()*(edge1^C1) > 0 && p.getNormal()*(edge2^C2) > 0){
+			collision = true;
+			return dist;
 		}
 		else{
 			collision = false;
@@ -508,6 +581,26 @@ float Cylinder::collision(Direction d, Point o, bool& collision){
 		return -1;
 	}
 }
+	
+string Triangle::showAsString(){
+	string s = "TRIANGLE:\n Point A: " + this->a.showAsString()
+			+ "\nPoint B: " + this->b.showAsString()
+			+ "\nPoint C: " + this->c.showAsString();
+	return s;
+}
+
+void Triangle::show(){
+	cout << this->showAsString() << endl;
+}
+
+Triangle Triangle::operator=(Triangle t){
+	this->a = t.getA();
+	this->b = t.getB();
+	this->c = t.getC();
+	this->color = t.getColor();	
+	return *this;
+}
+
 
 bool solveQuadratic(float a, float b, float c, float& t0, float& t1){
 	float discr = b * b - 4 * a * c; //discriminant
