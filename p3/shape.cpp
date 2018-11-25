@@ -497,6 +497,9 @@ float Cylinder::collision(Direction d, Point o, bool& collision){
 		else if(distBot <= distTop){
 			collision = true;
 			return distBot;
+		}
+	}
+}
 
 Triangle::Triangle() {
 	this->a = Point();
@@ -534,8 +537,6 @@ void Triangle::setP(Plane p){
 void Triangle::setColor(RGB color){
 	this->color = color;
 }
-
-
 
 RGB Triangle::getColor(){
 	return this->color;

@@ -7,7 +7,7 @@
 
 using namespace std;
 
-int main(){	
+int main(){
 	vector<Shape*> list;
 	Shape *shape = nullptr;
 	shape = new Plane(Direction(1, 0, 0), Point(-20, 0, 0), RGB(255, 0, 0)); //LEFT
@@ -20,7 +20,6 @@ int main(){
 	list.push_back(shape);
 	shape = new Plane(Direction(0, 0, 1), Point(0, 0, 40), RGB(191, 191, 191)); //BACK
 	list.push_back(shape);
-#if 1	
 	/*shape = new Sphere(Point(-12, -13, 33), 7, RGB(255, 0, 255));//LEFT BALL
 	list.push_back(shape);
 	shape = new Sphere(Point(12, -13, 33), 7, RGB(0, 0, 255)); //RIGHT BALL
@@ -45,7 +44,7 @@ int main(){
 	shape = new Cylinder(Disc(Direction(1, 1, 0), Point(-4, -4, 10), 4, RGB(255, 255, 255)), 
 				Disc(Direction(1, 1, 0), Point(4, 4, 10), 4, RGB(255,255,255)), RGB(0, 0, 255));
 	list.push_back(shape);
-#else //EL MARAVILLOSO PENE
+ /*//EL MARAVILLOSO PENE
 	shape = new Sphere(Point(5, -13.5, 35), 7, RGB(252, 123, 220)); //RIGHT BALL
 	list.push_back(shape);
 	shape = new Sphere(Point(-5, -13.5, 35), 7, RGB(252, 123, 220)); //LEFT BALL
@@ -54,9 +53,8 @@ int main(){
 				Disc(Direction(0,1,0), Point(0, 15, 35), 6, RGB(255,255,255)), RGB(214, 104, 187));
 	list.push_back(shape);
 	shape = new Sphere(Point(0, 15, 35), 6, RGB(173, 83, 151)); //TOP
-	list.push_back(shape);
+	list.push_back(shape);*/
 	
-#endif
 	Camera camera = Camera(Point(0, 0, 0), Direction(0, 0, 10), Direction(10, 0, 0), 720, 720);	camera.setL(camera.getL() * -1);
 	ofstream o("prueba.ppm");
 	o << "P3" << endl;

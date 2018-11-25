@@ -184,6 +184,8 @@ public:
 	void setColor(RGB color);
 
 	float collision(Direction d, Point o, bool& collision);
+};
+
 class Triangle : public Shape{
 private:
 	Point a;
@@ -222,7 +224,7 @@ public:
 	void show();
 
 	Triangle operator=(Triangle t);
-
+};
 bool solveQuadratic(float a, float b, float c, float& t0, float& t1);
 
 #endif
