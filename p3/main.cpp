@@ -20,29 +20,9 @@ int main(){
 	list.push_back(shape);
 	shape = new Plane(Direction(0, 0, 1), Point(0, 0, 40), RGB(191, 191, 191)); //BACK
 	list.push_back(shape);
-	/*shape = new Sphere(Point(-12, -13, 33), 7, RGB(255, 0, 255));//LEFT BALL
-	list.push_back(shape);
-	shape = new Sphere(Point(12, -13, 33), 7, RGB(0, 0, 255)); //RIGHT BALL
-	list.push_back(shape);
-	shape = new Sphere(Point(0, -13, 26), 7, RGB(255, 255, 0));//FRONT BALL
-	list.push_back(shape);
-	shape = new InfiniteCylinder(Direction(0, 1, 0), Point(0, 0, 20), 2, RGB(255, 255, 255)); //cylinder
-	list.push_back(shape);
-	shape = new Cylinder(Plane(Direction(0, 1, 0), Point(0, -10, 0), RGB(230, 230, 230)),
-				Plane(Direction(0, 1, 0), Point(0, 10, 0), RGB(230, 230, 230)), 1.2, Direction(0, 1, 0), Point(0, -20, 10), RGB(170, 19, 175));
-	shape = new Disc(Direction(0, 0, 1), Point(0, 0, 5), 3.2, RGB(255, 255, 255));
-	list.push_back(shape);
-	shape = new Cylinder(Disc(Direction(0, 1, 0), Point(0, -3, 10), 2, RGB(255, 255, 255)), 
-				Disc(Direction(0,1,0), Point(0, 5, 10), 2, RGB(255,255,255)), RGB(170, 19, 175));
-	list.push_back(shape);	
-	shape = new Cylinder(Disc(Direction(0, 1, 0), Point(0, -6, 12), 2, RGB(255, 255, 255)), 
-				Disc(Direction(0,1,0), Point(0, 6, 12), 2, RGB(255,255,255)), RGB(170, 0, 0));
-	list.push_back(shape);	
-	shape = new Cylinder(Disc(Direction(0, 0, 1), Point(7, 0, 10), 2, RGB(255, 255, 255)), 
-				Disc(Direction(0,0,1), Point(7, 0, 25), 2, RGB(255,255,255)), RGB(0, 0, 255));
-	list.push_back(shape);*/
-	shape = new Cylinder(Disc(Direction(1, 1, 0), Point(-4, -4, 10), 4, RGB(255, 255, 255)), 
-				Disc(Direction(1, 1, 0), Point(4, 4, 10), 4, RGB(255,255,255)), RGB(0, 0, 255));
+	shape = new Cylinder(Disc(Direction(1, 1, 0), Point(-4, -4, 15), 2, RGB(255, 255, 255)), 
+				Disc(Direction(1, 1, 0), Point(4, 4, 15), 2, RGB(255,255,255)), RGB(0, 0, 255));
+	//shape = new InfiniteCylinder(Direction(1, 1, 0), Point(0, 0, 10), 2, RGB(255, 0, 255));
 	list.push_back(shape);
  /*//EL MARAVILLOSO PENE
 	shape = new Sphere(Point(5, -13.5, 35), 7, RGB(252, 123, 220)); //RIGHT BALL
@@ -75,7 +55,7 @@ int main(){
 			d.normalize();
 			for(int k = 0; k < list.size(); k++){	
 				currentDist = list[k]->collision(d, camera.getOrigin(), collision);
-				if(currentDist < minDist && collision && currentDist > 0){
+				if(currentDist < minDist && collision && currentDist >= 0){
 					index = k;
 					minDist = currentDist;
 				}

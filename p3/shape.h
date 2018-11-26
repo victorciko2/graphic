@@ -118,13 +118,13 @@ public:
 
 class InfiniteCylinder : public Shape{
 protected:
-	Direction d; // Cylinder direction
-	Point p; // point origin of d
+	Direction v; // Cylinder direction
+	Point p; // point origin of v
 	float radius;
 public:
 	InfiniteCylinder();
 
-	InfiniteCylinder(Direction d, Point p, float r, RGB color);
+	InfiniteCylinder(Direction v, Point p, float r, RGB color);
 
 	Direction getDirection();
 
@@ -134,7 +134,7 @@ public:
 
 	RGB getColor();
 
-	void setDirection(Direction d);
+	void setDirection(Direction v);
 
 	void setPoint(Point p);
 
@@ -153,9 +153,9 @@ private:
 public:
 	Cylinder();
 
-	Cylinder(Plane inf, float h, float radius, Direction d, Point p, RGB color);
+	Cylinder(Plane inf, float h, float radius, Direction v, Point p, RGB color);
 
-	Cylinder(Plane inf, Plane sup, float radius, Direction d, Point p, RGB color);	
+	Cylinder(Plane inf, Plane sup, float radius, Direction v, Point p, RGB color);	
 
 	Cylinder(Disc bot, Disc top, RGB color);
 

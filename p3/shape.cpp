@@ -245,21 +245,22 @@ float Disc::collision(Direction d, Point o, bool& collision){
 }
 
 InfiniteCylinder::InfiniteCylinder(){
-	this->d = Direction();
+	this->v = Direction();
 	this->p = Point();
 	this->radius = -1;
 	this->color = RGB();
 }
 
-InfiniteCylinder::InfiniteCylinder(Direction d, Point p, float radius, RGB color){
-	this->d = d;
+InfiniteCylinder::InfiniteCylinder(Direction v, Point p, float radius, RGB color){
+	this->v = v;
+	this->v.normalize();
 	this->p = p;
 	this->radius = radius;
 	this->color = color;
 }
 
 Direction InfiniteCylinder::getDirection(){
-	return this->d;
+	return this->v;
 }
 
 Point InfiniteCylinder::getPoint(){
@@ -274,8 +275,9 @@ RGB InfiniteCylinder::getColor(){
 	return this->color;
 }
 
-void InfiniteCylinder::setDirection(Direction d){
-	this->d = d;
+void InfiniteCylinder::setDirection(Direction v){
+	this->v = v;
+	this->v.normalize();
 }
 
 void InfiniteCylinder::setPoint(Point p){
@@ -291,17 +293,19 @@ void InfiniteCylinder::setColor(RGB color){
 }
 
 float InfiniteCylinder::collision(Direction d, Point o, bool& collision){
-	float t0, t1, t;
+	float t0, t1,t;
 	d.normalize();
+	collision = true;
 	Direction iP = o - this->p;
-    float a = (d - (this->d * (d * this->d))) 
-    		* (d - (this->d * (d * this->d))); 
-    float b = 2 * ((d - this->d * (d * this->d)) 
-    			* (iP - (this->d * (iP * this->d))));
-    float c = (iP - (this->d * (iP * this->d)))
-    		*(iP - (this->d * (iP * this->d)))
-    		- this->radius * this->radius; 
-    collision = solveQuadratic(a, b, c, t0, t1);
+    float a = (d - (this->v * (d * this->v))) * (d - (this->v * (d * this->v))); 
+    float b = 2 * ((d - this->v * (d * this->v)) * (iP - (this->v * (iP * this->v))));
+    float c = (iP - (this->v * (iP * this->v))) * (iP - (this->v * (iP * this->v))) 
+    			- this->radius * this->radius; 
+    if (!solveQuadratic(a, b, c, t0, t1)){
+    	collision = false;
+    	return -1;
+    }
+    if (t0 > t1) std::swap(t0, t1);
     if (t0 < 0) { 
         t0 = t1; 
         if (t0 < 0){
@@ -309,12 +313,12 @@ float InfiniteCylinder::collision(Direction d, Point o, bool& collision){
         	return -1;
         }  
     }
-    collision = true;
-	return t0; 
+    t = t0; 
+	return t;
 }
 
 Cylinder::Cylinder(){
-	this->d = Direction();
+	this->v = Direction();
 	this->p = Point();
 	this->radius = -1;
 	this->color = RGB();
@@ -322,8 +326,8 @@ Cylinder::Cylinder(){
 	this->inf = Plane();
 }
 
-Cylinder::Cylinder(Plane inf, float h, float radius, Direction d, Point p, RGB color){
-	this->d = inf.getNormal();
+Cylinder::Cylinder(Plane inf, float h, float radius, Direction v, Point p, RGB color){
+	this->v = inf.getNormal();
 	this->p = inf.getO();
 	this->radius = radius;
 	this->color = color;
@@ -332,8 +336,9 @@ Cylinder::Cylinder(Plane inf, float h, float radius, Direction d, Point p, RGB c
 			inf.getColor());
 }
 
-Cylinder::Cylinder(Plane inf, Plane sup, float radius, Direction d, Point p, RGB color){
-	this->d = inf.getNormal();
+Cylinder::Cylinder(Plane inf, Plane sup, float radius, Direction v, Point p, RGB color){
+	this->v = inf.getNormal();
+	this->v.normalize();
 	this->p = inf.getO();
 	this->radius = radius;
 	this->color = color;
@@ -344,14 +349,15 @@ Cylinder::Cylinder(Plane inf, Plane sup, float radius, Direction d, Point p, RGB
 Cylinder::Cylinder(Disc bot, Disc top, RGB color){
 	this->bot = bot;
 	this->top = top;
-	this->d = bot.getNormal();
+	this->v = bot.getNormal();
+	this->v.normalize();
 	this->p = bot.getO();
 	this->color = color;
 	this->radius = top.getRadius();
 } 
 
 Direction Cylinder::getDirection(){
-	return this->d;
+	return this->v;
 }
 
 Point Cylinder::getPoint(){
@@ -382,8 +388,9 @@ void Cylinder::setInf(Plane inf){
 	this->inf = inf;
 }
 
-void Cylinder::setDirection(Direction d){
-	this->d = d;
+void Cylinder::setDirection(Direction v){
+	this->v = v;
+	this->v.normalize();
 }
 
 void Cylinder::setPoint(Point p){
@@ -402,11 +409,37 @@ float Cylinder::collision(Direction d, Point o, bool& collision){
 	float dist, distCyl, distTop, distBot;
 	d.normalize();	
 	bool colCyl, colTop, colBot;
-	InfiniteCylinder aux = InfiniteCylinder(this->d, this->p, this->radius, this->color);
+	InfiniteCylinder aux = InfiniteCylinder(this->v, this->p, this->radius, this->color);
 	distCyl = aux.collision(d, o, colCyl);
 	distTop = this->top.collision(d, o, colTop);
 	distBot = this->bot.collision(d, o, colBot);
-	if(colCyl && !colTop && !colBot){
+	if(!colCyl && !colTop && !colBot){
+		collision = false;
+		return -1;
+	}
+	else if(!colCyl && !colTop && colBot){
+		collision = false;
+		return -1;
+	}
+	else if(!colCyl && colTop && !colBot){
+		collision = false;
+		return -1;
+	}
+	else if(!colCyl && colTop && colBot){
+		if(distTop < distBot){
+			collision = true;
+			return distTop;
+		}
+		else if(distBot <= distTop){
+			collision = true;
+			return distBot;
+		}
+		else{
+			collision = false;
+			return -1;
+		}
+	}
+	else if(colCyl && !colTop && !colBot){
 		float dist2Bot = ((o + d * distCyl) - bot.getO()).modulus();
 		float dist2Top = ((o + d * distCyl) - top.getO()).modulus();
 		if(dist2Bot <= dist2Top){
@@ -429,18 +462,6 @@ float Cylinder::collision(Direction d, Point o, bool& collision){
 				return -1;
 			}
 		}
-	}
-	else if(!colCyl && !colTop && !colBot){
-		collision = false;
-		return -1;
-	}
-	else if(!colCyl && !colTop && colBot){
-		collision = true;
-		return distBot;
-	}
-	else if(!colCyl && colTop && !colBot){
-		collision = true;
-		return distTop;
 	}
 	else if(colCyl && !colTop && colBot){
 		if(distBot <= distCyl){
@@ -489,15 +510,9 @@ float Cylinder::collision(Direction d, Point o, bool& collision){
 			return -1;
 		}
 	}
-	else if(!colCyl && colTop && colBot){
-		if(distTop < distBot){
-			collision = true;
-			return distTop;
-		}
-		else if(distBot <= distTop){
-			collision = true;
-			return distBot;
-		}
+	else{
+		collision = false;
+		return -1;
 	}
 }
 
