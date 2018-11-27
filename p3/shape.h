@@ -89,13 +89,13 @@ public:
 	Plane operator=(Plane p);
 };
 
-class Disc : public Plane {
+class Disk : public Plane {
 protected:
 	float radius;
 public:
-	Disc();
+	Disk();
 
-	Disc(Direction normal, Point o, float r, RGB color);
+	Disk(Direction normal, Point o, float r, RGB color);
 	
 	Point getO();
 
@@ -149,7 +149,7 @@ class Cylinder : public InfiniteCylinder{
 private:
 	Plane sup;
 	Plane inf;
-	Disc top, bot;
+	Disk top, bot;
 public:
 	Cylinder();
 
@@ -157,7 +157,7 @@ public:
 
 	Cylinder(Plane inf, Plane sup, float radius, Direction v, Point p, RGB color);	
 
-	Cylinder(Disc bot, Disc top, RGB color);
+	Cylinder(Disk bot, Disk top, RGB color);
 
 	Direction getDirection();
 

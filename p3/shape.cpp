@@ -177,53 +177,53 @@ Plane Plane::operator=(Plane p){
 	return *this;
 }
 
-Disc::Disc(){
+Disk::Disk(){
 	this->normal = Direction();
 	this->o = Point();
 	this->radius = -1;
 	this->color = RGB();
 }
 
-Disc::Disc(Direction normal, Point o, float radius, RGB color){
+Disk::Disk(Direction normal, Point o, float radius, RGB color){
 	this->normal = normal;
 	this->radius = radius;
 	this->o = o;
 	this->color = color;
 }
 
-Point Disc::getO(){
+Point Disk::getO(){
 	return this->o;
 }
 
-float Disc::getRadius(){
+float Disk::getRadius(){
 	return this->radius;
 }
 
-Direction Disc::getNormal(){
+Direction Disk::getNormal(){
 	return this->normal;
 }
 
-RGB Disc::getColor(){
+RGB Disk::getColor(){
 	return this->color;
 }
 
-void Disc::setO(Point o){
+void Disk::setO(Point o){
 	this->o = o;
 }
 
-void Disc::setRadius(float radius){
+void Disk::setRadius(float radius){
 	this->radius = radius;
 }
 
-void Disc::setColor(RGB color){
+void Disk::setColor(RGB color){
 	this->color = color;
 }
 
-void Disc::setNormal(Direction normal){
+void Disk::setNormal(Direction normal){
 	this->normal = normal;
 }
 
-float Disc::collision(Direction d, Point o, bool& collision){
+float Disk::collision(Direction d, Point o, bool& collision){
 	d.normalize();
 	Plane aux = Plane(this->normal, this->o, this->color);
 	float dist = aux.collision(d, o, collision);
@@ -346,7 +346,7 @@ Cylinder::Cylinder(Plane inf, Plane sup, float radius, Direction v, Point p, RGB
 	this->sup = sup; 
 }
 
-Cylinder::Cylinder(Disc bot, Disc top, RGB color){
+Cylinder::Cylinder(Disk bot, Disk top, RGB color){
 	this->bot = bot;
 	this->top = top;
 	this->v = bot.getNormal();

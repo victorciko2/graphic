@@ -20,8 +20,8 @@ int main(){
 	list.push_back(shape);
 	shape = new Plane(Direction(0, 0, 1), Point(0, 0, 40), RGB(191, 191, 191)); //BACK
 	list.push_back(shape);
-	shape = new Cylinder(Disc(Direction(1, 1, 0), Point(-4, -4, 15), 2, RGB(255, 255, 255)), 
-				Disc(Direction(1, 1, 0), Point(4, 4, 15), 2, RGB(255,255,255)), RGB(0, 0, 255));
+	shape = new Cylinder(Disk(Direction(1, 1, 0), Point(-4, -4, 15), 2, RGB(255, 255, 255)), 
+				Disk(Direction(1, 1, 0), Point(4, 4, 15), 2, RGB(255,255,255)), RGB(0, 0, 255));
 	//shape = new InfiniteCylinder(Direction(1, 1, 0), Point(0, 0, 10), 2, RGB(255, 0, 255));
 	list.push_back(shape);
  /*//EL MARAVILLOSO PENE
@@ -29,8 +29,8 @@ int main(){
 	list.push_back(shape);
 	shape = new Sphere(Point(-5, -13.5, 35), 7, RGB(252, 123, 220)); //LEFT BALL
 	list.push_back(shape);
-	shape = new Cylinder(Disc(Direction(0, 1, 0), Point(0, -13, 35), 6, RGB(255, 255, 255)), 
-				Disc(Direction(0,1,0), Point(0, 15, 35), 6, RGB(255,255,255)), RGB(214, 104, 187));
+	shape = new Cylinder(Disk(Direction(0, 1, 0), Point(0, -13, 35), 6, RGB(255, 255, 255)), 
+				Disk(Direction(0,1,0), Point(0, 15, 35), 6, RGB(255,255,255)), RGB(214, 104, 187));
 	list.push_back(shape);
 	shape = new Sphere(Point(0, 15, 35), 6, RGB(173, 83, 151)); //TOP
 	list.push_back(shape);*/
