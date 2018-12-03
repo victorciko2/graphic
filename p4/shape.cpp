@@ -4,6 +4,41 @@
 
 using namespace std;
 
+
+Material::Material(){
+	this->color = RGB(0, 0, 0);
+}
+
+Material::Material(RGB color){
+	this->color = color;
+}
+
+RGB Material::getColor(){
+	return this->color;
+}
+
+RGB Material::getColor(Direction n, Point origin, Point hit, int depth){
+	return this->color;
+}
+
+float Material::getIntensity(){
+	return 0;
+}
+
+Scene::Scene(){}
+
+Scene::Scene(vector<Shape*> objects){
+	this->objects = vector<Shape*>();
+}
+
+void Scene::add(Shape* s){
+	this->objects.push_back(s);
+}
+
+vector<Shape*> Scene::getObjects(){
+	return this->objects;
+}
+
 Shape::Shape(){
 	this->color = RGB();
 }
@@ -18,6 +53,10 @@ void Shape::setColor(RGB color){
 
 RGB Shape::getColor(){
 	return this->color;
+}
+
+RGB Shape::getColor(Direction n, Point origin, Point hit, Scene scene, int depth){
+	return this->material->getColor(n, origin, hit, scene, depth);
 }
 
 float Shape::collision(Direction d, Point o, bool& collision){
