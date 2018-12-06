@@ -75,6 +75,17 @@ void RGB::show(){
 	cout << this->showAsString() << endl;
 }
 
+float RGB::operator[](int index){
+    if(index == 0){
+    	return r;
+    }
+    else if(index == 1){
+    	return g;
+    }
+    else if(index == 2){
+    	return b;
+    }
+}
 
 XYZ::XYZ(){
 	this->X = -1;
