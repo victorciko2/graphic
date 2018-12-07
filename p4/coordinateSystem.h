@@ -8,17 +8,22 @@
 
 using namespace std;
 
+using Matrix = std::array<std::array<float, 4>, 4>;
+using Vector = std::array<float, 4>;
+
 class Direction;
 
 class Point;
 
 class CoordinateSystem{
 private:
-	array <array<float, 4>, 4> matrix;
+	Matrix M;
 public:
 	CoordinateSystem();
 
-	CoordinateSystem(array <array<float, 4>, 4> matrix);
+	CoordinateSystem(Direction x, Direction y, Direction z, Point o);
+
+	Matrix& getM();
 
 	void setMatrix(array <array<float, 4>, 4> matrix);
 
@@ -53,5 +58,7 @@ public:
 	array <array<float, 4>, 4> invert(bool& hasInverse);
 
 };
+
+Vector operator*(const Matrix &a, const Vector &b);
 
 #endif

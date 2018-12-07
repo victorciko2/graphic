@@ -6,7 +6,11 @@
 #include <random>
 #include "point.h"
 #include "direction.h"
+#include "coordinateSystem.h"
 #include "color.h"
+
+using Vector = std::array<float,4>;
+using Matrix = std::array<std::array<float, 4>, 4>;
 
 class Point;
 

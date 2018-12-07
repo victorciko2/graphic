@@ -5,7 +5,6 @@
 
 using namespace std;
 
-
 Material::Material(){
 	this->color = RGB(0, 0, 0);
 }
@@ -85,6 +84,7 @@ RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth)
 		Point collision;
 		float shadowDist = -1;
 		Shape* object = r.collision(scene, collision, shadowDist); 
+		//incoming light to material
 		if(object != nullptr && shadowDist > 0 && shadowDist < dist){
 			float p = pl.getMaterial().getIntensity();
 			float a;
@@ -97,8 +97,65 @@ RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth)
 				a = abs(p / (dist * dist)) * abs(n * aux);
 			}
 			RGB rgbL = pl.getMaterial().getColor();
-			
+			Direction origin2hit = pl.getOrigin() - hit; origin2hit.normalize();
+			float dirLightR = dirLight[0] + rgbL[0] * a * ((rgb[0]/M_PI) + ks * (alpha + 2) / 2
+						 / M_PI * pow(abs(refPerfect * origin2hit), alpha));
+			float dirLightG = dirLight[1] + rgbL[1] * a * ((rgb[1]/M_PI) + ks * (alpha + 2) / 2
+						 / M_PI * pow(abs(refPerfect * origin2hit), alpha));
+			float dirLightB = dirLight[2] + rgbL[2] * a * ((rgb[2]/M_PI) + ks * (alpha + 2) / 2
+						 / M_PI * pow(abs(refPerfect * origin2hit), alpha));
+			dirLight = RGB(dirLightR, dirLightG, dirLightB);
 		}
+	}
+	vector<Shape*> objects = scene.getObjects();
+	bool rayShot = false;
+	if(rnd < kd){ //difuse
+		rayShot = true;
+		Direction any(1, 1, 1);
+		Direction axis = n ^ any; axis.normalize();
+		CoordinateSystem coor(axis, n, axis^n, hit);
+		float eO = distribution(gen);
+		float eI = distribution(gen);
+		float Oi = acos(sqrt(1 - eO));
+		float Ai = 2 * M_PI * eI;
+		Vector vecAux = {sin(Oi) * cos(Ai), cos(Oi), sin(Oi) * sin(Ai), 0};
+		vecAux = coor.getM() * vecAux;
+		Direction wi = Direction(vecAux[0], vecAux[1], vecAux[2]);
+		wi.normalize();
+
+		Ray dif = Ray(wi, hit + wi * 0.1f);
+		RGB Li = dif.tracePath(scene, depth + 1);
+
+		float factor = abs(cos(Oi)) * (alpha+2) / (alpha + 1);
+		rgb = RGB((Li[0] * rgb[0]) + dirLight[0],
+				   Li[1] * rgb[1] + dirLight[1],
+				   Li[2]  rgb[2] + dirLight[2]);
+	}
+	else if(rnd < kd + ks){//specular
+		rayShot = true;
+		Direction axis = n ^ refPerfect; axis.normalize();
+		CoordinateSystem coor(axis, refPerfect, axis ^ refPerfect, hit);
+		float eO = distribution(gen);
+		float eI = distribution(gen);
+		float Oi = acos(pow(eO, 1 / (alpha + 1)));
+		float Ai = 2 * M_PI * eI;
+		Vector vecAux = {sin(Oi)*cos(Ai), cos(Oi), sin(Oi) * sin(Ai), 0};
+		vecAux = coor.getM() * vecAux;
+		Direction wi = Direction(vecAux[0], vecAux[1], vecAux[2]);
+		wi.normalize();
+
+		Ray dif = Ray(wi, hit + wi * 0.1f);
+
+		float factor = abs(cos(Oi)) * (alpha+2) / (alpha + 1);
+		rgb = RGB((Li[0] * rgb[0]) + dirLight[0],
+				   Li[1] * rgb[1] + dirLight[1],
+				   Li[2]  rgb[2] + dirLight[2]); 
+	}
+	if(rayShot){
+		return RGB;
+	}
+	else{
+		return{0,0,0};
 	}
 }
 
@@ -117,6 +174,7 @@ Light::Light(float p, RGB color){
 }
 
 //n is the surface normal
+//color arriving to the surface from the light
 RGB Light::getColor(Direction n, Point origin, Point hit, Scene scene, int depth){
 	float dist = (origin - hit).modulus();
 	Direction aux = origin - hit;
