@@ -9,6 +9,8 @@ using namespace std;
 
 int main(){
 	vector<Shape*> list;
+
+	Scene scene();
 	Shape *shape = nullptr;
 	shape = new Plane(Direction(1, 0, 0), Point(-20, 0, 0), RGB(255, 0, 0)); //LEFT
 	list.push_back(shape);
@@ -19,28 +21,7 @@ int main(){
 	shape = new Plane(Direction(0, 1, 0), Point(0, 20, 0), RGB(140, 140, 140)); //UP
 	list.push_back(shape);
 	shape = new Plane(Direction(0, 0, 1), Point(0, 0, 40), RGB(191, 191, 191)); //BACK
-	list.push_back(shape);
-	//shape = new Cylinder(Disk(Direction(1, 1, 0), Point(-4, -4, 15), 2, RGB(255, 255, 255)), 
-	//			Disk(Direction(1, 1, 0), Point(4, 4, 15), 2, RGB(255,255,255)), RGB(0, 0, 255));
-	//shape = new InfiniteCylinder(Direction(1, 1, 0), Point(0, 0, 10), 2, RGB(255, 0, 255));
-	shape = new Triangle(Point(-3,8,15), Point(3,8,15), Point(0,6,13), RGB(255, 0, 0));
-	list.push_back(shape);
-	shape = new Triangle(Point(-3,8,15), Point(3,8,15), Point(0,10,17), RGB(0, 255, 0));
-	list.push_back(shape);
-	shape = new Triangle(Point(-3,-8,15), Point(3,-8,15), Point(0,-9,13), RGB(255, 0, 0));
-	list.push_back(shape);
-	shape = new Triangle(Point(-3,-8,15), Point(3,-8,15), Point(0,-6,17), RGB(0, 255, 0));
-	list.push_back(shape);
-	shape = new Triangle(Point(-3,8,15), Point(0, 6,13), Point(-3,-8,15), RGB(0, 0, 255));
-	list.push_back(shape);
-	shape = new Triangle(Point(0,6,13), Point(0, -9,13), Point(-3,-8,15), RGB(255, 255,0));
-	list.push_back(shape);
-
-	shape = new Triangle(Point(-0,6,13), Point(3,8,15), Point(3,-8,15), RGB(255, 0, 255));
-	list.push_back(shape);
-	shape = new Triangle(Point(0,-9,13), Point(3, -8,15), Point(0,6,13), RGB(0, 255, 255));
-	list.push_back(shape);
-	
+	list.push_back(shape);	
 
  /*//EL MARAVILLOSO PENE
 	shape = new Sphere(Point(5, -13.5, 35), 7, RGB(252, 123, 220)); //RIGHT BALL
@@ -71,13 +52,7 @@ int main(){
 		for(int j = 0; j < camera.getX(); j++){
 			d = (aux + (planeVectorL * j) + (planeVectorU * i))  - camera.getOrigin();
 			d.normalize();
-			for(int k = 0; k < list.size(); k++){	
-				currentDist = list[k]->collision(d, camera.getOrigin(), collision);
-				if(currentDist < minDist && collision && currentDist >= 0){
-					index = k;
-					minDist = currentDist;
-				}
-			}
+			
 			if(index != -1){
 				o << (long int) list[index]->getColor().getR() << " " << (long int) list[index]->getColor().getG() << " " 
 				  << (long int) list[index]->getColor().getB() << "	";

@@ -126,10 +126,9 @@ RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth)
 		Ray dif = Ray(wi, hit + wi * 0.1f);
 		RGB Li = dif.tracePath(scene, depth + 1);
 
-		float factor = abs(cos(Oi)) * (alpha+2) / (alpha + 1);
 		rgb = RGB((Li[0] * rgb[0]) + dirLight[0],
 				   Li[1] * rgb[1] + dirLight[1],
-				   Li[2]  rgb[2] + dirLight[2]);
+				   Li[2] * rgb[2] + dirLight[2]);
 	}
 	else if(rnd < kd + ks){//specular
 		rayShot = true;
@@ -146,16 +145,18 @@ RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth)
 
 		Ray dif = Ray(wi, hit + wi * 0.1f);
 
+		RGB Li = dif.tracePath(scene, depth + 1);
+
 		float factor = abs(cos(Oi)) * (alpha+2) / (alpha + 1);
-		rgb = RGB((Li[0] * rgb[0]) + dirLight[0],
-				   Li[1] * rgb[1] + dirLight[1],
-				   Li[2]  rgb[2] + dirLight[2]); 
+		rgb = RGB((Li[0] * rgb[0] * factor) + dirLight[0],
+				   Li[1] * rgb[1] * factor + dirLight[1],
+				   Li[2] * rgb[2] * factor + dirLight[2]); 
 	}
 	if(rayShot){
-		return RGB;
+		return rgb;
 	}
 	else{
-		return{0,0,0};
+		return RGB(0, 0, 0);
 	}
 }
 
@@ -171,6 +172,17 @@ Light::Light(float p){
 Light::Light(float p, RGB color){
 	this->p = p;
 	this->color = color;
+}
+
+Reflective::Reflective(){}
+
+RGB Reflective::getColor(Direction n, Point origin, Point hit, Scene scene, int depth){
+	Direction wo = hit - origin; wo.normalize();
+	float Or = acos((n * wo) / (wo.modulus() * n.modulus()));
+	Direction wi = wo - (n * (wo * n) * 2); wi.normalize();
+	Ray dif = Ray(wi, hit + wi * 0.1f);
+	RGB Li = dif.tracePath(scene, depth + 1);
+	return Li;
 }
 
 //n is the surface normal

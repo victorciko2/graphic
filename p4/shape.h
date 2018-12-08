@@ -45,6 +45,12 @@ public:
 	RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth);
 };
 
+class Reflective : public Material{
+public:
+	Reflective();
+	RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth);
+};
+
 class Shape{
 protected:
 	Material material;
