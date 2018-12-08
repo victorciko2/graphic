@@ -628,15 +628,6 @@ Triangle Triangle::operator=(Triangle t){
 	return *this;
 }
 
-/*
-Parallelepiped::Parallelepiped(){
-	Triangle t = Triangle(Point(16, 0, 20), Point(16, -7, 25), Point(16, 5, 30), RGB(255, 0, 0));
-	this->triangles.push_back(t);
-	Triangle u = Triangle(Point(16, 0, 20), Point(16, 12, 21), Point(16, 5, 30), RGB(0, 0, 255));
-	this->triangles.push_back(u);
-	this->color = RGB(0, 0, 255);
-}*/
-
 Parallelepiped::Parallelepiped(Triangle* A, Triangle* B, float c, RGB color){
 	// Triangle A: b point alone, a and c shared with triangle B
 	// Triangle B: b point alone, a and c shared with triangle A
