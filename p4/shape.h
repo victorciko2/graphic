@@ -3,14 +3,22 @@
 #include <iostream>
 #include <cstring>
 #include <vector>
+#include <random>
 #include "point.h"
 #include "direction.h"
+#include "coordinateSystem.h"
 #include "color.h"
 
+using Vector = std::array<float,4>;
+using Matrix = std::array<std::array<float, 4>, 4>;
 
 class Point;
 
 class Direction;
+
+class Scene; 
+
+class Shape; 
 
 class Material{
 protected:
@@ -19,20 +27,22 @@ public:
 	Material();
 	Material(RGB color);
 	RGB getColor();
-	virtual RGB getColor(Direction n, Point origin, Point hit, int depth);
+	virtual RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth);
 	virtual float getIntensity();
 };
 
-class Shape;
-
-class Scene{
+class BRDF : public Material{
 protected:
-	vector<Shape*> objects;
+	float kd, ks, alpha;//diffuse, specular, specular cone
+	mt19937 gen;
+	uniform_real_distribution<float> distribution;
 public:
-	Scene();
-	Scene(vector<Shape*> objects);
-	void add(Shape* s);
-	vector<Shape*> getObjects();
+	BRDF();
+	BRDF(float kd, float ks, float alpha, RGB color);
+	float getKd();
+	float getKs();
+	float getAlpha();
+	RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth);
 };
 
 class Shape{
@@ -48,11 +58,11 @@ public:
 
 	void setColor(RGB color);
 
-	virtual RGB getColor();
+	RGB getColor();
 
-	virtual RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth);
+	RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth);
 
-	virtual float getIntensity();
+	float getIntensity();
 
 	Material getMaterial();
 
@@ -65,6 +75,53 @@ public:
 	virtual string showAsString();
 
 	virtual void show();
+};
+
+class Light : public Material{
+protected:
+	float p;
+public:
+	Light();
+	Light(float p);
+	Light(float p, RGB color);
+	RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth);
+	float getIntensity();
+};
+
+class PointLight : public Shape{
+protected:
+	Point o;
+public:
+	PointLight();
+	PointLight(Point o, Light l); // Add Light as parameter?
+	Point getOrigin();
+};
+
+class Scene{
+protected:
+	vector<Shape*> objects;
+	vector<PointLight*> lights;
+public:
+	Scene();
+	Scene(vector<Shape*> objects);
+	Scene(vector<PointLight*> lights);
+	Scene(vector<Shape*> objects, vector<PointLight*> lights);
+	void add(Shape* s);
+	void add(PointLight* l);
+	vector<Shape*> getObjects();
+	vector<PointLight*> getLights();
+};
+
+class Ray{
+protected:
+	Direction dir;
+	Point p;
+public:
+	Ray(Direction dir, Point p);
+	Direction getDirection();
+	Point getPoint();
+	Shape* collision(Scene scene, Point& intersection, float& dist);
+	RGB tracePath(Scene scene, int depth);
 };
 
 class Sphere : public Shape{
@@ -173,8 +230,6 @@ public:
 
 	void setNormal(Direction normal);
 
-	Direction getNormal(Point x);
-
 	float collision(Direction d, Point o, bool& collision);
 };
 
@@ -228,10 +283,6 @@ public:
 	Cylinder(Plane inf, Plane sup, float radius, Direction v, Point p, RGB color);	
 
 	Cylinder(Disk bot, Disk top, RGB color);
-
-	Cylinder(Plane inf, float h, float radius, Direction v, Point p, Material material);
-
-	Cylinder(Plane inf, Plane sup, float radius, Direction v, Point p, Material material);	
 
 	Cylinder(Disk bot, Disk top, Material material);
 
@@ -298,6 +349,8 @@ public:
 	Material getMaterial();
 
 	void setMaterial(Material material);
+
+	Direction getNormal(Point x);
 
 	Point getA();
 
