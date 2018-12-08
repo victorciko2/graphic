@@ -2,9 +2,12 @@
 #define SHAPE_H_
 #include <iostream>
 #include <cstring>
+#include <vector>
 #include "point.h"
 #include "direction.h"
 #include "rgb.h"
+
+using namespace std;
 
 class Point;
 
@@ -197,6 +200,8 @@ public:
 
 	Triangle(Point a, Point b, Point c, Plane p, RGB color);
 
+	Triangle(Point a, Point b, Point c, RGB color);
+
 	void setA(Point a);
 
 	void setB(Point b);
@@ -225,6 +230,42 @@ public:
 
 	Triangle operator=(Triangle t);
 };
+
+class Parallelepiped : public Shape{
+private:
+	Triangle *t1, *t2, *t3, *t4, *t5, *t6, *t7, *t8, *t9, *t10, *t11, *t12;
+public:
+	Parallelepiped(Triangle* A, Triangle* B, float c, RGB color);
+
+	float collision(Direction d, Point o, bool& collision);
+
+	void setColor(RGB color);
+
+	RGB getColor();
+
+	string showAsString();
+
+	void show();
+};
+
+/*
+class Cone : public Shape{
+private:
+	
+public:
+	Cone();
+
+	float collision(Direction d, Point o, bool& collision);
+
+	void setColor(RGB color);
+
+	RGB getColor();
+
+	string showAsString();
+
+	void show();
+};*/
+
 bool solveQuadratic(float a, float b, float c, float& t0, float& t1);
 
 #endif
