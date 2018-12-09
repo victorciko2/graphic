@@ -20,21 +20,23 @@ int main(){
 	list.push_back(shape);
 	shape = new Plane(Direction(0, 0, 1), Point(0, 0, 40), RGB(191, 191, 191)); //BACK
 	list.push_back(shape);
-	shape = new Cylinder(Disk(Direction(1, 1, 0), Point(-4, -4, 15), 2, RGB(255, 255, 255)), 
-				Disk(Direction(1, 1, 0), Point(4, 4, 15), 2, RGB(255,255,255)), RGB(0, 0, 255));
-	//shape = new InfiniteCylinder(Direction(1, 1, 0), Point(0, 0, 10), 2, RGB(255, 0, 255));
+
+	shape = new Parallelepiped(new Triangle(Point(15, -10, 20), Point(15, -20, 30), Point(15, -10, 40), RGB(255, 0, 0)),
+					new Triangle(Point(15, -10, 20), Point(15, 0, 30), Point(15, -10, 40), RGB(0, 0, 180)), 4, RGB(255, 0, 0));
 	list.push_back(shape);
- /*//EL MARAVILLOSO PENE
-	shape = new Sphere(Point(5, -13.5, 35), 7, RGB(252, 123, 220)); //RIGHT BALL
+
+ 	// ******************************************* EL MARAVILLOSO PENE *********************************************************
+	/*
+	shape = new Sphere(Point(5, -13.5, 38), 7, RGB(252, 123, 220)); //RIGHT BALL
 	list.push_back(shape);
-	shape = new Sphere(Point(-5, -13.5, 35), 7, RGB(252, 123, 220)); //LEFT BALL
+	shape = new Sphere(Point(-5, -13.5, 38), 7, RGB(252, 123, 220)); //LEFT BALL
 	list.push_back(shape);
 	shape = new Cylinder(Disk(Direction(0, 1, 0), Point(0, -13, 35), 6, RGB(255, 255, 255)), 
 				Disk(Direction(0,1,0), Point(0, 15, 35), 6, RGB(255,255,255)), RGB(214, 104, 187));
 	list.push_back(shape);
 	shape = new Sphere(Point(0, 15, 35), 6, RGB(173, 83, 151)); //TOP
-	list.push_back(shape);*/
-	
+	list.push_back(shape); */
+
 	Camera camera = Camera(Point(0, 0, 0), Direction(0, 0, 10), Direction(10, 0, 0), 720, 720);	camera.setL(camera.getL() * -1);
 	ofstream o("prueba.ppm");
 	o << "P3" << endl;
@@ -46,7 +48,6 @@ int main(){
 	bool collision;
 	float currentDist;
 	Direction planeVectorL = camera.getL() * -2 / camera.getX();
-
 	Direction planeVectorU = camera.getU() * -2 / camera.getY();
 	Point aux = camera.getOrigin() + camera.getL() + camera.getU() + camera.getF() + planeVectorL / 2 + planeVectorU / 2;
 	for(int i = 0; i < camera.getY(); i++){
@@ -62,7 +63,7 @@ int main(){
 			}
 			if(index != -1){
 				o << (long int) list[index]->getColor().getR() << " " << (long int) list[index]->getColor().getG() << " " 
-				  << (long int) list[index]->getColor().getB() << "	";
+				  << (long int) list[index]->getColor().getB() << "	"; 
 			}
 			else{
 				o << "0 0 0	";
