@@ -50,8 +50,8 @@ public:
 	Direction operator/(float s);
 
 	Direction operator=(Direction d);
-
-	Direction operator*(CoordinateSystem c);
+	
+	float operator[](int i);
 
 	bool operator==(Direction d);
 

@@ -75,21 +75,23 @@ Direction Direction::operator/(float s){
 	return Direction(this->x / s, this->y / s, this->z / s);
 }
 
+float Direction::operator[](int i){
+	if(i == 0){
+		return this->x;
+	}
+	else if(i == 1){
+		return this->y;
+	}
+	else if(i == 2){
+		return this->z;
+	}
+}
+
 Direction Direction::operator=(Direction d){
 	this->x = d.getX();
 	this->y = d.getY();
 	this->z = d.getZ();
 	return *this;
-}
-
-Direction Direction::operator*(CoordinateSystem c){
-	array <array <float, 4> ,4> matrix = c.getMatrix();
-	return Direction((this->x * matrix[0][0] + this->y * matrix[1][0] 
-				 + this->z * matrix[2][0]),
-				 (this->x * matrix[0][1] + this->y * matrix[1][1] 
-				 + this->z * matrix[2][1]),
-				 (this->x * matrix[0][2] + this->y * matrix[1][2] 
-				 + this->z * matrix[2][2]));
 }
 
 float Direction::operator*(Direction d){

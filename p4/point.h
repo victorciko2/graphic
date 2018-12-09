@@ -40,10 +40,10 @@ public:
 
 	Point operator=(Point p);
 
-	Point operator*(CoordinateSystem c);
-
 	bool operator==(Point p);
 
+	float operator[](int i);
+	
 	string showAsString();
 };
 

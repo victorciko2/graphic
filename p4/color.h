@@ -35,6 +35,8 @@ public:
 	string showAsString();
 	
 	void show();
+
+	float operator[](int index);
 };
 
 class XYZ{
