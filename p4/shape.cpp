@@ -72,15 +72,12 @@ void BRDF::show(){
 	cout << "alpha: " << alpha << endl;
 }
 
-int times = 0;
 const int maxDepth = 20;
 
 RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth){
-	cout << "------------++++++++"<<endl;
 	if(depth >= maxDepth){
 		return {0, 0, 0};
 	}
-	times++;
 	float rnd = this->distribution(gen);
 	RGB dirLight(0, 0, 0);
 	Direction wo = hit - origin; wo.normalize();
@@ -94,13 +91,14 @@ RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth)
 		float dist = (hit - pl.getOrigin()).modulus();
 		Direction dirAux = pl.getOrigin() - hit;
 		dirAux.normalize();
-		Ray r = Ray(dirAux, hit + dirAux * 0.1f);
+		Ray r = Ray(dirAux, hit + dirAux * 0.1f); 
 		Point collision;
 		float shadowDist = -1;
 		Shape* object = r.collision(scene, collision, shadowDist); 
 		//incoming light to material
-		if(object != nullptr && shadowDist > 0 && shadowDist < dist){
-			float p = pl.getMaterial().getIntensity();
+		if(!(object != nullptr &&  shadowDist < dist && shadowDist > 0)){
+			//cout << "not found object" << endl;
+			float p = pl.getMaterial()->getIntensity();
 			float a;
 			Direction aux = pl.getOrigin() - hit;
 			aux.normalize();
@@ -110,7 +108,7 @@ RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth)
 			else{
 				a = abs(p / (dist * dist)) * abs(n * aux);
 			}
-			RGB rgbL = pl.getMaterial().getColor();
+			RGB rgbL = pl.getMaterial()->getColor();
 			Direction origin2hit = pl.getOrigin() - hit; origin2hit.normalize();
 			float dirLightR = dirLight[0] + rgbL[0] * a * ((rgb[0]/M_PI) + ks * (alpha + 2) / 2
 						 / M_PI * pow(abs(refPerfect * origin2hit), alpha));
@@ -229,7 +227,7 @@ float Light::getIntensity(){
 
 PointLight::PointLight(){}
 
-PointLight::PointLight(Point o, Light l) : Shape(l){
+PointLight::PointLight(Point o, Light* l) : Shape(l){
 	this->o = o;
 }
 
@@ -539,16 +537,18 @@ float Plane::collision(Direction d, Point o, bool& collision){
 	float aux = d * n;
 	if(abs(aux) > 0.00000001f){
 		Direction l = this->o - o;
+		l.normalize();
 		t = (l * n) / aux;
-		if(t < 0){//hemos tocado esto osea que ojito que igual esta mal
+		if(t < 0){ //hemos tocado esto osea que ojito que igual esta mal
 			collision = false;
 			return -1;
 		}
-		collision = true;
-		return t;
+		else{
+			collision = true;
+			//cout << t << endl;
+			return t;
+		}
 	}
-	collision = false;
-	return -1;
 }
 
 string Plane::showAsString(){

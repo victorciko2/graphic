@@ -103,7 +103,7 @@ protected:
 	Point o;
 public:
 	PointLight();
-	PointLight(Point o, Light l); // Add Light as parameter?
+	PointLight(Point o, Light* l); // Add Light as parameter?
 	Point getOrigin();
 };
 

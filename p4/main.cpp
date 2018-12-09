@@ -10,28 +10,33 @@ using namespace std;
 int main(){
 	Scene scene;
 	Shape *shape = nullptr;
-	shape = new Plane(Direction(1, 0, 0), Point(-20, 0, 0), BRDF(0.7, 0, 100, RGB(255, 0, 0))); //LEFT
-	cout << shape << endl;
+	//shape = new Plane(Direction(1, 0, 0), Point(-20, 0, 0), new BRDF(0.7, 0, 100, RGB(255, 0, 0))); //LEFT
+	shape = new Plane(Direction(1, 0, 0), Point(-20, 0, 0), RGB(255, 0, 0)); //LEFT
+	shape->show();
 	scene.add(shape);
-	shape = new Plane(Direction(1, 0, 0), Point(20, 0, 0), BRDF(0.7, 0, 100, RGB(0, 255, 0))); //RIGHT
-	scene.add(shape);
-	cout << shape << endl;
-	shape = new Plane(Direction(0, 1, 0), Point(0, -20, 0), BRDF(0.7, 0, 100, RGB(230, 230, 230))); //DOWN
-	scene.add(shape);
-	cout << shape << endl;
-	shape = new Plane(Direction(0, 1, 0), Point(0, 20, 0), BRDF(0.7, 0, 100, RGB(140, 140, 140))); //UP
-	scene.add(shape);
-	cout << shape << endl;
-	shape = new Plane(Direction(0, 0, 1), Point(0, 0, 40), BRDF(0.7, 0, 100, RGB(191, 191, 191))); //BACK
-	cout << shape << endl;
-	scene.add(shape);
-	PointLight* pl = new PointLight(Point(16, 18, 36), Light());
-	scene.add(pl);
-	cout << shape << endl;
-	Material m = new BRDF(0.7, 0, 100, RGB(252, 123, 220));
-	shape = new Sphere(Point(5, -13.5, 35), 7, m); 
+	shape = new Plane(Direction(1, 0, 0), Point(20, 0, 0), new BRDF(0.7, 0, 100, RGB(0, 255, 0))); //RIGHT
+	//shape = new Plane(Direction(1, 0, 0), Point(20, 0, 0), new Material(RGB(0, 255, 0)));
 	scene.add(shape);
 	shape->show();
+	shape = new Plane(Direction(0, 1, 0), Point(0, -20, 0), new BRDF(0.7, 0, 100, RGB(230, 230, 230))); //DOWN
+	//shape = new Plane(Direction(0, 1, 0), Point(0, -20, 0), new Material(RGB(230, 230, 230))); //DOWN
+	scene.add(shape);
+	shape->show();
+	shape = new Plane(Direction(0, 1, 0), Point(0, 20, 0), new BRDF(0.7, 0, 100, RGB(140, 140, 140))); //UP
+	//shape = new Plane(Direction(0, 1, 0), Point(0, 20, 0), new Material(RGB(140, 140, 140))); //UP
+	scene.add(shape);
+	shape->show();
+	shape = new Plane(Direction(0, 0, 1), Point(0, 0, 40), new BRDF(0.7, 0, 100, RGB(191, 191, 191))); //BACK
+	//shape = new Plane(Direction(0, 0, 1), Point(0, 0, 40), new Material(RGB(191, 191, 191))); //BACK
+	shape->show();
+	scene.add(shape);
+	PointLight* pl = new PointLight(Point(0, 0, 20), new Light());
+	scene.add(pl);
+	shape->show();
+	Material* m = new BRDF(0.7, 0, 100, RGB(252, 123, 220));
+	shape = new Sphere(Point(5, -13.5, 35), 7, m); 
+	//scene.add(shape);
+	//shape->show();
  /*//EL MARAVILLOSO PENE
 	shape = new Sphere(Point(5, -13.5, 35), 7, RGB(252, 123, 220)); //RIGHT BALL
 	
@@ -46,30 +51,37 @@ int main(){
 	Camera camera = Camera(Point(0, 0, 0), Direction(0, 0, 10), Direction(10, 0, 0), 480, 480);	camera.setL(camera.getL() * -1);
 	ofstream o("prueba.ppm");
 	o << "P3" << endl;
+	int numPaths = 10;
 	o << camera.getX() << " " << camera.getY() << endl;
 	o << "255" << endl;
 	Direction d;
 	float minDist = numeric_limits<float>::max();
 	int index = -1;
 	bool collision;
-	float currentDist;
+	random_device rd;
+	mt19937 gen = mt19937 (rd());
+	float currentDist, rndX, rndY;
 	Direction planeVectorL = camera.getL() * -2 / camera.getX();
 	Direction planeVectorU = camera.getU() * -2 / camera.getY();
-	Point aux = camera.getOrigin() + camera.getL() + camera.getU() + camera.getF() + planeVectorL / 2 + planeVectorU / 2;
+	Point aux = camera.getOrigin() + camera.getL() + camera.getU() + camera.getF();
+  	uniform_real_distribution<float> distributionX = uniform_real_distribution<float>(0, planeVectorL.modulus());
+  	uniform_real_distribution<float> distributionY = uniform_real_distribution<float>(0, planeVectorU.modulus());
 	//camera.show();
 	for(int i = 0; i < camera.getY(); i++){
 		for(int j = 0; j < camera.getX(); j++){
-			//cout << "----------------------------------------------------" << endl;
-			//cout << "pixel " << j << " " << i << endl;
-			d = (aux + (planeVectorL * j) + (planeVectorU * i))  - camera.getOrigin();
-			d.normalize();
-			Ray r(d, camera.getOrigin());
-			RGB color(0, 0, 0);
-			int depth = 0;
-			RGB color2 = r.tracePath(scene, depth);
-			o << color2[0] << " " << color2[1] << " " << color2[2] << " ";
-
-			//cout << "----------------------------------------------------" << endl;
+			RGB mean = RGB(0, 0, 0);
+			for(int k = 0; k < numPaths; k++){
+				rndX = distributionX(gen); rndY = distributionY(gen);
+				Point pointRnd = Point(aux[0] + rndX, aux[1] + rndY, aux[2]);
+				d = (pointRnd +  (planeVectorL * j) + (planeVectorU * i))  - camera.getOrigin();
+				d.normalize();
+				Ray r(d, camera.getOrigin());
+				int depth = 0;
+				RGB result = r.tracePath(scene, depth);
+				mean = RGB(mean[0] + result[0], mean[1] + result[1], mean[2] + result[2]);
+			}
+			mean = RGB(mean[0] / numPaths, mean[1] / numPaths, mean[2] / numPaths);
+			o << mean[0] << " " << mean[1] << " " << mean[2] << " ";
 		}
 		o << endl;
 	}
