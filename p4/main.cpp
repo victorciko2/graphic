@@ -10,18 +10,18 @@
 using namespace std;
 
 const int colorRange = 255;
-int main(){
+int main(){//may the normal vector point outwards
 	Scene scene;
 	Shape *shape = nullptr;
-	shape = new Plane(Direction(1, 0, 0), Point(-20, 0, 0), new BRDF(0.7, 0, 100, RGB(255, 0, 0))); //LEFT
+	shape = new Plane(Direction(-1, 0, 0), Point(-20, 0, 0), new BRDF(0.7, 0, 100, RGB(255, 0, 0))); //LEFT
 	//shape = new Plane(Direction(1, 0, 0), Point(-20, 0, 0), RGB(255, 0, 0)); //LEFT
 	//shape->show();
-	scene.add(shape);
+	//scene.add(shape);
 	shape = new Plane(Direction(1, 0, 0), Point(20, 0, 0), new BRDF(0.7, 0, 100, RGB(0, 255, 0))); //RIGHT
 	//shape = new Plane(Direction(1, 0, 0), Point(20, 0, 0), new Material(RGB(0, 255, 0)));
-	scene.add(shape);
+	//scene.add(shape);
 	//shape->show();
-	shape = new Plane(Direction(0, 1, 0), Point(0, -20, 0), new BRDF(0.7, 0, 100, RGB(230, 230, 230))); //DOWN
+	shape = new Plane(Direction(0, -1, 0), Point(0, -20, 0), new BRDF(0.7, 0, 100, RGB(206, 206, 206))); //DOWN
 	//shape = new Plane(Direction(0, 1, 0), Point(0, -20, 0), new Material(RGB(230, 230, 230))); //DOWN
 	//scene.add(shape);
 	//shape->show();
@@ -33,11 +33,22 @@ int main(){
 	//shape = new Plane(Direction(0, 0, 1), Point(0, 0, 40), new Material(RGB(191, 191, 191))); //BACK
 	//shape->show();
 	//scene.add(shape);
-	PointLight* pl = new PointLight(Point(0, 0, 20), new Light(250, RGB(1,1,1)));
+	PointLight* pl = new PointLight(Point(0, 18, 20), new Light(2500, RGB(1,1,1)));
 	scene.add(pl);
+	pl = new PointLight(Point(0, 18, 20), new Light(100, RGB(1,1,1)));
+	//scene.add(pl);
+	pl = new PointLight(Point(0, 18, 20), new Light(100, RGB(1,1,1)));
+	//scene.add(pl);
 	//shape->show();
-	Material* m = new BRDF(0.7, 0, 100, RGB(252, 123, 220));
-	shape = new Sphere(Point(5, -13.5, 35), 7, m); 
+	Material* m = new BRDF(0.7, 0, 1000000000, RGB(0, 0, 255));
+	shape = new Sphere(Point(-8, 0, 35), 7, m); 
+	scene.add(shape);
+	m = new BRDF(0.5, 0.5, 1, RGB(255, 0, 255));
+	shape = new Sphere(Point(8, 0, 35), 7, m); 
+	scene.add(shape);
+	shape = new Triangle(Point(-18, -18,  20), Point(-18, 0, 30), Point(-10, -18, 25), m); 
+	//scene.add(shape);
+	shape = new Triangle(Point(18, -18,  20), Point(18, 0, 30), Point(10, -18, 25), m); 
 	//scene.add(shape);
 	//shape->show();
  /*//EL MARAVILLOSO PENE
@@ -54,7 +65,7 @@ int main(){
 	Camera camera = Camera(Point(0, 0, 0), Direction(0, 0, 10), Direction(10, 0, 0), 480, 480);	camera.setL(camera.getL() * -1);
 	ofstream o("prueba.ppm");
 	o << "P3" << endl;
-	int numPaths = 1;
+	int numPaths = 20;
 	o << camera.getX() << " " << camera.getY() << endl;
 	o << "255" << endl;
 	Direction d;

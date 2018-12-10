@@ -78,8 +78,7 @@ RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth)
 	if(depth >= maxDepth){
 		return {0, 0, 0};
 	}
-	// n.normalize(); //diria que hay que normalizarlo pero no se
-	//cout << "geteando color" << endl;
+	//n.normalize(); //diria que hay que normalizarlo pero no se
 	float rnd = this->distribution(gen);
 	RGB dirLight(0, 0, 0);
 	Direction wo = hit - origin; wo.normalize();
@@ -403,7 +402,7 @@ Sphere::Sphere(Point center, float radius, RGB color){
 	this->radius = radius;
 }
 
-Sphere::Sphere(Point center, float radius, Material* material) : Shape(material){
+Sphere::Sphere(Point center, float radius, Material* material){
 	this->center = center;
 	this->material = material;
 	this->radius = radius;
@@ -442,7 +441,7 @@ float Sphere::getRadius(){
 }
 
 Direction Sphere::getNormal(Point x){
-	Direction result = x - center;
+	Direction result = (x - center);
 	result.normalize();
 	return result;
 }
@@ -470,7 +469,7 @@ float Sphere::collision(Direction d, Point o, bool& collision){  // cambiar radi
 string Sphere::showAsString(){
 	string s = "SPHERE:\n Center: " + this->center.showAsString()
 			+ "\nradius: " + to_string(this->radius)
-			+ "\n Color:\n" + this->color.showAsString();
+			+ "\n Color:\n" + this->color.showAsString() + "\n";
 	return s;
 }
 
@@ -564,7 +563,7 @@ float Plane::collision(Direction d, Point o, bool& collision){
 
 string Plane::showAsString(){
 	string s = "PLANE:\n Point: " + this->o.showAsString()
-			+ "\nnormal: " + this->normal.showAsString();
+			+ "\nnormal: " + this->normal.showAsString() + "\n";
 	return s;
 }
 
@@ -1017,6 +1016,18 @@ Triangle::Triangle(Point a, Point b, Point c, Plane p, Material* material) {
 	this->material = material;
 }
 
+
+Triangle::Triangle(Point a, Point b, Point c, Material* material) {
+	this->a = a;
+	this->b = b;
+	this->c = c;
+	Direction ab = a - b;
+	Direction ac = a - c;
+	Direction normal = ab ^ ac;
+	normal.normalize();
+	this->p = Plane(normal, this->a, this->color);
+	this->material = material;
+}
 
 void Triangle::setA(Point a){
 	this->a = a;
