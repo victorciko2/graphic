@@ -205,3 +205,4 @@ RGB xyY::toRGB(){
 	
 	return rgb;
 }
+

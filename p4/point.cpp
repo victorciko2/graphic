@@ -81,4 +81,3 @@ string Point::showAsString(){
 	return p;
 
 }
-

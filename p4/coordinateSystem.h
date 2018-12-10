@@ -60,5 +60,4 @@ public:
 };
 
 Vector operator*(const Matrix &a, const Vector &b);
-
 #endif

@@ -91,5 +91,4 @@ public:
 	RGB toRGB();
 
 };
-
 #endif

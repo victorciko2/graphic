@@ -1,8 +1,7 @@
 #include <iostream>
 #include <cmath>
+#include <limits>
 #include "shape.h"
-
-using namespace std;
 
 Shape::Shape(){
 	this->color = RGB();
@@ -524,6 +523,18 @@ Triangle::Triangle() {
 	this->color = RGB();
 }
 
+Triangle::Triangle(Point a, Point b, Point c, RGB color) {
+	this->a = a;
+	this->b = b;
+	this->c = c;
+	Direction ab = a - b;
+	Direction ac = a - c;
+	Direction normal = ab ^ ac;
+	normal.normalize();
+	this->p = Plane(normal, this->a, this->color);
+	this->color = color;
+}
+
 Triangle::Triangle(Point a, Point b, Point c, Plane p, RGB color) {
 	this->a = a;
 	this->b = b;
@@ -577,11 +588,11 @@ float Triangle::collision(Direction d, Point o, bool& collision){
 	float dist=this->p.collision(d,o,collision);
 	if(dist > 0){
 		//cout << " colisiona con el plano" << endl;
-		Direction edge0 = this->b - this->a; 
+		Direction edge0 = this->b - this->a;
 		Direction edge1 = this->c - this->b; 
 		Direction edge2 = this->a - this->c; 
 		Direction C0 = (o+d*dist) - this->a; 
-		Direction C1 = (o+d*dist) - this->b; 
+		Direction C1 = (o+d*dist) - this->b;
 		Direction C2 = (o+d*dist) - this->c; 
 		if (p.getNormal()*(edge0^C0) > 0 && p.getNormal()*(edge1^C1) > 0 && p.getNormal()*(edge2^C2) > 0){
 			collision = true;
@@ -617,6 +628,107 @@ Triangle Triangle::operator=(Triangle t){
 	return *this;
 }
 
+Parallelepiped::Parallelepiped(Triangle* A, Triangle* B, float c, RGB color){
+	// Triangle A: b point alone, a and c shared with triangle B
+	// Triangle B: b point alone, a and c shared with triangle A
+	this->color = color;
+	this->t1 = A;
+	this->t2 = B;
+
+	Point Aa = A->getA();
+	Point Ab = A->getB();
+	Point Ac = A->getC();
+
+	Point Ba = B->getA();
+	Point Bb = B->getB();
+	Point Bc = B->getC();
+
+	Direction ab = Aa - Ab;
+	Direction bc = Ab - Ac;
+	Direction normal = ab ^ bc;
+	normal.normalize();
+
+	// Compute of the 4 points with the normal and the distance
+	Point p = normal*c+Ab;
+	Point q = normal*c+Ac;
+	Point r = normal*c+Aa;
+	Point s = normal*c+Bb;
+
+	this->t3 = new Triangle(Aa, r, s, RGB(255, 0, 111));
+	this->t4 = new Triangle(Aa, Bb, s, RGB(125, 255, 125));
+	this->t5 = new Triangle(Ac, Bb, s, RGB(255, 0, 0));
+	this->t6 = new Triangle(Ac, s, q, RGB(255, 0, 0));
+	this->t7 = new Triangle(Ab, p, q, RGB(255, 0, 0));
+	this->t8 = new Triangle(Ab, Ac, q, RGB(255, 0, 0));
+	this->t9 = new Triangle(Ab, r, p, RGB(255, 0, 255));
+	this->t10 = new Triangle(Ab, Aa, r, RGB(255, 255, 0));
+	this->t11 = new Triangle(r, s, p, RGB(255, 125, 0));
+	this->t12 = new Triangle(s, p, q, RGB(255, 0, 0));
+}
+
+float Parallelepiped::collision(Direction d, Point o, bool& collision){
+	vector<float> distances;
+
+	d.normalize();
+	distances.push_back(t1->collision(d, o, collision));
+	distances.push_back(t2->collision(d, o, collision));
+	distances.push_back(t3->collision(d, o, collision));
+	distances.push_back(t4->collision(d, o, collision));
+	distances.push_back(t5->collision(d, o, collision));
+	distances.push_back(t6->collision(d, o, collision));
+	distances.push_back(t7->collision(d, o, collision));
+	distances.push_back(t8->collision(d, o, collision));
+	distances.push_back(t9->collision(d, o, collision));
+	distances.push_back(t10->collision(d, o, collision));
+	distances.push_back(t11->collision(d, o, collision));
+	distances.push_back(t12->collision(d, o, collision));
+
+	float minDist = numeric_limits<float>::max();
+	float distance = 0.0;
+	collision = false;
+	for (int i = 0; i < distances.size(); i++){
+		distance = distances[i];
+		if (distance < minDist && distance != -1){
+			minDist = distance;
+			collision = true;
+		}
+	}
+	if(collision){
+		return minDist;
+	}
+	else{
+		return -1;
+	}
+}
+
+void Parallelepiped::setColor(RGB color){
+	this->color = color;
+}
+
+RGB Parallelepiped::getColor(){
+	return this->color;
+}
+
+string Parallelepiped::showAsString(){
+	string s = "Parallelepiped: \n";
+	s += this->t1->showAsString();
+	s += this->t2->showAsString();
+	s += this->t3->showAsString();
+	s += this->t4->showAsString();
+	s += this->t5->showAsString();
+	s += this->t6->showAsString();
+	s += this->t7->showAsString();
+	s += this->t8->showAsString();
+	s += this->t9->showAsString();
+	s += this->t10->showAsString();
+	s += this->t11->showAsString();
+	s += this->t12->showAsString();
+	return s;
+}
+
+void Parallelepiped::show(){
+	cout << this->showAsString() << endl;
+}
 
 bool solveQuadratic(float a, float b, float c, float& t0, float& t1){
 	float discr = b * b - 4 * a * c; //discriminant
