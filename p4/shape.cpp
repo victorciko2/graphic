@@ -26,7 +26,6 @@ float Material::getIntensity(){
 }
 
 void Material::show(){
-	cout << "entroo aqui"<< endl;
 	this->color.show();
 
 }
@@ -72,7 +71,7 @@ void BRDF::show(){
 	cout << "alpha: " << alpha << endl;
 }
 
-const int maxDepth = 2;
+const int maxDepth = 20;
 
 RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth){
 	if(depth >= maxDepth){
@@ -91,7 +90,6 @@ RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth)
 	for(int i = 0; i < lights.size(); i++){
 		PointLight pl = *lights[i];
 		float dist = (hit - pl.getOrigin()).modulus();
-		//cout << "distancia a luz = " << dist << endl;
 		Direction dirAux = pl.getOrigin() - hit;
 		dirAux.normalize();
 		Ray r = Ray(dirAux, hit + dirAux * 0.1f); 
@@ -99,41 +97,42 @@ RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth)
 		float shadowDist = -1;
 		Shape* object = r.collision(scene, collision, shadowDist); 
 		//incoming light to material
-		//cout << "RAYO DE SOMBRA" << endl;
-		//cout << collision.showAsString() << " dist " << shadowDist << endl;
-		if((object == nullptr || shadowDist > dist || shadowDist < 0)){
+		//if((object == nullptr || shadowDist > dist || shadowDist < 0)){
+		if(object == nullptr || shadowDist > dist || shadowDist < 0){
 			//cout << "not found object" << endl;
 			float p = pl.getMaterial()->getIntensity();
 			float a;
-			Direction aux = pl.getOrigin() - hit;
-			aux.normalize();
+			Direction origin2hit = pl.getOrigin() - hit; origin2hit.normalize();
 			if(dist < 1){
-				a = p * abs(n * aux);
+				a = p * abs(n * origin2hit);
 			}
 			else{
-				a = abs(p / (dist * dist)) * abs(n * aux);
+				a = abs(p / (dist * dist)) * abs(n * origin2hit);
 			}
 			RGB rgbL = pl.getMaterial()->getColor();
-		//	cout << "light color = " << rgbL.showAsString() << endl;
-			Direction origin2hit = pl.getOrigin() - hit; origin2hit.normalize();
+			//cout << "light color = " << rgbL.showAsString() << endl;
 			dirLight = RGB(
 				dirLight[0] + rgbL[0] * a * ((rgb[0]/M_PI) + ks * (alpha + 2) / 2 / M_PI * pow(abs(refPerfect * origin2hit), alpha)),
 				dirLight[1] + rgbL[1] * a * ((rgb[1]/M_PI) + ks * (alpha + 2) / 2 / M_PI * pow(abs(refPerfect * origin2hit), alpha)),
 				dirLight[2] + rgbL[2] * a * ((rgb[2]/M_PI) + ks * (alpha + 2) / 2 / M_PI * pow(abs(refPerfect * origin2hit), alpha)));
 		}
+		else{
+			//cout << "collision in direct lighting" << endl;
+		}
+	}
+	if(maxDepth == 1){
+		return dirLight;
 	}
 	//cout << "el color directo es : " << dirLight.showAsString() << endl; 
-	bool rayShot = false;
 	if(rnd < kd){ //difuse
 		//cout << "Difuse" << endl;
-		rayShot = true;
-		Direction any(1, 1, 1);
+		Direction any(1, 1, 1); any.normalize();
 		Direction axis = n ^ any; axis.normalize();
 		CoordinateSystem coor(axis, n, axis^n, hit);
 		float eO = distribution(gen);
 		float eI = distribution(gen);
 		float Oi = acos(sqrt(1 - eO));
-		float Ai = 2 * M_PI * eI;
+		float Ai = 2 * M_PI * eI; //azimuth aleatorio
 		Vector vecAux = {sin(Oi) * cos(Ai), cos(Oi), sin(Oi) * sin(Ai), 0};
 		vecAux = coor.getM() * vecAux;
 		Direction wi = Direction(vecAux[0], vecAux[1], vecAux[2]);
@@ -148,7 +147,6 @@ RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth)
 	}
 	else if(rnd < kd + ks){//specular
 		//cout << "Specular" << endl; 
-		rayShot = true;
 		Direction axis = n ^ refPerfect; axis.normalize();
 		CoordinateSystem coor(axis, refPerfect, axis ^ refPerfect, hit);
 		float eO = distribution(gen);
@@ -169,14 +167,10 @@ RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth)
 				   Li[1] * rgb[1] * factor + dirLight[1],
 				   Li[2] * rgb[2] * factor + dirLight[2]); 
 	}
-	if(rayShot){
-		//cout << "lo qe se devuelve " << rgb.showAsString() << endl;
-		return rgb;
-	}
 	else{
-		//cout << "Morir por RR" << RGB(0, 0, 0).showAsString() << endl;
 		return RGB(0, 0, 0);
 	}
+	return rgb;
 }
 
 Light::Light(){
@@ -241,7 +235,11 @@ PointLight::PointLight(Point o, Light* l) : Shape(l){
 Point PointLight::getOrigin(){
 	return this->o;
 }
-
+/*
+DiskLight(Disk d, float p){}
+float collision(Direction d, Point o, bool& collision){}
+RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth){} 
+*/
 Scene::Scene(){}
 
 Scene::Scene(vector<Shape*> objects){
@@ -357,9 +355,8 @@ Shape* Ray::collision(Scene scene, Point& intersection, float& dist){
 		dist2 = es[i]->collision(this->dir, this->p, collision);
 		//es[i]->show();
 		//cout << "a distancia: " << dist2 << " collision: " << collision << endl;
-
 		if(collision && dist2 < minDist && dist2 > 0){
-		//	cout << "entro" << endl;
+			//cout << "entro" << endl;
 			minDist = dist2;
 			minInter = this->dir * minDist + this->p;
 			min = o;
@@ -375,11 +372,6 @@ RGB Ray::tracePath(Scene scene, int depth){
 	Point minInter;
 	Shape* min = collision(scene, minInter, minDist);
 	if(min != nullptr){
-		//cout << "figura mas cercana a distancia: " << minDist << endl;
-		//cout << "colision en : " << flush;
-		//minInter.show(); cout << endl;
-		//min->show(); cout << endl;
-		//cout << "collisiona " << min << endl;
 		return min->getColor(min->getNormal(minInter),
 				p, minInter, scene, depth);
 	}
@@ -448,22 +440,22 @@ Direction Sphere::getNormal(Point x){
 
 float Sphere::collision(Direction d, Point o, bool& collision){  // cambiar radio por float
 	d.normalize();
+	Direction aux = o - this->center;
 	float a = d * d;
-	float b = 2 * (d * (o - this->center));
-	float c = (o - this->center)*(o - this->center) - radius * radius;
+	float b = 2 * (d * aux);
+	float c = aux * aux - this->radius * this->radius;
 	float t0, t1;
 	collision = solveQuadratic(a, b, c, t0, t1);
+	if(t0 > t1) swap(t0, t1);
 	if(collision){
-		if(t0 > 0){
-			return t0;
-		}
-		else{
-			return -1;
+		if(t0 < 0){
+			t0 = t1;
+			if(t0 < 0){
+				return -1;
+			}
 		}
 	}
-	else{
-		return -1;
-	}
+	return t0;
 }
 
 string Sphere::showAsString(){

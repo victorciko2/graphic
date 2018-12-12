@@ -106,7 +106,14 @@ public:
 	PointLight(Point o, Light* l); // Add Light as parameter?
 	Point getOrigin();
 };
-
+/*
+class DiskLight : public Disk{
+public:
+	DiskLight(Disk d, float p);
+	float collision(Direction d, Point o, bool& collision);
+	RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth); 
+};
+*/
 class Scene{
 protected:
 	vector<Shape*> objects;
