@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 #include <limits>
 #include "shape.h"
 
@@ -202,6 +203,48 @@ void Reflective::show(){
 	this->color.show();
 }
 
+// I = incident ray, N = normal, iorm = index of refraction of medium, iorr = of the medium where the ray is
+Direction refract(Direction I, Direction N, float iorm, bool& refraction){
+	I.normalize(); N.normalize();
+    float cosi = I * N; 
+    if(cosi < -1) cosi = -1;
+    if(cosi > 1) cosi = 1;
+    float etai = 1, etat = iorm; 
+    Direction n = N; 
+    if (cosi < 0) { cosi = -cosi; } else { std::swap(etai, etat); n = N * -1; } 
+    float eta = etai / etat; 
+    float k = 1 - eta * eta * (1 - cosi * cosi); 
+    Direction aux1 = I * eta; 
+    Direction aux2 = (n * (eta * cosi - sqrtf(k)));
+    aux1 = Direction(aux1[0] + aux2[0], aux1[1] + aux2[1], aux1[2] + aux2[2]);
+    if(k < 0){
+    	//cout << "k < 0" << endl;
+    	refraction = false;
+    	//cout << aux1.showAsString() << endl;
+    	return aux1;
+    }
+    else{
+    	refraction = true;
+    	return aux1;
+    } 
+} 
+
+Refractive::Refractive(){this->n = 1;}
+
+Refractive::Refractive(float n){this->n = n;}
+
+RGB Refractive::getColor(Direction n, Point origin, Point hit, Scene scene, int depth){
+	Direction incident = hit - origin; incident.normalize();
+	bool refraction;
+	Direction outRay = refract(incident, n, this->n, refraction); outRay.normalize();
+	Ray r(outRay, hit + outRay * 0.1f);
+	RGB Li = RGB(0, 0, 0);
+//	cout << outRay.showAsString() << endl;
+	if(refraction) Li = r.tracePath(scene, depth + 1);
+	return Li;
+}
+
+
 //n is the surface normal
 //color arriving to the surface from the light
 RGB Light::getColor(Direction n, Point origin, Point hit, Scene scene, int depth){
@@ -235,11 +278,7 @@ PointLight::PointLight(Point o, Light* l) : Shape(l){
 Point PointLight::getOrigin(){
 	return this->o;
 }
-/*
-DiskLight(Disk d, float p){}
-float collision(Direction d, Point o, bool& collision){}
-RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth){} 
-*/
+
 Scene::Scene(){}
 
 Scene::Scene(vector<Shape*> objects){

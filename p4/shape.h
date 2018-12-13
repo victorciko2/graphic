@@ -55,6 +55,15 @@ public:
 	void show();
 };
 
+class Refractive : public Material{
+private:
+	float n; //Index of refraction
+public:
+	Refractive();
+	Refractive(float n);
+	RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth);		 
+};
+
 class Shape{
 protected:
 	Material* material;
@@ -106,14 +115,7 @@ public:
 	PointLight(Point o, Light* l); // Add Light as parameter?
 	Point getOrigin();
 };
-/*
-class DiskLight : public Disk{
-public:
-	DiskLight(Disk d, float p);
-	float collision(Direction d, Point o, bool& collision);
-	RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth); 
-};
-*/
+
 class Scene{
 protected:
 	vector<Shape*> objects;
@@ -249,6 +251,16 @@ public:
 
 	float collision(Direction d, Point o, bool& collision);
 };
+/*
+class DiskLight : public Disk{
+	Light l;
+	Disk d;
+public:
+	DiskLight(Disk d, Light l);
+	float collision(Direction d, Point o, bool& collision);
+	RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth); 
+};
+*/
 
 class InfiniteCylinder : public Shape{
 protected:

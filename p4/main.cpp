@@ -11,7 +11,12 @@
 using namespace std;
 
 const int colorRange = 255;
+
 int main(int argc, char* argv[]){//may the normal vector point outwards
+	if(argc != 5){
+		cout << "ERROR: Use " << argv[0] << " numPaths width height fileName" << endl; 
+		return -1;
+	}
 	int	numPaths = atoi(argv[1]);
 	int pixelX = atoi(argv[2]);
 	int pixelY = atoi(argv[3]);
@@ -33,6 +38,7 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 	shape = new Plane(Direction(0, 0, -1), Point(0, 00, 20), new BRDF(0.7, 0, 100, RGB((float)191/255, (float)191/255, (float)191/255))); //BACK
 	//shape->show();
 	scene.add(shape);
+
 	PointLight* pl = new PointLight(Point(0, 6, 12), new Light(250, RGB(1,1,1)));
 	scene.add(pl);
 	pl = new PointLight(Point(0, 18, 20), new Light(100, RGB(1,1,1)));
@@ -41,16 +47,12 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 	//scene.add(pl);
 	//shape->show();
 	Material* m = new BRDF(0, 0.7, 1, RGB(0, 0, (float)255/255));
-	shape = new Sphere(Point(-5, -1, 16.5), 3, m); 
-	scene.add(shape);
-	m = new BRDF(0, 0.7, 100, RGB((float)255/255, 0, (float)255/255));
-	shape = new Sphere(Point(4, 1, 16.5), 1, m); 
-	scene.add(shape);
-	shape = new Triangle(Point(-18, -18,  20), Point(-18, 0, 30), Point(-10, -18, 25), m); 
 	//scene.add(shape);
-	shape = new Triangle(Point(18, -18,  20), Point(18, 0, 30), Point(10, -18, 25), m); 
-	shape = new Cylinder(Disk(Direction(0, 1, 0), Point(0, -13, 35), 6, m), 
-				Disk(Direction(0,1,0), Point(0, 15, 35), 6, m), m);
+	m = new BRDF(0, 0.7, 100, RGB((float)255/255, 0, (float)255/255));
+	shape = new Sphere(Point(0,0,15), 3, new Refractive(4)); 
+	scene.add(shape);
+	shape = new Sphere(Point(4, 1, 19), 1, m); 
+	//scene.add(shape);
 	//scene.add(shape);
 	//shape->show();
  /*//EL MARAVILLOSO PENE
