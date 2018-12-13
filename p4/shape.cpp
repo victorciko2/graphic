@@ -204,6 +204,7 @@ void Reflective::show(){
 }
 
 // I = incident ray, N = normal, iorm = index of refraction of medium, iorr = of the medium where the ray is
+//CAMBIAR INDICES DE LOS MEDIOS
 Direction refract(Direction I, Direction N, float iorm, bool& refraction){
 	I.normalize(); N.normalize();
     float cosi = I * N; 
