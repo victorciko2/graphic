@@ -397,6 +397,26 @@ public:
 
 	Triangle operator=(Triangle t);
 };
+
+class Parallelepiped : public Shape{
+private:
+	Triangle *t1, *t2, *t3, *t4, *t5, *t6, *t7, *t8, *t9, *t10, *t11, *t12;
+public:
+	Parallelepiped(Triangle* A, Triangle* B, float c, RGB color);
+
+	Parallelepiped(Triangle* A, Triangle* B, float c, Material* material);
+
+	float collision(Direction d, Point o, bool& collision);
+
+	void setColor(RGB color);
+
+	RGB getColor();
+
+	string showAsString();
+
+	void show();
+};
+
 bool solveQuadratic(float a, float b, float c, float& t0, float& t1);
 
 #endif

@@ -44,6 +44,8 @@ public:
 
 	bool operator==(Point p);
 
+	float operator[](int index);
+
 	string showAsString();
 };
 

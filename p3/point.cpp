@@ -81,3 +81,16 @@ string Point::showAsString(){
 
 }
 
+float Point::operator[](int i){
+	if(i == 0){
+		return this->x;
+	}
+	else if(i == 1){
+		return this->y;
+	}
+	else if(i == 2){
+		return this->z;
+	}
+}
+
+

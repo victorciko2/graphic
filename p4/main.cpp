@@ -38,6 +38,15 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 	shape = new Plane(Direction(0, 0, -1), Point(0, 00, 20), new BRDF(0.7, 0, 100, RGB((float)191/255, (float)191/255, (float)191/255))); //BACK
 	//shape->show();
 	scene.add(shape);
+	/*shape = new Sphere(Point(5, -13.5, 35), 7, RGB(252, 123, 220)); //RIGHT BALL
+	scene.add(shape);*/
+	shape = new Triangle(Point(-10, -10, 10), Point(-5, 10, 15), Point(0, -5, 12), new BRDF(0, 0.7, 1, RGB(0, 0, (float)255/255)));
+	scene.add(shape);
+	Material* m = new BRDF(0, 0.7, 1, RGB(0, 0, (float)255/255));
+	m = new BRDF(0, 0.7, 100, RGB((float)255/255, 0, (float)255/255));
+	shape = new Parallelepiped(new Triangle(Point(7, -5, 10), Point(7, -10, 15), Point(7, -5, 20), RGB(255, 0, 0)),
+					new Triangle(Point(7, -5, 10), Point(7, 0, 15), Point(7, -5, 20), RGB(0, 0, 180)), 4, m);
+	scene.add(shape);
 
 	PointLight* pl = new PointLight(Point(0, 6, 12), new Light(250, RGB(1,1,1)));
 	scene.add(pl);
@@ -46,12 +55,12 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 	pl = new PointLight(Point(0, 18, 20), new Light(100, RGB(1,1,1)));
 	//scene.add(pl);
 	//shape->show();
-	Material* m = new BRDF(0, 0.7, 1, RGB(0, 0, (float)255/255));
+	
 	//scene.add(shape);
 	m = new BRDF(0, 0.7, 100, RGB((float)255/255, 0, (float)255/255));
 	shape = new Sphere(Point(0,0,15), 3, new Refractive(4)); 
 	scene.add(shape);
-	shape = new Sphere(Point(4, 1, 19), 1, m); 
+	//shape = new Sphere(Point(4, 1, 19), 1, m); 
 	//scene.add(shape);
 	//scene.add(shape);
 	//shape->show();
