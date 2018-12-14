@@ -83,7 +83,17 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 	shape = new Cylinder(Disk(Direction(0, -1, 0), Point(-7.5, -10, 18), 1, m), Disk(Direction(0, -1, 0), Point(-7.5, 2, 18), 0.2, m), m);
 	scene.add(shape);
 
-	
+	// ACERA
+	m = new BRDF(0, 0.7, 100, RGB((float)125/255, (float)109/255, (float)94/255));
+	shape = new Parallelepiped(new Triangle(Point(-10, -10, 0), Point(-10, -9.6, 0), Point(-5, -9.6, 0), m),
+					new Triangle(Point(-10, -10, 0), Point(-5, -10, 0), Point(-5, -9.6, 0), m), -20, m);
+	scene.add(shape);
+
+	shape = new Parallelepiped(new Triangle(Point(10, -10, 0), Point(10, -9.6, 0), Point(5, -9.6, 0), m),
+					new Triangle(Point(10, -10, 0), Point(5, -10, 0), Point(5, -9.6, 0), m), 20, m);
+	scene.add(shape);
+
+
 	PointLight* pl = new PointLight(Point(0, 6, 12), new Light(250, RGB(1,1,1)));
 	scene.add(pl);
 
