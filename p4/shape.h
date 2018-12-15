@@ -30,6 +30,7 @@ public:
 	virtual RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth);
 	virtual float getIntensity();
 	virtual void show();
+	virtual bool getRefractive();
 };
 
 class BRDF : public Material{
@@ -45,6 +46,7 @@ public:
 	float getAlpha();
 	RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth);
 	void show();
+	bool getRefractive();
 
 };
 
@@ -53,14 +55,17 @@ public:
 	Reflective();
 	RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth);
 	void show();
+	bool getRefractive();
 };
 
 class Refractive : public Material{
 private:
 	float n; //Index of refraction
+	bool wide;  
 public:
 	Refractive();
-	Refractive(float n);
+	Refractive(float n, bool wide);
+	bool getRefractive();
 	RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth);		 
 };
 
@@ -412,6 +417,8 @@ public:
 
 	RGB getColor();
 
+	Direction getNormal(Point x);
+	
 	string showAsString();
 
 	void show();

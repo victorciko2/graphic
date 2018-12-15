@@ -22,6 +22,10 @@ RGB Material::getColor(Direction n, Point origin, Point hit, Scene scene, int de
 	return this->color;
 }
 
+bool Material::getRefractive(){
+	return false;
+}
+
 float Material::getIntensity(){
 	return 0;
 }
@@ -72,6 +76,10 @@ void BRDF::show(){
 	cout << "alpha: " << alpha << endl;
 }
 
+bool BRDF::getRefractive(){
+	return false;
+}
+
 const int maxDepth = 20;
 
 RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth){
@@ -97,9 +105,7 @@ RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth)
 		Point collision;
 		float shadowDist = -1;
 		Shape* object = r.collision(scene, collision, shadowDist); 
-		//incoming light to material
-		//if((object == nullptr || shadowDist > dist || shadowDist < 0)){
-		if(object == nullptr || shadowDist > dist || shadowDist < 0){
+		if(object == nullptr || shadowDist > dist || shadowDist < 0 ){
 			//cout << "not found object" << endl;
 			float p = pl.getMaterial()->getIntensity();
 			float a;
@@ -111,14 +117,29 @@ RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth)
 				a = abs(p / (dist * dist)) * abs(n * origin2hit);
 			}
 			RGB rgbL = pl.getMaterial()->getColor();
-			//cout << "light color = " << rgbL.showAsString() << endl;
 			dirLight = RGB(
 				dirLight[0] + rgbL[0] * a * ((rgb[0]/M_PI) + ks * (alpha + 2) / 2 / M_PI * pow(abs(refPerfect * origin2hit), alpha)),
 				dirLight[1] + rgbL[1] * a * ((rgb[1]/M_PI) + ks * (alpha + 2) / 2 / M_PI * pow(abs(refPerfect * origin2hit), alpha)),
 				dirLight[2] + rgbL[2] * a * ((rgb[2]/M_PI) + ks * (alpha + 2) / 2 / M_PI * pow(abs(refPerfect * origin2hit), alpha)));
 		}
-		else{
-			//cout << "collision in direct lighting" << endl;
+		if(object != nullptr && object->getMaterial()->getRefractive()){
+			dirAux = pl.getOrigin() - hit; dirAux.normalize();
+			bool mierda;
+			float dist2 = object->collision(dirAux, hit, mierda);
+			float a;
+			float p = pl.getMaterial()->getIntensity();
+			Direction origin2hit = pl.getOrigin() - hit; origin2hit.normalize();
+			if(dist < 1){
+				a = p * abs(n * origin2hit);
+			}
+			else{
+				a = abs(p / (dist * dist)) * abs(n * origin2hit);
+			}
+			RGB rgbL = object->getMaterial()->getColor(dirAux, hit, collision, scene, depth);
+			dirLight = RGB(
+				dirLight[0] + rgbL[0] * a * ((rgb[0]/M_PI) + ks * (alpha + 2) / 2 / M_PI * pow(abs(refPerfect * origin2hit), alpha)),
+				dirLight[1] + rgbL[1] * a * ((rgb[1]/M_PI) + ks * (alpha + 2) / 2 / M_PI * pow(abs(refPerfect * origin2hit), alpha)),
+				dirLight[2] + rgbL[2] * a * ((rgb[2]/M_PI) + ks * (alpha + 2) / 2 / M_PI * pow(abs(refPerfect * origin2hit), alpha)));
 		}
 	}
 	if(maxDepth == 1){
@@ -203,14 +224,18 @@ void Reflective::show(){
 	this->color.show();
 }
 
+bool Reflective::getRefractive(){
+	return false;
+}
+
 // I = incident ray, N = normal, iorm = index of refraction of medium, iorr = of the medium where the ray is
 //CAMBIAR INDICES DE LOS MEDIOS
-Direction refract(Direction I, Direction N, float iorm, bool& refraction){
+Direction refract(Direction I, Direction N, float iorm, float iorr, bool& refraction){
 	I.normalize(); N.normalize();
     float cosi = I * N; 
     if(cosi < -1) cosi = -1;
     if(cosi > 1) cosi = 1;
-    float etai = 1, etat = iorm; 
+    float etai = iorr, etat = iorm; 
     Direction n = N; 
     if (cosi < 0) { cosi = -cosi; } else { std::swap(etai, etat); n = N * -1; } 
     float eta = etai / etat; 
@@ -219,9 +244,7 @@ Direction refract(Direction I, Direction N, float iorm, bool& refraction){
     Direction aux2 = (n * (eta * cosi - sqrtf(k)));
     aux1 = Direction(aux1[0] + aux2[0], aux1[1] + aux2[1], aux1[2] + aux2[2]);
     if(k < 0){
-    	//cout << "k < 0" << endl;
     	refraction = false;
-    	//cout << aux1.showAsString() << endl;
     	return aux1;
     }
     else{
@@ -230,19 +253,51 @@ Direction refract(Direction I, Direction N, float iorm, bool& refraction){
     } 
 } 
 
-Refractive::Refractive(){this->n = 1;}
+Refractive::Refractive(){this->n = 1; this->wide = false;}
 
-Refractive::Refractive(float n){this->n = n;}
+Refractive::Refractive(float n, bool wide){this->n = n; this->wide = wide;}
+
+bool Refractive::getRefractive(){
+	return true;
+}
 
 RGB Refractive::getColor(Direction n, Point origin, Point hit, Scene scene, int depth){
-	Direction incident = hit - origin; incident.normalize();
-	bool refraction;
-	Direction outRay = refract(incident, n, this->n, refraction); outRay.normalize();
-	Ray r(outRay, hit + outRay * 0.1f);
-	RGB Li = RGB(0, 0, 0);
-//	cout << outRay.showAsString() << endl;
-	if(refraction) Li = r.tracePath(scene, depth + 1);
-	return Li;
+	if(!this->wide){
+		Direction incident = hit - origin; incident.normalize();
+		bool refraction;
+		Direction outRay = refract(incident, n, this->n, 1, refraction); outRay.normalize();
+		Ray r(outRay, hit + outRay * 0.1f);
+		RGB Li = RGB(0, 0, 0);
+		Point intersection; float dist;
+		Shape* shape = nullptr;
+ 		Li = r.tracePath(scene, depth + 1);
+ 		return Li;
+	}
+	else{
+		//cout << "first refraction point " << hit.showAsString() << endl;
+		Direction incident = hit - origin; incident.normalize();
+		bool refraction;
+		Direction outRay = refract(incident, n, this->n, 1, refraction); outRay.normalize();
+		Ray r(outRay, hit + outRay * 0.1f);
+		RGB Li = RGB(0, 0, 0);
+		Point intersection; float dist;
+		Shape* shape = nullptr;
+		shape = r.collision(scene, intersection,dist);
+		//cout << "second : " << intersection.showAsString() << endl;
+		if(shape != nullptr){
+			//cout << "collision with" << endl;
+			//shape->show(); cout << endl;
+			Direction aux = (intersection - hit); aux.normalize();
+			outRay = refract(aux, shape->getNormal(intersection), 1, this->n, refraction); outRay.normalize();
+			Ray r(outRay, intersection + outRay * 0.1f);
+			Li = r.tracePath(scene, depth + 1);
+		}
+		else{
+			Li = r.tracePath(scene, depth + 1);
+		}
+		/*if(refraction)*/ Li = r.tracePath(scene, depth + 1);	
+		return Li;
+	}
 }
 
 
@@ -1057,6 +1112,7 @@ Triangle::Triangle(Point a, Point b, Point c, Material* material) {
 	Direction ac = a - c;
 	Direction normal = ab ^ ac;
 	normal.normalize();
+	normal = normal * 1;
 	this->p = Plane(normal, this->a, this->color);
 	this->material = material;
 }
@@ -1234,9 +1290,10 @@ Parallelepiped::Parallelepiped(Triangle* A, Triangle* B, float c, Material* mate
 	this->t12 = new Triangle(s, p, q, this->material);
 }
 
+Triangle* normalParallelepiped = new Triangle();
 float Parallelepiped::collision(Direction d, Point o, bool& collision){
 	vector<float> distances;
-
+	int triangle = -1;
 	d.normalize();
 	distances.push_back(t1->collision(d, o, collision));
 	distances.push_back(t2->collision(d, o, collision));
@@ -1258,10 +1315,48 @@ float Parallelepiped::collision(Direction d, Point o, bool& collision){
 		distance = distances[i];
 		if (distance < minDist && distance != -1){
 			minDist = distance;
+			triangle = i;
 			collision = true;
 		}
 	}
 	if(collision){
+		if(triangle = 0){
+			normalParallelepiped = this->t1;
+		}
+		else if(triangle = 1){
+			normalParallelepiped = this->t2;
+		}
+		else if(triangle = 2){
+			normalParallelepiped = this->t3;
+		}
+		else if(triangle = 3){
+			normalParallelepiped = this->t4;
+		}
+		else if(triangle = 4){
+			normalParallelepiped = this->t5;
+		}
+		else if(triangle = 5){
+			normalParallelepiped = this->t6;
+		}
+		else if(triangle = 6){
+			normalParallelepiped = this->t7;
+		}
+		else if(triangle = 7){
+			normalParallelepiped = this->t8;
+		}
+		else if(triangle = 8){
+			normalParallelepiped = this->t9;
+		}
+		else if(triangle = 9){
+			normalParallelepiped = this->t10;
+		}
+		else if(triangle = 10){
+			normalParallelepiped = this->t11;
+		}
+		else if(triangle = 11){
+			normalParallelepiped = this->t12;
+		}
+		
 		return minDist;
 	}
 	else{
@@ -1277,9 +1372,13 @@ RGB Parallelepiped::getColor(){
 	return this->color;
 }
 
+Direction Parallelepiped::getNormal(Point x){
+	return normalParallelepiped->getNormal(x);
+}	
+
 string Parallelepiped::showAsString(){
 	string s = "Parallelepiped: \n";
-	s += this->t1->showAsString();
+	/*s += this->t1->showAsString();
 	s += this->t2->showAsString();
 	s += this->t3->showAsString();
 	s += this->t4->showAsString();
@@ -1290,7 +1389,7 @@ string Parallelepiped::showAsString(){
 	s += this->t9->showAsString();
 	s += this->t10->showAsString();
 	s += this->t11->showAsString();
-	s += this->t12->showAsString();
+	s += this->t12->showAsString();*/
 	return s;
 }
 

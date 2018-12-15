@@ -30,81 +30,29 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 	scene.add(shape);
 	shape = new Plane(Direction(0, 1, 0), Point(0,-10, 10), new BRDF(0.7, 0, 100, RGB((float)206/255, (float)206/255, (float)206/255))); //DOWN
 	scene.add(shape);
-	shape = new Plane(Direction(0, -1, 0), Point(0, 10, 10), new BRDF(0.7, 0, 100, RGB((float)140/255, (float)140/255, (float)140/255))); //UP
+	shape = new Plane(Direction(0, -1, 0), Point(0, 10, 10), new BRDF(0.7, 0, 100, RGB((float)255/255, (float)0/255, (float)140/255))); //UP
 	scene.add(shape);
-	shape = new Plane(Direction(0, 0, -1), Point(0, 00, 20), new BRDF(0.7, 0, 100, RGB((float)191/255, (float)191/255, (float)191/255))); //BACK
+	shape = new Plane(Direction(0, 0, -1), Point(0, 00, 20), new BRDF(0.7, 0, 100, RGB((float)191/255, (float)191/255, (float)0/255))); //BACK
 	scene.add(shape);
 
 	// Pruebas sin mas
-	Material* m = new BRDF(0, 0.7, 1, RGB(0, 0, (float)255/255));
-	
-	/*shape = new Triangle(Point(-10, -10, 10), Point(-5, 10, 15), Point(0, -5, 12), new Refractive(4));
-	scene.add(shape);*/
-	
-	//m = new BRDF(0, 0.7, 100, RGB((float)255/255, 0, (float)255/255));
-	/*shape = new Parallelepiped(new Triangle(Point(7, -5, 10), Point(7, -10, 15), Point(7, -5, 20), RGB(255, 0, 0)),
-					new Triangle(Point(7, -5, 10), Point(7, 0, 15), Point(7, -5, 20), RGB(0, 0, 180)), 4, new Refractive(4));
-	scene.add(shape);*/
-
-
-	// FAROLAS
-	m = new BRDF(0, 0.7, 100, RGB((float)59/255, (float)29/255, 0));
-	shape = new Sphere(Point(7.5, 2.4, 12), 0.7, new Refractive(4));
+	Material* m = new BRDF(0, 0.7, 1, RGB(0, 0, (float)255/255));	
+	m = new BRDF(0.7, 0, 100, RGB((float)255/255, 0, (float)255/255));
+	Material* r = new Reflective();
+	shape = new Parallelepiped(new Triangle(Point(7, -5, 10), Point(7, -10, 15), Point(7, -5, 20), r),
+					new Triangle(Point(7, -5, 10), Point(7, 0, 15), Point(7, -5, 20), r), 12, r);
 	scene.add(shape);
-	shape = new Cylinder(Disk(Direction(0, -1, 0), Point(7.5, -10, 12), 1, m), Disk(Direction(0, -1, 0), Point(7.5, 2, 12), 0.2, m), m);
-	scene.add(shape);
-	shape = new Sphere(Point(7.5, 2.4, 14), 0.7, new Refractive(4));
-	scene.add(shape);
-	shape = new Cylinder(Disk(Direction(0, -1, 0), Point(7.5, -10, 14), 1, m), Disk(Direction(0, -1, 0), Point(7.5, 2, 14), 0.2, m), m);
-	scene.add(shape);
-	shape = new Sphere(Point(7.5, 2.4, 16), 0.7, new Refractive(4));
-	scene.add(shape);
-	shape = new Cylinder(Disk(Direction(0, -1, 0), Point(7.5, -10, 16), 1, m), Disk(Direction(0, -1, 0), Point(7.5, 2, 16), 0.2, m), m);
-	scene.add(shape);
-	shape = new Sphere(Point(7.5, 2.4, 18), 0.7, new Refractive(4));
-	scene.add(shape);
-	shape = new Cylinder(Disk(Direction(0, -1, 0), Point(7.5, -10, 18), 1, m), Disk(Direction(0, -1, 0), Point(7.5, 2, 18), 0.2, m), m);
-	scene.add(shape);
-
-	shape = new Sphere(Point(-7.5, 2.4, 12), 0.7, new Refractive(4));
-	scene.add(shape);
-	shape = new Cylinder(Disk(Direction(0, -1, 0), Point(-7.5, -10, 12), 1, m), Disk(Direction(0, -1, 0), Point(-7.5, 2, 12), 0.2, m), m);
-	scene.add(shape);
-	shape = new Sphere(Point(-7.5, 2.4, 14), 0.7, new Refractive(4));
-	scene.add(shape);
-	shape = new Cylinder(Disk(Direction(0, -1, 0), Point(-7.5, -10, 14), 1, m), Disk(Direction(0, -1, 0), Point(-7.5, 2, 14), 0.2, m), m);
-	scene.add(shape);
-	shape = new Sphere(Point(-7.5, 2.4, 16), 0.7, new Refractive(4));
-	scene.add(shape);
-	shape = new Cylinder(Disk(Direction(0, -1, 0), Point(-7.5, -10, 16), 1, m), Disk(Direction(0, -1, 0), Point(-7.5, 2, 16), 0.2, m), m);
-	scene.add(shape);
-	shape = new Sphere(Point(-7.5, 2.4, 18), 0.7, new Refractive(4));
-	scene.add(shape);
-	shape = new Cylinder(Disk(Direction(0, -1, 0), Point(-7.5, -10, 18), 1, m), Disk(Direction(0, -1, 0), Point(-7.5, 2, 18), 0.2, m), m);
-	scene.add(shape);
-
-	// ACERA
-	m = new BRDF(0, 0.7, 100, RGB((float)125/255, (float)109/255, (float)94/255));
-	shape = new Parallelepiped(new Triangle(Point(-10, -10, 0), Point(-10, -9.6, 0), Point(-5, -9.6, 0), m),
-					new Triangle(Point(-10, -10, 0), Point(-5, -10, 0), Point(-5, -9.6, 0), m), -20, m);
-	scene.add(shape);
-
-	shape = new Parallelepiped(new Triangle(Point(10, -10, 0), Point(10, -9.6, 0), Point(5, -9.6, 0), m),
-					new Triangle(Point(10, -10, 0), Point(5, -10, 0), Point(5, -9.6, 0), m), 20, m);
-	scene.add(shape);
-
-
-	PointLight* pl = new PointLight(Point(0, 6, 12), new Light(250, RGB(1,1,1)));
+	shape = new Sphere(Point(-5,5,10),2.5, new Reflective());
+	//shape = new Plane(Direction(0,0,1), Point(0,0,10), new Refractive(1.4, false));
+	//shape = new Triangle(Point(-5,-5,10),Point(5,-5,10), Point(0,5,10), new Refractive(2));
+	//scene.add(shape);
+	shape = new Sphere(Point(5,0,10),2.5, new Refractive(4, false));
+	//scene.add(shape);
+	shape = new Cylinder(Disk(Direction(0, -1, 0), Point(0, -6, 12), 2, m), Disk(Direction(0, -1, 0), Point(0, 4, 12), 2, m), new Refractive(2, true));
+	shape = new Cylinder(Disk(Direction(0, -1, 0), Point(0, -10, 10), 1, m), Disk(Direction(0, -1, 0), Point(0, 4, 10), 1, m), m);
+	//scene.add(shape);
+	PointLight* pl = new PointLight(Point(0, 6, 10), new Light(250, RGB(1,1,1)));
 	scene.add(pl);
-
- 	/* //EL MARAVILLOSO PENE
-	shape = new Sphere(Point(5, -13.5, 35), 7, RGB(252, 123, 220)); //RIGHT BALL
-	
-	shape = new Sphere(Point(-5, -13.5, 35), 7, RGB(252, 123, 220)); //LEFT BALL
-	shape = new Cylinder(Disk(Direction(0, 1, 0), Point(0, -13, 35), 6, RGB(255, 255, 255)), 
-				Disk(Direction(0,1,0), Point(0, 15, 35), 6, RGB(255,255,255)), RGB(214, 104, 187));
-	shape = new Sphere(Point(0, 15, 35), 6, RGB(173, 83, 151)); //TOP
-	*/
 	
 	// MAIN CODE
 	Camera camera = Camera(Point(0, 0, 0), Direction(0, 0, 10), Direction(10, 0, 0), pixelX, pixelY);	camera.setL(camera.getL() * -1);
@@ -142,7 +90,6 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 				mean = RGB(mean[0] + result[0], mean[1] + result[1], mean[2] + result[2]);
 			}
 			mean = RGB((mean[0] / numPaths) * colorRange, (mean[1] / numPaths) * colorRange, (mean[2] / numPaths) * colorRange);
-			//mean = RGB((mean[0] / numPaths), (mean[1] / numPaths), (mean[2] / numPaths));
 			if(mean[0] > colorRange || mean[0] < 0) mean = RGB(colorRange, mean[1], mean[2]); 
 			if(mean[1] > colorRange || mean[1] < 0) mean = RGB(mean[0], colorRange, mean[2]);
 			if(mean[2] > colorRange || mean[2] < 0) mean = RGB(mean[0], mean[1], colorRange);
@@ -152,26 +99,6 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 		cout << i << endl;
 	}
 	o.close();
-/*	random_device rd;
-	mt19937 gen = mt19937 (rd());
-		uniform_real_distribution<float> distribution = uniform_real_distribution<float>(0, 1);
-		Direction n(0, 1,0); n.normalize();
-		cout << "normal " << n.showAsString() << endl;
-		cout << endl;
-	for(int i = 0; i < 10; i ++){
-		Direction any(1, 0, 1); any.normalize();
-		Direction axis = n ^ any; axis.normalize();
-		CoordinateSystem coor(axis, n, axis^n, Point(0,0,0));
-		float eO = distribution(gen);
-		float eI = distribution(gen);
-		float Oi = acos(sqrt(1 - eO));
-		float Ai = 2 * M_PI * eI; //azimuth aleatorio
-		Vector vecAux = {sin(Oi) * cos(Ai), cos(Oi), sin(Oi) * sin(Ai), 0};
-		vecAux = coor.getM() * vecAux;
-		Direction wi = Direction(vecAux[0], vecAux[1], vecAux[2]);
-		wi.normalize();
-		cout <<"WI " << wi.showAsString() << endl;
-	}*/
 	
 
 	return 0;
