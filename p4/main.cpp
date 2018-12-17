@@ -23,6 +23,7 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 	string f = argv[4]; 
 	Scene scene;
 	Shape *shape = nullptr;
+	Material* r = new Reflective();
 	// CORNELL BOX
 	shape = new Plane(Direction(1, 0, 0), Point(-10, 0, 10), new BRDF(0.7, 0, 100, RGB((float)255/255, 0, 0))); //LEFT
 	scene.add(shape);
@@ -37,19 +38,19 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 
 	// Pruebas sin mas
 	Material* m = new BRDF(0, 0.7, 1, RGB(0, 0, (float)255/255));	
-	m = new BRDF(0.7, 0, 100, RGB((float)255/255, 0, (float)255/255));
-	Material* r = new Reflective();
-	shape = new Parallelepiped(new Triangle(Point(7, -5, 10), Point(7, -10, 15), Point(7, -5, 20), r),
-					new Triangle(Point(7, -5, 10), Point(7, 0, 15), Point(7, -5, 20), r), 12, r);
+	//m = new BRDF(0.7, 0, 100, RGB((float)255/255, 0, (float)255/255));
+	shape = new Parallelepiped(new Triangle(Point(-9, -5, 10), Point(-7, -10, 15), Point(-5, -5, 20), r),
+					new Triangle(Point(-9, -5, 10), Point(-7, 0, 15), Point(-7, -5, 20), r), -2, new Refractive(4, false));
 	scene.add(shape);
 	shape = new Sphere(Point(-5,5,10),2.5, new Reflective());
+	//scene.add(shape);
 	//shape = new Plane(Direction(0,0,1), Point(0,0,10), new Refractive(1.4, false));
 	//shape = new Triangle(Point(-5,-5,10),Point(5,-5,10), Point(0,5,10), new Refractive(2));
 	//scene.add(shape);
-	shape = new Sphere(Point(5,0,10),2.5, new Refractive(4, false));
+	//shape = new Sphere(Point(5,0,10),2.5, new Refractive(4, false));
 	//scene.add(shape);
-	shape = new Cylinder(Disk(Direction(0, -1, 0), Point(0, -6, 12), 2, m), Disk(Direction(0, -1, 0), Point(0, 4, 12), 2, m), new Refractive(2, true));
-	shape = new Cylinder(Disk(Direction(0, -1, 0), Point(0, -10, 10), 1, m), Disk(Direction(0, -1, 0), Point(0, 4, 10), 1, m), m);
+	//shape = new Cylinder(Disk(Direction(0, -1, 0), Point(0, -6, 12), 2, m), Disk(Direction(0, -1, 0), Point(0, 4, 12), 2, m), new Refractive(2, true));
+	//shape = new Cylinder(Disk(Direction(0, -1, 0), Point(0, -10, 10), 1, m), Disk(Direction(0, -1, 0), Point(0, 4, 10), 1, m), m);
 	//scene.add(shape);
 	PointLight* pl = new PointLight(Point(0, 6, 10), new Light(250, RGB(1,1,1)));
 	scene.add(pl);

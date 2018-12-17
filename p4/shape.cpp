@@ -1234,10 +1234,10 @@ Parallelepiped::Parallelepiped(Triangle* A, Triangle* B, float c, RGB color){
 	normal.normalize();
 
 	// Compute of the 4 points with the normal and the distance
-	Point p = normal*c+Ab;
-	Point q = normal*c+Ac;
-	Point r = normal*c+Aa;
-	Point s = normal*c+Bb;
+	this->p = normal*c+Ab;
+	this->q = normal*c+Ac;
+	this->r = normal*c+Aa;
+	this->s = normal*c+Bb;
 
 	this->t3 = new Triangle(Aa, r, s, RGB(255, 0, 111));
 	this->t4 = new Triangle(Aa, Bb, s, RGB(125, 255, 125));
@@ -1273,10 +1273,10 @@ Parallelepiped::Parallelepiped(Triangle* A, Triangle* B, float c, Material* mate
 	normal.normalize();
 
 	// Compute of the 4 points with the normal and the distance
-	Point p = normal*c+Ab;
-	Point q = normal*c+Ac;
-	Point r = normal*c+Aa;
-	Point s = normal*c+Bb;
+	this->p = normal*c+Ab;
+	this->q = normal*c+Ac;
+	this->r = normal*c+Aa;
+	this->s = normal*c+Bb;
 
 	this->t3 = new Triangle(Aa, r, s, this->material);
 	this->t4 = new Triangle(Aa, Bb, s, this->material);
@@ -1291,9 +1291,9 @@ Parallelepiped::Parallelepiped(Triangle* A, Triangle* B, float c, Material* mate
 }
 
 Triangle* normalParallelepiped = new Triangle();
+int triangle = -1;
 float Parallelepiped::collision(Direction d, Point o, bool& collision){
 	vector<float> distances;
-	int triangle = -1;
 	d.normalize();
 	distances.push_back(t1->collision(d, o, collision));
 	distances.push_back(t2->collision(d, o, collision));
@@ -1320,42 +1320,42 @@ float Parallelepiped::collision(Direction d, Point o, bool& collision){
 		}
 	}
 	if(collision){
-		if(triangle = 0){
+		/*if(triangle == 0){
 			normalParallelepiped = this->t1;
 		}
-		else if(triangle = 1){
+		else if(triangle == 1){
 			normalParallelepiped = this->t2;
 		}
-		else if(triangle = 2){
+		else if(triangle == 2){
 			normalParallelepiped = this->t3;
 		}
-		else if(triangle = 3){
+		else if(triangle == 3){
 			normalParallelepiped = this->t4;
 		}
-		else if(triangle = 4){
+		else if(triangle == 4){
 			normalParallelepiped = this->t5;
 		}
-		else if(triangle = 5){
+		else if(triangle == 5){
 			normalParallelepiped = this->t6;
 		}
-		else if(triangle = 6){
+		else if(triangle == 6){
 			normalParallelepiped = this->t7;
 		}
-		else if(triangle = 7){
+		else if(triangle == 7){
 			normalParallelepiped = this->t8;
 		}
-		else if(triangle = 8){
+		else if(triangle == 8){
 			normalParallelepiped = this->t9;
 		}
-		else if(triangle = 9){
+		else if(triangle == 9){
 			normalParallelepiped = this->t10;
 		}
-		else if(triangle = 10){
+		else if(triangle == 10){
 			normalParallelepiped = this->t11;
 		}
-		else if(triangle = 11){
+		else if(triangle == 11){
 			normalParallelepiped = this->t12;
-		}
+		}*/
 		
 		return minDist;
 	}
@@ -1373,7 +1373,27 @@ RGB Parallelepiped::getColor(){
 }
 
 Direction Parallelepiped::getNormal(Point x){
-	return normalParallelepiped->getNormal(x);
+	Direction d;
+	if(triangle == 0 || triangle == 1){
+		d = this->t1->getA() - this->r ;
+	}
+	else if(triangle == 2 || triangle == 3){
+		d = this->r - this->p;
+	}
+	else if(triangle == 4 || triangle == 5){
+		d = this->s - this->r;
+	}
+	else if(triangle == 6 || triangle == 7){
+		d = this->q - this->s;
+	}
+	else if(triangle == 8 || triangle == 9){
+		d = this->r - this->s;
+	}
+	else if(triangle == 10 || triangle == 11){
+		d = this->r - this->t1->getA();
+	}
+	d.normalize();
+	return d;
 }	
 
 string Parallelepiped::showAsString(){
