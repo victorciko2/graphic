@@ -137,6 +137,7 @@ protected:
 	Direction dir;
 	Point p;
 public:
+	Ray();
 	Ray(Direction dir, Point p);
 	~Ray();
 	Direction getDirection();
@@ -294,47 +295,26 @@ public:
 	Triangle();
 	~Triangle();
 	Triangle(Point a, Point b, Point c, Plane p, RGB color);
-
 	Triangle(Point a, Point b, Point c, RGB color);
-
 	Triangle(Point a, Point b, Point c, Plane p, Material* material);
-
 	Triangle(Point a, Point b, Point c, Material* material);
-
 	Triangle(Point a, Point b, Point c);
-
 	void setA(Point a);
-
 	void setB(Point b);
-
 	void setC(Point c);
-
 	void setP(Plane p);
-
 	void setColor(RGB color);
-
 	RGB getColor();
-	
 	Material* getMaterial();
-
 	void setMaterial(Material* material);
-
 	Direction getNormal(Point x);
-
 	Point getA();
-
 	Point getB();
-
 	Point getC();
-
 	Plane getP();
-
 	float collision(Direction d, Point o, bool& collision);
-
 	string showAsString();
-
 	void show();
-
 	Triangle operator=(Triangle t);
 };
 
@@ -344,19 +324,13 @@ private:
 	Point p, q, r, s;
 public:
 	Parallelepiped(Triangle* A, Triangle* B, float c, RGB color);
-
+	~Parallelepiped();
 	Parallelepiped(Triangle* A, Triangle* B, float c, Material* material);
-
 	float collision(Direction d, Point o, bool& collision);
-
 	void setColor(RGB color);
-
 	RGB getColor();
-
 	Direction getNormal(Point x);
-	
 	string showAsString();
-
 	void show();
 };
 

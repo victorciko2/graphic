@@ -36,7 +36,7 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 	scene.add(shape);
 
 	// Pruebas sin mas
-	Material* r = new Reflective();
+	Material* ref = new Reflective();
 	Material* m = new BRDF(0.7, 0.2, 1, RGB((float)255/255, (float)255/255, (float)255/255));	
 	//body
 	shape = new Sphere(Point(0,-7,13), 3, m);
@@ -67,18 +67,18 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 	shape = new Cylinder(Disk(Direction(1, 0, 0), Point(-0.5, -0.2, 11), 0.1), 1.1, m);
 	scene.add(shape);
 	shape = new Parallelepiped(new Triangle(Point(-8, -9.9, 14), Point(-8, -9.9, 18), Point(-2, -9.9, 18)),
-					new Triangle(Point(-8, -9.9, 14), Point(-2, -9.9 ,14), Point(-2, -9.9, 18)), 12, r);
+					new Triangle(Point(-8, -9.9, 14), Point(-2, -9.9 ,14), Point(-2, -9.9, 18)), 12, ref);
 	//scene.add(shape);
 	//shape = new Plane(Direction(0,0,1), Point(0,0,10), new Refractive(1.4, false));
 	//shape = new Triangle(Point(-5,-5,10),Point(5,-5,10), Point(0,5,10), new Refractive(2));
 	//scene.add(shape);
 	//shape = new Sphere(Point(5,0,10),2.5, new Refractive(4, false));
 	m = new BRDF(0.5, 0.3, 100, RGB((float)255/255, 0, (float)255/255));
-	shape = new Parallelepiped(new Triangle(Point(-9, -5, 20), Point(-7, -10, 15), Point(-7, -5, 10), r),
-					new Triangle(Point(-9, -5, 20), Point(-7, 0, 15), Point(-7, -5, 10), r), -1, r);
+	shape = new Parallelepiped(new Triangle(Point(-9, -5, 20), Point(-7, -10, 15), Point(-7, -5, 10), ref),
+					new Triangle(Point(-9, -5, 20), Point(-7, 0, 15), Point(-7, -5, 10)), -1, ref);
 	//scene.add(shape);
-	shape = new Parallelepiped(new Triangle(Point(7, -5, 10), Point(7, -10, 15), Point(7, -5, 20), r),
-					new Triangle(Point(7, -5, 10), Point(7, 0, 15), Point(7, -5, 20), r), 3, new Refractive(4, true));
+	shape = new Parallelepiped(new Triangle(Point(7, -5, 10), Point(7, -10, 15), Point(7, -5, 20), ref),
+					new Triangle(Point(7, -5, 10), Point(7, 0, 15), Point(7, -5, 20)), 3, new Refractive(4, true));
 	//scene.add(shape);
 	shape = new Sphere(Point(0,2,10),2, m);
 	shape = new Cylinder(Disk(Direction(0, 1, 0), Point(-6, -9.9, 16), 3), 14, new Reflective());
@@ -111,21 +111,26 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 	Point aux = camera.getOrigin() + camera.getL() + camera.getU() + camera.getF();
   	uniform_real_distribution<float> distributionX = uniform_real_distribution<float>(0, 1);
   	uniform_real_distribution<float> distributionY = uniform_real_distribution<float>(0, planeVectorU.modulus());
+  	RGB mean;
+  	Direction auxPi;
+  	Point pointRnd;
+  	Ray r;
+  	int depth = 0;
+  	RGB result;
 	for(int i = 0; i < camera.getY(); i++){
 		for(int j = 0; j < camera.getX(); j++){
-			RGB mean = RGB(0, 0, 0);
+			mean = RGB(0, 0, 0);
 			for(int k = 0; k < numPaths; k++){
 				rndX = distributionX(gen); rndY = distributionY(gen);
-				Point pointRnd = Point(aux[0] + distributionX(gen)*planeVectorL.modulus(), 
+				pointRnd = Point(aux[0] + distributionX(gen)*planeVectorL.modulus(), 
 										aux[1] + distributionX(gen)*planeVectorU.modulus(), aux[2]);
-				Direction auxPi=Direction(distributionX(gen)*2*camera.getL().modulus()/camera.getX(), distributionX(gen)*2*camera.getU().modulus()/camera.getY(), 0);
-				Point aux;
+				auxPi = Direction(distributionX(gen)*2*camera.getL().modulus()/camera.getX(), distributionX(gen)*2*camera.getU().modulus()/camera.getY(), 0);
 				d = (pointRnd +  (planeVectorL * j) + (planeVectorU * i))  - camera.getOrigin();
 				d.normalize();
 				//d.show();
-				Ray r(d, camera.getOrigin());
-				int depth = 0;
-				RGB result = r.tracePath(scene, depth);
+				r = Ray(d, camera.getOrigin());
+				depth = 0;
+				result = r.tracePath(scene, depth);
 				mean = RGB(mean[0] + result[0], mean[1] + result[1], mean[2] + result[2]);
 			}
 			mean = RGB((mean[0] / numPaths) * colorRange, (mean[1] / numPaths) * colorRange, (mean[2] / numPaths) * colorRange);

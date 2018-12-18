@@ -9,9 +9,7 @@ using namespace std;
 Material::Material(){
 	this->color = RGB(0, 0, 0);
 }
-Material::~Material(void){
-	cout << "deleting material" << endl;
-}
+Material::~Material(void){}
 
 Material::Material(RGB color){
 	this->color = color;
@@ -49,9 +47,7 @@ BRDF::BRDF(){
    	this->color = RGB();
 }
 
-BRDF::~BRDF(void){
-	cout << "deleting brdf" << endl;
-}
+BRDF::~BRDF(void){}
 
 BRDF::BRDF(float kd, float ks, float alpha, RGB color){
 	this->kd = kd;
@@ -207,9 +203,7 @@ Light::Light(){
 	this->p = 100;
 }
 
-Light::~Light(void){
-	cout << "deleting light" << endl;
-}
+Light::~Light(void){}
 
 Light::Light(float p){
 	this->p = p;
@@ -222,9 +216,7 @@ Light::Light(float p, RGB color){
 
 Reflective::Reflective(){}
 
-Reflective::~Reflective(void){
-	cout << "deleting Reflective" << endl;
-}
+Reflective::~Reflective(void){}
 
 RGB Reflective::getColor(Direction n, Point origin, Point hit, Scene scene, int depth){
 	Direction wo = hit - origin; wo.normalize();
@@ -270,9 +262,7 @@ Direction refract(Direction I, Direction N, float iorm, float iorr, bool& refrac
 
 Refractive::Refractive(){this->n = 1; this->wide = false;}
 
-Refractive::~Refractive(void){
-	cout << "deleting refracive" << endl;
-}
+Refractive::~Refractive(void){}
 
 Refractive::Refractive(float n, bool wide){this->n = n; this->wide = wide;}
 
@@ -346,9 +336,7 @@ float Light::getIntensity(){
 
 PointLight::PointLight(){}
 
-PointLight::~PointLight(void){
-	cout << "deleting point light" << endl;
-}
+PointLight::~PointLight(void){}
 
 PointLight::PointLight(Point o, Light* l) : Shape(l){
 	this->o = o;
@@ -360,15 +348,7 @@ Point PointLight::getOrigin(){
 
 Scene::Scene(){}
 
-Scene::~Scene(void){
-	cout << "deleting scene" << endl;
-	for(int i = 0; i < this->objects.size(); i++){
-		this->~objects[i];
-	}
-	for(int i = 0; i < this->lights.size(); i++){
-		this->~lights[i];
-	}	
-}
+Scene::~Scene(void){}
 
 Scene::Scene(vector<Shape*> objects){
 	this->objects = vector<Shape*>();
@@ -404,9 +384,7 @@ Shape::Shape(){
 	this->material = new Material();
 }
 
-Shape::~Shape(void){
-	cout << "deleting shape" << endl;
-}
+Shape::~Shape(void){}
 Shape::Shape(RGB color){
 	this->color = color;
 	this->material = new Material();
@@ -458,15 +436,14 @@ void Shape::show(){
 	cout << this->showAsString() << endl;
 }
 
+Ray::Ray(){}
 Ray::Ray(Direction dir, Point p){
 	this->dir = dir;
 	this->dir.normalize();
 	this->p = p;
 }
 
-Ray::~Ray(void){
-	cout << "deleting ray" << endl;
-}
+Ray::~Ray(void){}
 
 Direction Ray::getDirection(){
 	return this->dir;
@@ -522,9 +499,7 @@ Sphere::Sphere(){
 	this->material = new Material();
 }
 
-Sphere::~Sphere(void){
-	cout << "deleting sphere" << endl;
-}
+Sphere::~Sphere(void){}
 
 Sphere::Sphere(Point center, float radius, RGB color){
 	this->center = center;
@@ -627,9 +602,7 @@ Plane::Plane(){
 	this->material = new Material(); 
 }
 
-Plane::~Plane(void){
-	cout << "deleting plane" << endl;
-}
+Plane::~Plane(void){}
 
 Plane::Plane(Direction normal, Point o, RGB color){
 	this->o = o;
@@ -732,9 +705,7 @@ Disk::Disk(){
 
 }
 
-Disk::~Disk(void){
-	cout << "deleting disk" << endl;
-}
+Disk::~Disk(void){}
 
 Disk::Disk(Direction normal, Point o, float radius, RGB color){
 	this->normal = normal;
@@ -825,9 +796,7 @@ InfiniteCylinder::InfiniteCylinder(){
 	this->material = new Material();
 }
 
-InfiniteCylinder::~InfiniteCylinder(void){
-	cout << "deleting InfiniteCylinder" << endl;
-}
+InfiniteCylinder::~InfiniteCylinder(void){}
 
 InfiniteCylinder::InfiniteCylinder(Direction v, Point p, float radius, RGB color){
 	this->v = v;
@@ -936,9 +905,7 @@ Cylinder::Cylinder(){
 	this->material = new Material();
 }
 
-Cylinder::~Cylinder(void){
-	cout << "deleting cylinder" << endl;
-}
+Cylinder::~Cylinder(void){}
 
 Cylinder::Cylinder(Plane inf, float h, float radius, Direction v, Point p, RGB color){
 	this->v = inf.getNormal();
@@ -1189,9 +1156,7 @@ Triangle::Triangle() {
 	this->material = new Material();
 }
 
-Triangle::~Triangle(void){
-	cout << "deleting triangle" << endl;
-}
+Triangle::~Triangle(void){}
 
 Triangle::Triangle(Point a, Point b, Point c, RGB color) {
 	this->a = a;
@@ -1381,9 +1346,7 @@ Parallelepiped::Parallelepiped(Triangle* A, Triangle* B, float c, RGB color){
 	this->t12 = new Triangle(s, p, q, RGB(255, 0, 0));
 }
 
-Parallelepiped::~Parallelepiped(void){
-	cout << "deleting Parallelepiped" << endl;
-}
+Parallelepiped::~Parallelepiped(void){}
 
 Parallelepiped::Parallelepiped(Triangle* A, Triangle* B, float c, Material* material){
 	// Triangle A: b point alone, a and c shared with triangle B
