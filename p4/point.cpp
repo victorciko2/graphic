@@ -48,6 +48,10 @@ Point Point::operator+(Direction d){
 	return Point(this->x + d.getX(), this->y + d.getY(), this->z + d.getZ());
 }
 
+Point Point::operator*(float d){
+	return Point(this->x * d, this->y * d, this->z * d);
+}
+
 Direction Point::operator-(Point p2){
 	return Direction(this->x - p2.getX(), this->y - p2.getY(), this->z - p2.getZ());
 }

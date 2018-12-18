@@ -38,6 +38,8 @@ public:
 
 	Direction operator-(Point p2);
 
+	Point operator*(float d);
+	
 	Point operator=(Point p);
 
 	bool operator==(Point p);

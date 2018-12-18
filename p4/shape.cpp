@@ -9,6 +9,9 @@ using namespace std;
 Material::Material(){
 	this->color = RGB(0, 0, 0);
 }
+Material::~Material(void){
+	cout << "deleting material" << endl;
+}
 
 Material::Material(RGB color){
 	this->color = color;
@@ -39,11 +42,15 @@ BRDF::BRDF(){
 	this->kd = 0.7;
 	this->ks = 0;
 	this->alpha = 1;
-	this->distribution= uniform_real_distribution<float>(0,1);
+	this->distribution = uniform_real_distribution<float>(0,1);
 	random_device rd;
     // Initialize Mersenne Twister pseudo-random number generator
    	this->gen = mt19937 (rd());
    	this->color = RGB();
+}
+
+BRDF::~BRDF(void){
+	cout << "deleting brdf" << endl;
 }
 
 BRDF::BRDF(float kd, float ks, float alpha, RGB color){
@@ -200,6 +207,10 @@ Light::Light(){
 	this->p = 100;
 }
 
+Light::~Light(void){
+	cout << "deleting light" << endl;
+}
+
 Light::Light(float p){
 	this->p = p;
 }
@@ -210,6 +221,10 @@ Light::Light(float p, RGB color){
 }
 
 Reflective::Reflective(){}
+
+Reflective::~Reflective(void){
+	cout << "deleting Reflective" << endl;
+}
 
 RGB Reflective::getColor(Direction n, Point origin, Point hit, Scene scene, int depth){
 	Direction wo = hit - origin; wo.normalize();
@@ -254,6 +269,10 @@ Direction refract(Direction I, Direction N, float iorm, float iorr, bool& refrac
 } 
 
 Refractive::Refractive(){this->n = 1; this->wide = false;}
+
+Refractive::~Refractive(void){
+	cout << "deleting refracive" << endl;
+}
 
 Refractive::Refractive(float n, bool wide){this->n = n; this->wide = wide;}
 
@@ -327,6 +346,10 @@ float Light::getIntensity(){
 
 PointLight::PointLight(){}
 
+PointLight::~PointLight(void){
+	cout << "deleting point light" << endl;
+}
+
 PointLight::PointLight(Point o, Light* l) : Shape(l){
 	this->o = o;
 }
@@ -336,6 +359,16 @@ Point PointLight::getOrigin(){
 }
 
 Scene::Scene(){}
+
+Scene::~Scene(void){
+	cout << "deleting scene" << endl;
+	for(int i = 0; i < this->objects.size(); i++){
+		this->~objects[i];
+	}
+	for(int i = 0; i < this->lights.size(); i++){
+		this->~lights[i];
+	}	
+}
 
 Scene::Scene(vector<Shape*> objects){
 	this->objects = vector<Shape*>();
@@ -371,6 +404,9 @@ Shape::Shape(){
 	this->material = new Material();
 }
 
+Shape::~Shape(void){
+	cout << "deleting shape" << endl;
+}
 Shape::Shape(RGB color){
 	this->color = color;
 	this->material = new Material();
@@ -428,6 +464,10 @@ Ray::Ray(Direction dir, Point p){
 	this->p = p;
 }
 
+Ray::~Ray(void){
+	cout << "deleting ray" << endl;
+}
+
 Direction Ray::getDirection(){
 	return this->dir;
 }
@@ -482,7 +522,10 @@ Sphere::Sphere(){
 	this->material = new Material();
 }
 
-//A LO MEJOR EL COORDINATE SYSTEM ESTA MAL CALCULADO POR LA CIUDAD DE REFERENCIA
+Sphere::~Sphere(void){
+	cout << "deleting sphere" << endl;
+}
+
 Sphere::Sphere(Point center, float radius, RGB color){
 	this->center = center;
 	this->color = color;
@@ -492,6 +535,11 @@ Sphere::Sphere(Point center, float radius, RGB color){
 Sphere::Sphere(Point center, float radius, Material* material){
 	this->center = center;
 	this->material = material;
+	this->radius = radius;
+}
+
+Sphere::Sphere(Point center, float radius){
+	this->center = center;
 	this->radius = radius;
 }
 
@@ -579,6 +627,10 @@ Plane::Plane(){
 	this->material = new Material(); 
 }
 
+Plane::~Plane(void){
+	cout << "deleting plane" << endl;
+}
+
 Plane::Plane(Direction normal, Point o, RGB color){
 	this->o = o;
 	this->color = color;
@@ -588,6 +640,11 @@ Plane::Plane(Direction normal, Point o, RGB color){
 Plane::Plane(Direction normal, Point o, Material* material){
 	this->o = o;
 	this->material = material;
+	this->normal = normal;
+}
+
+Plane::Plane(Direction normal, Point o){
+	this->o = o;
 	this->normal = normal;
 }
 
@@ -675,6 +732,10 @@ Disk::Disk(){
 
 }
 
+Disk::~Disk(void){
+	cout << "deleting disk" << endl;
+}
+
 Disk::Disk(Direction normal, Point o, float radius, RGB color){
 	this->normal = normal;
 	this->radius = radius;
@@ -687,6 +748,12 @@ Disk::Disk(Direction normal, Point o, float radius, Material* material){
 	this->radius = radius;
 	this->o = o;
 	this->material = material;
+}
+
+Disk::Disk(Direction normal, Point o, float radius){
+	this->normal = normal;
+	this->radius = radius;
+	this->o = o;
 }
 
 Point Disk::getO(){
@@ -758,6 +825,10 @@ InfiniteCylinder::InfiniteCylinder(){
 	this->material = new Material();
 }
 
+InfiniteCylinder::~InfiniteCylinder(void){
+	cout << "deleting InfiniteCylinder" << endl;
+}
+
 InfiniteCylinder::InfiniteCylinder(Direction v, Point p, float radius, RGB color){
 	this->v = v;
 	this->v.normalize();
@@ -772,6 +843,13 @@ InfiniteCylinder::InfiniteCylinder(Direction v, Point p, float radius, Material*
 	this->p = p;
 	this->radius = radius;
 	this->material = material;
+}
+
+InfiniteCylinder::InfiniteCylinder(Direction v, Point p, float radius){
+	this->v = v;
+	this->v.normalize();
+	this->p = p;
+	this->radius = radius;
 }
 
 Direction InfiniteCylinder::getDirection(){
@@ -858,6 +936,10 @@ Cylinder::Cylinder(){
 	this->material = new Material();
 }
 
+Cylinder::~Cylinder(void){
+	cout << "deleting cylinder" << endl;
+}
+
 Cylinder::Cylinder(Plane inf, float h, float radius, Direction v, Point p, RGB color){
 	this->v = inf.getNormal();
 	this->p = inf.getO();
@@ -888,13 +970,45 @@ Cylinder::Cylinder(Disk bot, Disk top, RGB color){
 	this->radius = top.getRadius();
 } 
 
-Cylinder::Cylinder(Disk bot, Disk top, Material* material){
+//bot normal must point to where the cylinder grows, but then must be point outwards
+//for light interaction
+Cylinder::Cylinder(Disk bot, float length, Material* material){
 	this->bot = bot;
-	this->top = top;
+	this->top = Disk(bot.getNormal(), bot.getO() + bot.getNormal() * length, bot.getRadius());
 	this->v = bot.getNormal();
+	this->bot.setNormal(bot.getNormal() * -1);
 	this->v.normalize();
 	this->p = bot.getO();
 	this->material = material;
+	this->radius = top.getRadius();
+} 
+
+Cylinder::Cylinder(Disk bot, float length){
+	this->bot = bot;
+	this->top = Disk(bot.getNormal(), bot.getO() * length, bot.getRadius());
+	this->v = bot.getNormal();
+	this->bot.setNormal(bot.getNormal() * -1);
+	this->v.normalize();
+	this->p = bot.getO();
+	this->radius = bot.getRadius();
+}
+
+Cylinder::Cylinder(Disk bot, Disk top, Material* material){
+	this->bot = bot;
+	this->top = top;
+	this->v = top.getNormal();
+	this->v.normalize();
+	this->p = bot.getO();
+	this->material = material;
+	this->radius = top.getRadius();
+}
+
+Cylinder::Cylinder(Disk bot, Disk top){
+	this->bot = bot;
+	this->top = top;
+	this->v = top.getNormal();
+	this->v.normalize();
+	this->p = bot.getO();
 	this->radius = top.getRadius();
 }
 
@@ -1075,6 +1189,10 @@ Triangle::Triangle() {
 	this->material = new Material();
 }
 
+Triangle::~Triangle(void){
+	cout << "deleting triangle" << endl;
+}
+
 Triangle::Triangle(Point a, Point b, Point c, RGB color) {
 	this->a = a;
 	this->b = b;
@@ -1112,9 +1230,21 @@ Triangle::Triangle(Point a, Point b, Point c, Material* material) {
 	Direction ac = a - c;
 	Direction normal = ab ^ ac;
 	normal.normalize();
-	normal = normal * 1;
-	this->p = Plane(normal, this->a, this->color);
+	normal = normal;
+	this->p = Plane(normal, this->a, this->material);
 	this->material = material;
+}
+
+Triangle::Triangle(Point a, Point b, Point c) {
+	this->a = a;
+	this->b = b;
+	this->c = c;
+	Direction ab = a - b;
+	Direction ac = a - c;
+	Direction normal = ab ^ ac;
+	normal.normalize();
+	normal = normal;
+	this->p = Plane(normal, this->a, this->material);
 }
 
 void Triangle::setA(Point a){
@@ -1249,6 +1379,10 @@ Parallelepiped::Parallelepiped(Triangle* A, Triangle* B, float c, RGB color){
 	this->t10 = new Triangle(Ab, Aa, r, RGB(255, 255, 0));
 	this->t11 = new Triangle(r, s, p, RGB(255, 125, 0));
 	this->t12 = new Triangle(s, p, q, RGB(255, 0, 0));
+}
+
+Parallelepiped::~Parallelepiped(void){
+	cout << "deleting Parallelepiped" << endl;
 }
 
 Parallelepiped::Parallelepiped(Triangle* A, Triangle* B, float c, Material* material){
