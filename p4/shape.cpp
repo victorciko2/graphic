@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 #include <limits>
 #include "shape.h"
 
@@ -8,6 +9,7 @@ using namespace std;
 Material::Material(){
 	this->color = RGB(0, 0, 0);
 }
+Material::~Material(void){}
 
 Material::Material(RGB color){
 	this->color = color;
@@ -21,12 +23,15 @@ RGB Material::getColor(Direction n, Point origin, Point hit, Scene scene, int de
 	return this->color;
 }
 
+bool Material::getRefractive(){
+	return false;
+}
+
 float Material::getIntensity(){
 	return 0;
 }
 
 void Material::show(){
-	cout << "entroo aqui"<< endl;
 	this->color.show();
 
 }
@@ -35,12 +40,14 @@ BRDF::BRDF(){
 	this->kd = 0.7;
 	this->ks = 0;
 	this->alpha = 1;
-	this->distribution= uniform_real_distribution<float>(0,1);
+	this->distribution = uniform_real_distribution<float>(0,1);
 	random_device rd;
     // Initialize Mersenne Twister pseudo-random number generator
    	this->gen = mt19937 (rd());
    	this->color = RGB();
 }
+
+BRDF::~BRDF(void){}
 
 BRDF::BRDF(float kd, float ks, float alpha, RGB color){
 	this->kd = kd;
@@ -72,66 +79,85 @@ void BRDF::show(){
 	cout << "alpha: " << alpha << endl;
 }
 
-int times = 0;
+bool BRDF::getRefractive(){
+	return false;
+}
+
 const int maxDepth = 20;
 
 RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth){
-	cout << "------------++++++++"<<endl;
 	if(depth >= maxDepth){
 		return {0, 0, 0};
 	}
-	times++;
+	//n.normalize(); //diria que hay que normalizarlo pero no se
 	float rnd = this->distribution(gen);
 	RGB dirLight(0, 0, 0);
 	Direction wo = hit - origin; wo.normalize();
 	//lighting 24
 	Direction refPerfect = (wo - (n * (wo * n) * 2)); refPerfect.normalize();
 	float Or = acos((n * wo) / (wo.modulus() * n.modulus()));
-	RGB rgb = this->color;
+	RGB rgb = Material::getColor();
+	//cout << "color material: " << rgb.showAsString() << endl;
 	vector<PointLight*> lights = scene.getLights();
 	for(int i = 0; i < lights.size(); i++){
 		PointLight pl = *lights[i];
 		float dist = (hit - pl.getOrigin()).modulus();
 		Direction dirAux = pl.getOrigin() - hit;
 		dirAux.normalize();
-		Ray r = Ray(dirAux, hit + dirAux * 0.1f);
+		Ray r = Ray(dirAux, hit + dirAux * 0.1f); 
 		Point collision;
 		float shadowDist = -1;
 		Shape* object = r.collision(scene, collision, shadowDist); 
-		//incoming light to material
-		if(object != nullptr && shadowDist > 0 && shadowDist < dist){
-			float p = pl.getMaterial().getIntensity();
+		if(object == nullptr || shadowDist > dist || shadowDist < 0 ){
+			//cout << "not found object" << endl;
+			float p = pl.getMaterial()->getIntensity();
 			float a;
-			Direction aux = pl.getOrigin() - hit;
-			aux.normalize();
+			Direction origin2hit = pl.getOrigin() - hit; origin2hit.normalize();
 			if(dist < 1){
-				a = p * abs(n * aux);
+				a = p * abs(n * origin2hit);
 			}
 			else{
-				a = abs(p / (dist * dist)) * abs(n * aux);
+				a = abs(p / (dist * dist)) * abs(n * origin2hit);
 			}
-			RGB rgbL = pl.getMaterial().getColor();
+			RGB rgbL = pl.getMaterial()->getColor();
+			dirLight = RGB(
+				dirLight[0] + rgbL[0] * a * ((rgb[0]/M_PI) + ks * (alpha + 2) / 2 / M_PI * pow(abs(refPerfect * origin2hit), alpha)),
+				dirLight[1] + rgbL[1] * a * ((rgb[1]/M_PI) + ks * (alpha + 2) / 2 / M_PI * pow(abs(refPerfect * origin2hit), alpha)),
+				dirLight[2] + rgbL[2] * a * ((rgb[2]/M_PI) + ks * (alpha + 2) / 2 / M_PI * pow(abs(refPerfect * origin2hit), alpha)));
+		}
+		if(object != nullptr && object->getMaterial()->getRefractive()){
+			dirAux = pl.getOrigin() - hit; dirAux.normalize();
+			bool mierda;
+			float dist2 = object->collision(dirAux, hit, mierda);
+			float a;
+			float p = pl.getMaterial()->getIntensity();
 			Direction origin2hit = pl.getOrigin() - hit; origin2hit.normalize();
-			float dirLightR = dirLight[0] + rgbL[0] * a * ((rgb[0]/M_PI) + ks * (alpha + 2) / 2
-						 / M_PI * pow(abs(refPerfect * origin2hit), alpha));
-			float dirLightG = dirLight[1] + rgbL[1] * a * ((rgb[1]/M_PI) + ks * (alpha + 2) / 2
-						 / M_PI * pow(abs(refPerfect * origin2hit), alpha));
-			float dirLightB = dirLight[2] + rgbL[2] * a * ((rgb[2]/M_PI) + ks * (alpha + 2) / 2
-						 / M_PI * pow(abs(refPerfect * origin2hit), alpha));
-			dirLight = RGB(dirLightR, dirLightG, dirLightB);
+			if(dist < 1){
+				a = p * abs(n * origin2hit);
+			}
+			else{
+				a = abs(p / (dist * dist)) * abs(n * origin2hit);
+			}
+			RGB rgbL = object->getMaterial()->getColor(dirAux, hit, collision, scene, depth);
+			dirLight = RGB(
+				dirLight[0] + rgbL[0] * a * ((rgb[0]/M_PI) + ks * (alpha + 2) / 2 / M_PI * pow(abs(refPerfect * origin2hit), alpha)),
+				dirLight[1] + rgbL[1] * a * ((rgb[1]/M_PI) + ks * (alpha + 2) / 2 / M_PI * pow(abs(refPerfect * origin2hit), alpha)),
+				dirLight[2] + rgbL[2] * a * ((rgb[2]/M_PI) + ks * (alpha + 2) / 2 / M_PI * pow(abs(refPerfect * origin2hit), alpha)));
 		}
 	}
-	vector<Shape*> objects = scene.getObjects();
-	bool rayShot = false;
+	if(maxDepth == 1){
+		return dirLight;
+	}
+	//cout << "el color directo es : " << dirLight.showAsString() << endl; 
 	if(rnd < kd){ //difuse
-		rayShot = true;
-		Direction any(1, 1, 1);
+		//cout << "Difuse" << endl;
+		Direction any(1, 1, 1); any.normalize();
 		Direction axis = n ^ any; axis.normalize();
 		CoordinateSystem coor(axis, n, axis^n, hit);
 		float eO = distribution(gen);
 		float eI = distribution(gen);
 		float Oi = acos(sqrt(1 - eO));
-		float Ai = 2 * M_PI * eI;
+		float Ai = 2 * M_PI * eI; //azimuth aleatorio
 		Vector vecAux = {sin(Oi) * cos(Ai), cos(Oi), sin(Oi) * sin(Ai), 0};
 		vecAux = coor.getM() * vecAux;
 		Direction wi = Direction(vecAux[0], vecAux[1], vecAux[2]);
@@ -145,7 +171,7 @@ RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth)
 				   Li[2] * rgb[2] + dirLight[2]);
 	}
 	else if(rnd < kd + ks){//specular
-		rayShot = true;
+		//cout << "Specular" << endl; 
 		Direction axis = n ^ refPerfect; axis.normalize();
 		CoordinateSystem coor(axis, refPerfect, axis ^ refPerfect, hit);
 		float eO = distribution(gen);
@@ -166,18 +192,18 @@ RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth)
 				   Li[1] * rgb[1] * factor + dirLight[1],
 				   Li[2] * rgb[2] * factor + dirLight[2]); 
 	}
-	if(rayShot){
-		return rgb;
-	}
 	else{
 		return RGB(0, 0, 0);
 	}
+	return rgb;
 }
 
 Light::Light(){
 	this->color = RGB(1, 1, 1);
 	this->p = 100;
 }
+
+Light::~Light(void){}
 
 Light::Light(float p){
 	this->p = p;
@@ -189,6 +215,8 @@ Light::Light(float p, RGB color){
 }
 
 Reflective::Reflective(){}
+
+Reflective::~Reflective(void){}
 
 RGB Reflective::getColor(Direction n, Point origin, Point hit, Scene scene, int depth){
 	Direction wo = hit - origin; wo.normalize();
@@ -202,6 +230,85 @@ RGB Reflective::getColor(Direction n, Point origin, Point hit, Scene scene, int 
 void Reflective::show(){
 	this->color.show();
 }
+
+bool Reflective::getRefractive(){
+	return false;
+}
+
+// I = incident ray, N = normal, iorm = index of refraction of medium, iorr = of the medium where the ray is
+//CAMBIAR INDICES DE LOS MEDIOS
+Direction refract(Direction I, Direction N, float iorm, float iorr, bool& refraction){
+	I.normalize(); N.normalize();
+    float cosi = I * N; 
+    if(cosi < -1) cosi = -1;
+    if(cosi > 1) cosi = 1;
+    float etai = iorr, etat = iorm; 
+    Direction n = N; 
+    if (cosi < 0) { cosi = -cosi; } else { std::swap(etai, etat); n = N * -1; } 
+    float eta = etai / etat; 
+    float k = 1 - eta * eta * (1 - cosi * cosi); 
+    Direction aux1 = I * eta; 
+    Direction aux2 = (n * (eta * cosi - sqrtf(k)));
+    aux1 = Direction(aux1[0] + aux2[0], aux1[1] + aux2[1], aux1[2] + aux2[2]);
+    if(k < 0){
+    	refraction = false;
+    	return aux1;
+    }
+    else{
+    	refraction = true;
+    	return aux1;
+    } 
+} 
+
+Refractive::Refractive(){this->n = 1; this->wide = false;}
+
+Refractive::~Refractive(void){}
+
+Refractive::Refractive(float n, bool wide){this->n = n; this->wide = wide;}
+
+bool Refractive::getRefractive(){
+	return true;
+}
+
+RGB Refractive::getColor(Direction n, Point origin, Point hit, Scene scene, int depth){
+	if(!this->wide){
+		Direction incident = hit - origin; incident.normalize();
+		bool refraction;
+		Direction outRay = refract(incident, n, this->n, 1, refraction); outRay.normalize();
+		Ray r(outRay, hit + outRay * 0.1f);
+		RGB Li = RGB(0, 0, 0);
+		Point intersection; float dist;
+		Shape* shape = nullptr;
+ 		Li = r.tracePath(scene, depth + 1);
+ 		return Li;
+	}
+	else{
+		//cout << "first refraction point " << hit.showAsString() << endl;
+		Direction incident = hit - origin; incident.normalize();
+		bool refraction;
+		Direction outRay = refract(incident, n, this->n, 1, refraction); outRay.normalize();
+		Ray r(outRay, hit + outRay * 0.1f);
+		RGB Li = RGB(0, 0, 0);
+		Point intersection; float dist;
+		Shape* shape = nullptr;
+		shape = r.collision(scene, intersection,dist);
+		//cout << "second : " << intersection.showAsString() << endl;
+		if(shape != nullptr){
+			//cout << "collision with" << endl;
+			//shape->show(); cout << endl;
+			Direction aux = (intersection - hit); aux.normalize();
+			outRay = refract(aux, shape->getNormal(intersection), 1, this->n, refraction); outRay.normalize();
+			Ray r(outRay, intersection + outRay * 0.1f);
+			Li = r.tracePath(scene, depth + 1);
+		}
+		else{
+			Li = r.tracePath(scene, depth + 1);
+		}
+		/*if(refraction)*/ Li = r.tracePath(scene, depth + 1);	
+		return Li;
+	}
+}
+
 
 //n is the surface normal
 //color arriving to the surface from the light
@@ -229,7 +336,9 @@ float Light::getIntensity(){
 
 PointLight::PointLight(){}
 
-PointLight::PointLight(Point o, Light l) : Shape(l){
+PointLight::~PointLight(void){}
+
+PointLight::PointLight(Point o, Light* l) : Shape(l){
 	this->o = o;
 }
 
@@ -238,6 +347,8 @@ Point PointLight::getOrigin(){
 }
 
 Scene::Scene(){}
+
+Scene::~Scene(void){}
 
 Scene::Scene(vector<Shape*> objects){
 	this->objects = vector<Shape*>();
@@ -273,6 +384,7 @@ Shape::Shape(){
 	this->material = new Material();
 }
 
+Shape::~Shape(void){}
 Shape::Shape(RGB color){
 	this->color = color;
 	this->material = new Material();
@@ -324,11 +436,14 @@ void Shape::show(){
 	cout << this->showAsString() << endl;
 }
 
+Ray::Ray(){}
 Ray::Ray(Direction dir, Point p){
 	this->dir = dir;
 	this->dir.normalize();
 	this->p = p;
 }
+
+Ray::~Ray(void){}
 
 Direction Ray::getDirection(){
 	return this->dir;
@@ -352,9 +467,8 @@ Shape* Ray::collision(Scene scene, Point& intersection, float& dist){
 		dist2 = es[i]->collision(this->dir, this->p, collision);
 		//es[i]->show();
 		//cout << "a distancia: " << dist2 << " collision: " << collision << endl;
-
 		if(collision && dist2 < minDist && dist2 > 0){
-		//	cout << "entro" << endl;
+			//cout << "entro" << endl;
 			minDist = dist2;
 			minInter = this->dir * minDist + this->p;
 			min = o;
@@ -370,7 +484,6 @@ RGB Ray::tracePath(Scene scene, int depth){
 	Point minInter;
 	Shape* min = collision(scene, minInter, minDist);
 	if(min != nullptr){
-	//cout << "collisiona " << min << endl;
 		return min->getColor(min->getNormal(minInter),
 				p, minInter, scene, depth);
 	}
@@ -386,16 +499,22 @@ Sphere::Sphere(){
 	this->material = new Material();
 }
 
-//A LO MEJOR EL COORDINATE SYSTEM ESTA MAL CALCULADO POR LA CIUDAD DE REFERENCIA
+Sphere::~Sphere(void){}
+
 Sphere::Sphere(Point center, float radius, RGB color){
 	this->center = center;
 	this->color = color;
 	this->radius = radius;
 }
 
-Sphere::Sphere(Point center, float radius, Material* material) : Shape(material){
+Sphere::Sphere(Point center, float radius, Material* material){
 	this->center = center;
 	this->material = material;
+	this->radius = radius;
+}
+
+Sphere::Sphere(Point center, float radius){
+	this->center = center;
 	this->radius = radius;
 }
 
@@ -432,35 +551,35 @@ float Sphere::getRadius(){
 }
 
 Direction Sphere::getNormal(Point x){
-	Direction result = x - center;
+	Direction result = (x - center);
 	result.normalize();
 	return result;
 }
 
 float Sphere::collision(Direction d, Point o, bool& collision){  // cambiar radio por float
 	d.normalize();
+	Direction aux = o - this->center;
 	float a = d * d;
-	float b = 2 * (d * (o - this->center));
-	float c = (o - this->center)*(o - this->center) - radius * radius;
+	float b = 2 * (d * aux);
+	float c = aux * aux - this->radius * this->radius;
 	float t0, t1;
 	collision = solveQuadratic(a, b, c, t0, t1);
+	if(t0 > t1) swap(t0, t1);
 	if(collision){
-		if(t0 > 0){
-			return t0;
-		}
-		else{
-			return -1;
+		if(t0 < 0){
+			t0 = t1;
+			if(t0 < 0){
+				return -1;
+			}
 		}
 	}
-	else{
-		return -1;
-	}
+	return t0;
 }
 
 string Sphere::showAsString(){
 	string s = "SPHERE:\n Center: " + this->center.showAsString()
 			+ "\nradius: " + to_string(this->radius)
-			+ "\n Color:\n" + this->color.showAsString();
+			+ "\n Color:\n" + this->color.showAsString() + "\n";
 	return s;
 }
 
@@ -483,6 +602,8 @@ Plane::Plane(){
 	this->material = new Material(); 
 }
 
+Plane::~Plane(void){}
+
 Plane::Plane(Direction normal, Point o, RGB color){
 	this->o = o;
 	this->color = color;
@@ -492,6 +613,11 @@ Plane::Plane(Direction normal, Point o, RGB color){
 Plane::Plane(Direction normal, Point o, Material* material){
 	this->o = o;
 	this->material = material;
+	this->normal = normal;
+}
+
+Plane::Plane(Direction normal, Point o){
+	this->o = o;
 	this->normal = normal;
 }
 
@@ -536,29 +662,31 @@ float Plane::collision(Direction d, Point o, bool& collision){
 	d.normalize();
 	Direction n = this->normal;
 	n.normalize();
-	float aux = d * n;
+	float aux = n * d;
 	if(abs(aux) > 0.00000001f){
 		Direction l = this->o - o;
+		//l.normalize();
 		t = (l * n) / aux;
-		if(t < 0){//hemos tocado esto osea que ojito que igual esta mal
+		if(t < 0){ //hemos tocado esto osea que ojito que igual esta mal
 			collision = false;
 			return -1;
 		}
-		collision = true;
-		return t;
+		else{
+			collision = true;
+			return t;
+		}
 	}
-	collision = false;
-	return -1;
 }
 
 string Plane::showAsString(){
 	string s = "PLANE:\n Point: " + this->o.showAsString()
-			+ "\nnormal: " + this->normal.showAsString();
+			+ "\nnormal: " + this->normal.showAsString() + "\n";
 	return s;
 }
 
 void Plane::show(){
 	cout << this->showAsString() << endl;
+	this->material->show(); cout << endl;
 }
 	
 Plane Plane::operator=(Plane p){
@@ -577,6 +705,8 @@ Disk::Disk(){
 
 }
 
+Disk::~Disk(void){}
+
 Disk::Disk(Direction normal, Point o, float radius, RGB color){
 	this->normal = normal;
 	this->radius = radius;
@@ -589,6 +719,12 @@ Disk::Disk(Direction normal, Point o, float radius, Material* material){
 	this->radius = radius;
 	this->o = o;
 	this->material = material;
+}
+
+Disk::Disk(Direction normal, Point o, float radius){
+	this->normal = normal;
+	this->radius = radius;
+	this->o = o;
 }
 
 Point Disk::getO(){
@@ -660,6 +796,8 @@ InfiniteCylinder::InfiniteCylinder(){
 	this->material = new Material();
 }
 
+InfiniteCylinder::~InfiniteCylinder(void){}
+
 InfiniteCylinder::InfiniteCylinder(Direction v, Point p, float radius, RGB color){
 	this->v = v;
 	this->v.normalize();
@@ -674,6 +812,13 @@ InfiniteCylinder::InfiniteCylinder(Direction v, Point p, float radius, Material*
 	this->p = p;
 	this->radius = radius;
 	this->material = material;
+}
+
+InfiniteCylinder::InfiniteCylinder(Direction v, Point p, float radius){
+	this->v = v;
+	this->v.normalize();
+	this->p = p;
+	this->radius = radius;
 }
 
 Direction InfiniteCylinder::getDirection(){
@@ -760,6 +905,8 @@ Cylinder::Cylinder(){
 	this->material = new Material();
 }
 
+Cylinder::~Cylinder(void){}
+
 Cylinder::Cylinder(Plane inf, float h, float radius, Direction v, Point p, RGB color){
 	this->v = inf.getNormal();
 	this->p = inf.getO();
@@ -790,13 +937,45 @@ Cylinder::Cylinder(Disk bot, Disk top, RGB color){
 	this->radius = top.getRadius();
 } 
 
-Cylinder::Cylinder(Disk bot, Disk top, Material* material){
+//bot normal must point to where the cylinder grows, but then must be point outwards
+//for light interaction
+Cylinder::Cylinder(Disk bot, float length, Material* material){
 	this->bot = bot;
-	this->top = top;
+	this->top = Disk(bot.getNormal(), bot.getO() + bot.getNormal() * length, bot.getRadius());
 	this->v = bot.getNormal();
+	this->bot.setNormal(bot.getNormal() * -1);
 	this->v.normalize();
 	this->p = bot.getO();
 	this->material = material;
+	this->radius = top.getRadius();
+} 
+
+Cylinder::Cylinder(Disk bot, float length){
+	this->bot = bot;
+	this->top = Disk(bot.getNormal(), bot.getO() * length, bot.getRadius());
+	this->v = bot.getNormal();
+	this->bot.setNormal(bot.getNormal() * -1);
+	this->v.normalize();
+	this->p = bot.getO();
+	this->radius = bot.getRadius();
+}
+
+Cylinder::Cylinder(Disk bot, Disk top, Material* material){
+	this->bot = bot;
+	this->top = top;
+	this->v = top.getNormal();
+	this->v.normalize();
+	this->p = bot.getO();
+	this->material = material;
+	this->radius = top.getRadius();
+}
+
+Cylinder::Cylinder(Disk bot, Disk top){
+	this->bot = bot;
+	this->top = top;
+	this->v = top.getNormal();
+	this->v.normalize();
+	this->p = bot.getO();
 	this->radius = top.getRadius();
 }
 
@@ -977,6 +1156,8 @@ Triangle::Triangle() {
 	this->material = new Material();
 }
 
+Triangle::~Triangle(void){}
+
 Triangle::Triangle(Point a, Point b, Point c, RGB color) {
 	this->a = a;
 	this->b = b;
@@ -1005,6 +1186,31 @@ Triangle::Triangle(Point a, Point b, Point c, Plane p, Material* material) {
 	this->material = material;
 }
 
+
+Triangle::Triangle(Point a, Point b, Point c, Material* material) {
+	this->a = a;
+	this->b = b;
+	this->c = c;
+	Direction ab = a - b;
+	Direction ac = a - c;
+	Direction normal = ab ^ ac;
+	normal.normalize();
+	normal = normal;
+	this->p = Plane(normal, this->a, this->material);
+	this->material = material;
+}
+
+Triangle::Triangle(Point a, Point b, Point c) {
+	this->a = a;
+	this->b = b;
+	this->c = c;
+	Direction ab = a - b;
+	Direction ac = a - c;
+	Direction normal = ab ^ ac;
+	normal.normalize();
+	normal = normal;
+	this->p = Plane(normal, this->a, this->material);
+}
 
 void Triangle::setA(Point a){
 	this->a = a;
@@ -1100,6 +1306,212 @@ Triangle Triangle::operator=(Triangle t){
 	this->c = t.getC();
 	this->color = t.getColor();	
 	return *this;
+}
+
+Parallelepiped::Parallelepiped(Triangle* A, Triangle* B, float c, RGB color){
+	// Triangle A: b point alone, a and c shared with triangle B
+	// Triangle B: b point alone, a and c shared with triangle A
+	this->color = color;
+	this->t1 = A;
+	this->t2 = B;
+
+	Point Aa = A->getA();
+	Point Ab = A->getB();
+	Point Ac = A->getC();
+
+	Point Ba = B->getA();
+	Point Bb = B->getB();
+	Point Bc = B->getC();
+
+	Direction ab = Aa - Ab;
+	Direction bc = Ab - Ac;
+	Direction normal = ab ^ bc;
+	normal.normalize();
+
+	// Compute of the 4 points with the normal and the distance
+	this->p = normal*c+Ab;
+	this->q = normal*c+Ac;
+	this->r = normal*c+Aa;
+	this->s = normal*c+Bb;
+
+	this->t3 = new Triangle(Aa, r, s, RGB(255, 0, 111));
+	this->t4 = new Triangle(Aa, Bb, s, RGB(125, 255, 125));
+	this->t5 = new Triangle(Ac, Bb, s, RGB(255, 0, 0));
+	this->t6 = new Triangle(Ac, s, q, RGB(255, 0, 0));
+	this->t7 = new Triangle(Ab, p, q, RGB(255, 0, 0));
+	this->t8 = new Triangle(Ab, Ac, q, RGB(255, 0, 0));
+	this->t9 = new Triangle(Ab, r, p, RGB(255, 0, 255));
+	this->t10 = new Triangle(Ab, Aa, r, RGB(255, 255, 0));
+	this->t11 = new Triangle(r, s, p, RGB(255, 125, 0));
+	this->t12 = new Triangle(s, p, q, RGB(255, 0, 0));
+}
+
+Parallelepiped::~Parallelepiped(void){}
+
+Parallelepiped::Parallelepiped(Triangle* A, Triangle* B, float c, Material* material){
+	// Triangle A: b point alone, a and c shared with triangle B
+	// Triangle B: b point alone, a and c shared with triangle A
+	this->color = color;
+	this->t1 = A;
+	this->t2 = B;
+	this->material = material;
+
+	Point Aa = A->getA();
+	Point Ab = A->getB();
+	Point Ac = A->getC();
+
+	Point Ba = B->getA();
+	Point Bb = B->getB();
+	Point Bc = B->getC();
+
+	Direction ab = Aa - Ab;
+	Direction bc = Ab - Ac;
+	Direction normal = ab ^ bc;
+	normal.normalize();
+
+	// Compute of the 4 points with the normal and the distance
+	this->p = normal*c+Ab;
+	this->q = normal*c+Ac;
+	this->r = normal*c+Aa;
+	this->s = normal*c+Bb;
+
+	this->t3 = new Triangle(Aa, r, s, this->material);
+	this->t4 = new Triangle(Aa, Bb, s, this->material);
+	this->t5 = new Triangle(Ac, Bb, s, this->material);
+	this->t6 = new Triangle(Ac, s, q, this->material);
+	this->t7 = new Triangle(Ab, p, q, this->material);
+	this->t8 = new Triangle(Ab, Ac, q, this->material);
+	this->t9 = new Triangle(Ab, r, p, this->material);
+	this->t10 = new Triangle(Ab, Aa, r, this->material);
+	this->t11 = new Triangle(r, s, p, this->material);
+	this->t12 = new Triangle(s, p, q, this->material);
+}
+
+Triangle* normalParallelepiped = new Triangle();
+int triangle = -1;
+float Parallelepiped::collision(Direction d, Point o, bool& collision){
+	vector<float> distances;
+	d.normalize();
+	distances.push_back(t1->collision(d, o, collision));
+	distances.push_back(t2->collision(d, o, collision));
+	distances.push_back(t3->collision(d, o, collision));
+	distances.push_back(t4->collision(d, o, collision));
+	distances.push_back(t5->collision(d, o, collision));
+	distances.push_back(t6->collision(d, o, collision));
+	distances.push_back(t7->collision(d, o, collision));
+	distances.push_back(t8->collision(d, o, collision));
+	distances.push_back(t9->collision(d, o, collision));
+	distances.push_back(t10->collision(d, o, collision));
+	distances.push_back(t11->collision(d, o, collision));
+	distances.push_back(t12->collision(d, o, collision));
+
+	float minDist = numeric_limits<float>::max();
+	float distance = 0.0;
+	collision = false;
+	for (int i = 0; i < distances.size(); i++){
+		distance = distances[i];
+		if (distance < minDist && distance != -1){
+			minDist = distance;
+			triangle = i;
+			collision = true;
+		}
+	}
+	if(collision){
+		/*if(triangle == 0){
+			normalParallelepiped = this->t1;
+		}
+		else if(triangle == 1){
+			normalParallelepiped = this->t2;
+		}
+		else if(triangle == 2){
+			normalParallelepiped = this->t3;
+		}
+		else if(triangle == 3){
+			normalParallelepiped = this->t4;
+		}
+		else if(triangle == 4){
+			normalParallelepiped = this->t5;
+		}
+		else if(triangle == 5){
+			normalParallelepiped = this->t6;
+		}
+		else if(triangle == 6){
+			normalParallelepiped = this->t7;
+		}
+		else if(triangle == 7){
+			normalParallelepiped = this->t8;
+		}
+		else if(triangle == 8){
+			normalParallelepiped = this->t9;
+		}
+		else if(triangle == 9){
+			normalParallelepiped = this->t10;
+		}
+		else if(triangle == 10){
+			normalParallelepiped = this->t11;
+		}
+		else if(triangle == 11){
+			normalParallelepiped = this->t12;
+		}*/
+		
+		return minDist;
+	}
+	else{
+		return -1;
+	}
+}
+
+void Parallelepiped::setColor(RGB color){
+	this->color = color;
+}
+
+RGB Parallelepiped::getColor(){
+	return this->color;
+}
+
+Direction Parallelepiped::getNormal(Point x){
+	Direction d;
+	if(triangle == 0 || triangle == 1){
+		d = this->t1->getA() - this->r ;
+	}
+	else if(triangle == 2 || triangle == 3){
+		d = this->r - this->p;
+	}
+	else if(triangle == 4 || triangle == 5){
+		d = this->s - this->r;
+	}
+	else if(triangle == 6 || triangle == 7){
+		d = this->q - this->s;
+	}
+	else if(triangle == 8 || triangle == 9){
+		d = this->r - this->s;
+	}
+	else if(triangle == 10 || triangle == 11){
+		d = this->r - this->t1->getA();
+	}
+	d.normalize();
+	return d;
+}	
+
+string Parallelepiped::showAsString(){
+	string s = "Parallelepiped: \n";
+	/*s += this->t1->showAsString();
+	s += this->t2->showAsString();
+	s += this->t3->showAsString();
+	s += this->t4->showAsString();
+	s += this->t5->showAsString();
+	s += this->t6->showAsString();
+	s += this->t7->showAsString();
+	s += this->t8->showAsString();
+	s += this->t9->showAsString();
+	s += this->t10->showAsString();
+	s += this->t11->showAsString();
+	s += this->t12->showAsString();*/
+	return s;
+}
+
+void Parallelepiped::show(){
+	cout << this->showAsString() << endl;
 }
 
 bool solveQuadratic(float a, float b, float c, float& t0, float& t1){

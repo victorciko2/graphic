@@ -25,11 +25,13 @@ protected:
 	RGB color;
 public:
 	Material();
+	~Material();
 	Material(RGB color);
 	RGB getColor();
 	virtual RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth);
 	virtual float getIntensity();
 	virtual void show();
+	virtual bool getRefractive();
 };
 
 class BRDF : public Material{
@@ -39,20 +41,36 @@ protected:
 	uniform_real_distribution<float> distribution;
 public:
 	BRDF();
+	~BRDF();
 	BRDF(float kd, float ks, float alpha, RGB color);
 	float getKd();
 	float getKs();
 	float getAlpha();
 	RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth);
 	void show();
+	bool getRefractive();
 
 };
 
 class Reflective : public Material{
 public:
 	Reflective();
+	~Reflective();
 	RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth);
 	void show();
+	bool getRefractive();
+};
+
+class Refractive : public Material{
+private:
+	float n; //Index of refraction
+	bool wide;  
+public:
+	Refractive();
+	~Refractive();
+	Refractive(float n, bool wide);
+	bool getRefractive();
+	RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth);		 
 };
 
 class Shape{
@@ -61,29 +79,18 @@ protected:
 	RGB color;
 public:
 	Shape();
-
+	~Shape();
 	Shape(Material* material);
-
 	Shape(RGB color);
-
 	void setColor(RGB color);
-
 	RGB getColor();
-
 	RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth);
-
 	float getIntensity();
-
 	Material* getMaterial();
-
 	void setMaterial(Material* material);
-
 	virtual Direction getNormal(Point x);
-
 	virtual float collision(Direction d, Point o, bool& collision);
-
 	virtual string showAsString();
-
 	virtual void show();
 };
 
@@ -92,6 +99,7 @@ protected:
 	float p;
 public:
 	Light();
+	~Light();
 	Light(float p);
 	Light(float p, RGB color);
 	RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth);
@@ -103,7 +111,8 @@ protected:
 	Point o;
 public:
 	PointLight();
-	PointLight(Point o, Light l); // Add Light as parameter?
+	~PointLight();
+	PointLight(Point o, Light* l); // Add Light as parameter?
 	Point getOrigin();
 };
 
@@ -113,6 +122,7 @@ protected:
 	vector<PointLight*> lights;
 public:
 	Scene();
+	~Scene();
 	Scene(vector<Shape*> objects);
 	Scene(vector<PointLight*> lights);
 	Scene(vector<Shape*> objects, vector<PointLight*> lights);
@@ -127,7 +137,9 @@ protected:
 	Direction dir;
 	Point p;
 public:
+	Ray();
 	Ray(Direction dir, Point p);
+	~Ray();
 	Direction getDirection();
 	Point getPoint();
 	Shape* collision(Scene scene, Point& intersection, float& dist);
@@ -140,35 +152,22 @@ private:
 	float radius;
 public:
 	Sphere();
-
+	~Sphere();
 	Sphere(Point center, float radius, RGB color);
-
 	Sphere(Point center, float radius, Material* material);
-
+	Sphere(Point center, float radius);
 	void setCenter(Point center);
-
 	void setRadius(float radius);
-
 	void setColor(RGB color);
-
 	void setMaterial(Material* material);
-
 	Material* getMaterial();
-
 	RGB getColor();
-
 	Point getCenter();
-
 	float getRadius();
-
 	Direction getNormal(Point x);
-
 	float collision(Direction d, Point o, bool& collision);
-
 	string showAsString();
-	
 	void show();
-
 	Sphere operator=(Sphere s);
 };
 
@@ -178,35 +177,22 @@ protected:
 	Point o;
 public:
 	Plane();
-
+	~Plane();
 	Plane(Direction normal, Point o, RGB color);
-
 	Plane(Direction normal, Point o, Material* material);
-
+	Plane(Direction normal, Point o);
 	void setO(Point o);
-
 	void setNormal(Direction normal);
-
 	void setColor(RGB color);
-
 	void setMaterial(Material* material);
-
 	Material* getMaterial();
-
 	RGB getColor();
-
 	Point getO();
-
 	Direction getNormal();
-
 	Direction getNormal(Point x);
-
 	float collision(Direction d, Point o, bool& collision);
-
 	string showAsString();
-	
 	void show();
-
 	Plane operator=(Plane p);
 };
 
@@ -215,33 +201,32 @@ protected:
 	float radius;
 public:
 	Disk();
-
+	~Disk();
 	Disk(Direction normal, Point o, float r, RGB color);
-	
 	Disk(Direction normal, Point o, float radius, Material* material);
-
+	Disk(Direction normal, Point o, float radius);
 	Point getO();
-
 	float getRadius();
-
 	Direction getNormal();
-
 	RGB getColor();
-
 	Material* getMaterial();
-
 	void setMaterial(Material* material);
-
 	void setO(Point o);
-
 	void setRadius(float radius);
-
 	void setColor(RGB color);
-
 	void setNormal(Direction normal);
-
 	float collision(Direction d, Point o, bool& collision);
 };
+/*
+class DiskLight : public Disk{
+	Light l;
+	Disk d;
+public:
+	DiskLight(Disk d, Light l);
+	float collision(Direction d, Point o, bool& collision);
+	RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth); 
+};
+*/
 
 class InfiniteCylinder : public Shape{
 protected:
@@ -250,33 +235,21 @@ protected:
 	float radius;
 public:
 	InfiniteCylinder();
-
+	~InfiniteCylinder();
 	InfiniteCylinder(Direction v, Point p, float r, RGB color);
-
 	InfiniteCylinder(Direction v, Point p, float r, Material* material);
-	
+	InfiniteCylinder(Direction v, Point p, float r);
 	Direction getDirection();
-
 	Point getPoint();
-
 	float getRadius();
-
 	Material* getMaterial();
-
 	void setMaterial(Material* material);
-
 	RGB getColor();
-
 	void setDirection(Direction v);
-
 	void setPoint(Point p);
-
 	void setRadius(float radius);
-
 	Direction getNormal(Point x);
-
 	void setColor(RGB color);
-
 	float collision(Direction d, Point o, bool& collision);
 };
 
@@ -287,43 +260,28 @@ private:
 	Disk top, bot;
 public:
 	Cylinder();
-
+	~Cylinder();
 	Cylinder(Plane inf, float h, float radius, Direction v, Point p, RGB color);
-
 	Cylinder(Plane inf, Plane sup, float radius, Direction v, Point p, RGB color);	
-
 	Cylinder(Disk bot, Disk top, RGB color);
-
 	Cylinder(Disk bot, Disk top, Material* material);
-
+	Cylinder(Disk bot, Disk top);
+	Cylinder(Disk bot, float length, Material* material);
+	Cylinder(Disk bot, float length);
 	Direction getDirection();
-
 	Point getPoint();
-
 	float getRadius();
-
 	Material* getMaterial();
-
 	void setMaterial(Material* material);
-
 	RGB getColor();
-
 	Plane getSup();
-
 	Plane getInf();
-
 	void setSup(Plane sup);
-
 	void setInf(Plane inf);
-
 	void setDirection(Direction d);
-
 	void setPoint(Point p);
-
 	void setRadius(float radius);
-
 	void setColor(RGB color);
-
 	float collision(Direction d, Point o, bool& collision);
 };
 
@@ -335,49 +293,47 @@ private:
 	Plane p;
 public:
 	Triangle();
-
+	~Triangle();
 	Triangle(Point a, Point b, Point c, Plane p, RGB color);
-
 	Triangle(Point a, Point b, Point c, RGB color);
-
 	Triangle(Point a, Point b, Point c, Plane p, Material* material);
-
 	Triangle(Point a, Point b, Point c, Material* material);
-
+	Triangle(Point a, Point b, Point c);
 	void setA(Point a);
-
 	void setB(Point b);
-
 	void setC(Point c);
-
 	void setP(Plane p);
-
 	void setColor(RGB color);
-
 	RGB getColor();
-	
 	Material* getMaterial();
-
 	void setMaterial(Material* material);
-
 	Direction getNormal(Point x);
-
 	Point getA();
-
 	Point getB();
-
 	Point getC();
-
 	Plane getP();
-
 	float collision(Direction d, Point o, bool& collision);
-
 	string showAsString();
-
 	void show();
-
 	Triangle operator=(Triangle t);
 };
+
+class Parallelepiped : public Shape{
+private:
+	Triangle *t1, *t2, *t3, *t4, *t5, *t6, *t7, *t8, *t9, *t10, *t11, *t12;
+	Point p, q, r, s;
+public:
+	Parallelepiped(Triangle* A, Triangle* B, float c, RGB color);
+	~Parallelepiped();
+	Parallelepiped(Triangle* A, Triangle* B, float c, Material* material);
+	float collision(Direction d, Point o, bool& collision);
+	void setColor(RGB color);
+	RGB getColor();
+	Direction getNormal(Point x);
+	string showAsString();
+	void show();
+};
+
 bool solveQuadratic(float a, float b, float c, float& t0, float& t1);
 
 #endif

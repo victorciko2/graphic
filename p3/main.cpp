@@ -2,6 +2,7 @@
 #include <vector>
 #include <fstream>	
 #include <limits>
+#include <random>
 #include "shape.h"
 #include "camera.h"
 
@@ -37,7 +38,7 @@ int main(){
 	shape = new Sphere(Point(0, 15, 35), 6, RGB(173, 83, 151)); //TOP
 	list.push_back(shape); */
 
-	Camera camera = Camera(Point(0, 0, 0), Direction(0, 0, 10), Direction(10, 0, 0), 720, 720);	camera.setL(camera.getL() * -1);
+	Camera camera = Camera(Point(0, 0, 0), Direction(0, 0, 10), Direction(10, 0, 0), 1080, 1080);	camera.setL(camera.getL() * -1);
 	ofstream o("prueba.ppm");
 	o << "P3" << endl;
 	o << camera.getX() << " " << camera.getY() << endl;
@@ -46,13 +47,20 @@ int main(){
 	float minDist = numeric_limits<float>::max();
 	int index = -1;
 	bool collision;
-	float currentDist;
+	random_device rd;
+	mt19937 gen = mt19937 (rd());
+	float currentDist, rndX, rndY;
 	Direction planeVectorL = camera.getL() * -2 / camera.getX();
 	Direction planeVectorU = camera.getU() * -2 / camera.getY();
-	Point aux = camera.getOrigin() + camera.getL() + camera.getU() + camera.getF() + planeVectorL / 2 + planeVectorU / 2;
+	Point aux = camera.getOrigin() + camera.getL() + camera.getU() + camera.getF();
+  	uniform_real_distribution<float> distributionX = uniform_real_distribution<float>(0, planeVectorL.modulus());
+  	uniform_real_distribution<float> distributionY = uniform_real_distribution<float>(0, planeVectorU.modulus());
+	//camera.show();
 	for(int i = 0; i < camera.getY(); i++){
 		for(int j = 0; j < camera.getX(); j++){
-			d = (aux + (planeVectorL * j) + (planeVectorU * i))  - camera.getOrigin();
+			rndX = distributionX(gen); rndY = distributionY(gen);
+			Point pointRnd = Point(aux[0] + rndX, aux[1] + rndY, aux[2]);
+			d = (pointRnd +  (planeVectorL * j) + (planeVectorU * i))  - camera.getOrigin();
 			d.normalize();
 			for(int k = 0; k < list.size(); k++){	
 				currentDist = list[k]->collision(d, camera.getOrigin(), collision);
