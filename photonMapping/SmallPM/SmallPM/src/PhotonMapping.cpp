@@ -16,6 +16,16 @@ In no event shall copyright holders be liable for any damage.
 #include "Intersection.h"
 #include "Ray.h"
 #include "BSDF.h"
+#include <random>
+#include "KDTree.h"
+
+using namespace std;
+
+random_device rd;
+mt19937 gen = mt19937(rd());
+uniform_real_distribution<float> distribution = uniform_real_distribution<float>(-1, 1);
+KDTree<Vector3, 20U> kdTree;
+
 
 //*********************************************************************
 // Compute the photons by tracing the Ray 'r' from the light source
@@ -104,9 +114,16 @@ bool PhotonMapping::trace_ray(const Ray& r, const Vector3 &p,
 		if (direct_only && !is_caustic_particle && photon_ray.get_level() > 1)
 			break;
 
+		/*cout << photon_ray.get_direction().getComponent(0) << flush;
+		cout << " " << photon_ray.get_direction().getComponent(1) << flush;
+		cout << " " << photon_ray.get_direction().getComponent(2) << endl;*/
 		// Random walk's next step
 		// Get sampled direction plus pdf, and update attenuation
 		it.intersected()->material()->get_outgoing_sample_ray(it, photon_ray, pdf );
+
+		/*cout << photon_ray.get_direction().getComponent(0) << flush;
+		cout << " " << photon_ray.get_direction().getComponent(1) << flush;
+		cout << " " << photon_ray.get_direction().getComponent(2) << endl;*/
 
 		// Shade...
 		energy = energy*surf_albedo;
@@ -140,8 +157,51 @@ bool PhotonMapping::trace_ray(const Ray& r, const Vector3 &p,
 //		for rendering. 
 //		NOTE: Careful with function
 //---------------------------------------------------------------------
+
+
 void PhotonMapping::preprocess()
 {
+	list<Photon> global_photons;
+	list<Photon> caustic_photons;
+
+	Vector3 randomDirection(0);
+	Vector3 lightPosition(0);
+	Ray r(lightPosition, randomDirection, 0);
+	bool morePhotons;
+
+	for (int i = 0; i < world->light_source_list.size(); i++) {
+		for (int j = 0; j < 1; j++) {
+			lightPosition = world->light_source_list[i]->get_position();
+			randomDirection = Vector3(distribution(gen), distribution(gen), distribution(gen));
+			randomDirection.normalize();
+			r = Ray(lightPosition, randomDirection, 0);
+			morePhotons = trace_ray(r, world->light_source_list[i]->get_intensities(), global_photons, caustic_photons, false, false);
+		}
+	}
+	// Iterator to iterate the photons list
+	list<Photon>::iterator it;
+	vector<float> direction(3, 0);
+	int hola = 0;
+	for (it = global_photons.begin(); it != global_photons.end(); ++it) {
+		cout << "Estamos en global_photons (" << hola << ")" << endl;
+		direction[0] = it->direction[0];
+		direction[1] = it->direction[1];
+		direction[2] = it->direction[2];
+		cout << "eyyo" << endl;
+		kdTree.store(direction, it->flux);
+		cout << "k" << endl;
+		hola++;
+	}
+	hola = 0;
+	for (it = caustic_photons.begin(); it != caustic_photons.end(); ++it) {
+		cout << "Estamos en caustics (" << hola << ")" << endl;
+		direction[0] = it->direction[0];
+		direction[1] = it->direction[1];
+		direction[2] = it->direction[2];
+		kdTree.store(direction, it->flux);
+		hola++;
+	}
+	kdTree.balance();
 }
 
 //*********************************************************************

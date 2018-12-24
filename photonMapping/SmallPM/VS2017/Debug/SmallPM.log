@@ -1,0 +1,6 @@
+﻿cl : Línea de comandos warning D9035: La opción 'Gm' está desusada y se quitará en próximas versiones
+  PhotonMapping.cpp
+d:\victor\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\smallrt\include\ray.h(26): warning C4305: 'inicializando': truncamiento de 'double' a 'float'
+d:\victor\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\photonmapping.cpp(131): warning C4244: 'argumento': conversión de 'double' a 'const float'; posible pérdida de datos
+d:\victor\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\photonmapping.cpp(172): warning C4018: '<': no coinciden signed/unsigned
+  SmallPM.vcxproj -> D:\Victor\7CUATRI\IG\graphic\photonMapping\SmallPM\VS2017\Debug\SmallPM.exe
