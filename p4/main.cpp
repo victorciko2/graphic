@@ -22,88 +22,75 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 	int pixelY = atoi(argv[3]);
 	string f = argv[4]; 
 	Scene scene;
-	Shape *shape = nullptr;
+	Shape shape;
+	vector<shared_ptr<Shape>> shapes;
+	vector<shared_ptr<PointLight>> lights;
 	// CORNELL BOX
-	shape = new Plane(Direction(1, 0, 0), Point(-10, 0, 10), new BRDF(0.7, 0, 100, RGB((float)255/255, 0, 0))); //LEFT
-	scene.add(shape);
-	shape = new Plane(Direction(-1, 0, 0), Point(10, 0, -10), new BRDF(0.7, 0, 100, RGB(0, (float)255/255, 0))); //RIGHT
-	scene.add(shape);
-	shape = new Plane(Direction(0, 1, 0), Point(0,-10, 10), new BRDF(0.7, 0, 100, RGB((float)230/255, (float)230/255, (float)230/255))); //DOWN
-	scene.add(shape);
-	shape = new Plane(Direction(0, -1, 0), Point(0, 10, 10), new BRDF(0.7, 0, 100, RGB((float)140/255, (float)140/255, (float)140/255))); //UP
-	scene.add(shape);
-	shape = new Plane(Direction(0, 0, -1), Point(0, 0, 20), new BRDF(0.7, 0, 100, RGB((float)191/255, (float)191/255, (float)191/255))); //BACK
-	scene.add(shape);
+	Plane left(Direction(1, 0, 0), Point(-10, 0, 10), make_shared<BRDF>(BRDF(0.7, 0, 100, RGB((float)255/255, 0, 0)))); //LEFT
+	//shapes.push_back(make_shared<Plane>(shape));	
+	scene.add(make_shared<Plane>(left));
+	Plane right(Direction(-1, 0, 0), Point(10, 0, -10), make_shared<BRDF>(BRDF(0.7, 0, 100, RGB(0, (float)255/255, 0)))); //RIGHT
+	scene.add(make_shared<Plane>(right));
+	Plane down(Direction(0, 1, 0), Point(0,-10, 10), make_shared<BRDF>(BRDF(0.7, 0, 100, RGB((float)230/255, (float)230/255, (float)230/255)))); //DOWN
+	scene.add(make_shared<Plane>(down));
+	Plane up(Direction(0, -1, 0), Point(0, 10, 10), make_shared<BRDF>(BRDF(0.7, 0, 100, RGB((float)140/255, (float)140/255, (float)140/255)))); //UP
+	scene.add(make_shared<Plane>(up));
+	Plane back(Direction(0, 0, -1), Point(0, 0, 20), make_shared<BRDF>(BRDF(0.7, 0, 100, RGB((float)191/255, (float)191/255, (float)191/255)))); //BACK
+	scene.add(make_shared<Plane>(back));
 
 
 
  	// ******************************************* EL MARAVILLOSO PENE *********************************************************
-	Material* m = new BRDF(0.7, 0.1, 1, RGB((float)252/255, (float)123/255, (float)220/255));
-	shape = new Sphere(Point(2.5, -7, 17), 3, m); //RIGHT BALL
-	scene.add(shape);
-	shape = new Sphere(Point(-2.5, -7, 17), 3, m); //LEFT BALL
-	scene.add(shape);
-	m = new BRDF(0.7, 0.1, 1, RGB((float)214/255, (float)104/255, (float)187/255));
-	shape = new Cylinder(Disk(Direction(0, 1, 0), Point(0,-6.5, 18.5), 1.5), 
-				Disk(Direction(0,1,0), Point(0, 8, 18), 3), m);
-	scene.add(shape);
-	m = new BRDF(0.8, 0.1, 1, RGB((float)173/255, (float)83/255, (float)151/255));
-	shape = new Sphere(Point(0, 6.5, 17), 3, m); //TOP
-	scene.add(shape); 
+	BRDF m = BRDF(0.7, 0.1, 1, RGB((float)252/255, (float)123/255, (float)220/255));
+	shape = Sphere(Point(2.5, -7, 17), 3, make_shared<Material>(m)); //RIGHT BALL
+	//scene.add(make_shared<Shape>(shape));
+	shape = Sphere(Point(-2.5, -7, 17), 3, make_shared<Material>(m)); //LEFT BALL
+	//scene.add(make_shared<Shape>(shape));
+	m = BRDF(0.7, 0.1, 1, RGB((float)214/255, (float)104/255, (float)187/255));
+	shape = Cylinder(Disk(Direction(0, 1, 0), Point(0,-6.5, 18.5), 1.5), 
+				Disk(Direction(0,1,0), Point(0, 8, 18), 3), make_shared<Material>(m));
+	//scene.add(make_shared<Shape>(shape));
+	m = BRDF(0.8, 0.1, 1, RGB((float)173/255, (float)83/255, (float)151/255));
+	shape = Sphere(Point(0, 6.5, 17), 3, make_shared<Material>(m)); //TOP
+	//scene.add(make_shared<Shape>(shape)); 
 	// Pruebas sin mas
-	Material* ref = new Reflective();
-	 m = new BRDF(0.7, 0.2, 1, RGB((float)255/255, (float)255/255, (float)255/255));	
+	//***************************SNOWMAN*******************************************
+	Material ref = Reflective();
+	m = BRDF(0.7, 0.2, 1, RGB((float)255/255, (float)255/255, (float)255/255));	
 	//body
-	shape = new Sphere(Point(0,-7,13), 3, m);
-	//scene.add(shape);
-	shape = new Sphere(Point(0,-2.8,13), 2.5, m);
-	//scene.add(shape);
-	shape = new Sphere(Point(0,0.4,13), 1.8, m);
-	//scene.add(shape);
-	m = new BRDF(0.6, 0.1, 1, RGB((float)0/255, (float)0/255, (float)0/255));	
+	Sphere body(Point(0,-7,13), 3, make_shared<BRDF>(m));
+	scene.add(make_shared<Sphere>(body));
+	Sphere body2(Point(0,-2.8,13), 2.5, make_shared<BRDF>(m));
+	scene.add(make_shared<Sphere>(body2));
+	Sphere body3(Point(0,0.4,13), 1.8, make_shared<BRDF>(m));
+	scene.add(make_shared<Sphere>(body3));
+	m = BRDF(0.6, 0.1, 1, RGB((float)0/255, (float)0/255, (float)0/255));	
 	//arms
-	shape = new Cylinder(Disk(Direction(1, 1, 0), Point(2, -1.5, 13), 0.3), 4, m);
-	//scene.add(shape);
-	shape = new Cylinder(Disk(Direction(-1, 1, 0), Point(-2, -1.5, 13), 0.3), 4, m);
-	//scene.add(shape);
+	Cylinder rightArm(Disk(Direction(1, 1, 0), Point(2, -1.5, 13), 0.3), 4, make_shared<BRDF>(m));
+	scene.add(make_shared<Cylinder>(rightArm));
+	Cylinder leftArm(Disk(Direction(-1, 1, 0), Point(-2, -1.5, 13), 0.3), 4, make_shared<BRDF>(m));
+	scene.add(make_shared<Cylinder>(leftArm));
 	//eyes
-	shape = new Sphere(Point(-0.7,0.8,11.2), 0.2, m);
-	//scene.add(shape);
-	shape = new Sphere(Point(0.7,0.8,11.2), 0.2, m);
-	//scene.add(shape);
+	Sphere leftEye(Point(-0.7,0.8,11.2), 0.2, make_shared<BRDF>(m));
+	scene.add(make_shared<Sphere>(leftEye));
+	Sphere rightEye(Point(0.7,0.8,11.2), 0.2, make_shared<BRDF>(m));
+	scene.add(make_shared<Sphere>(rightEye));
 	//buttons
-	shape = new Sphere(Point(0,-2.2,10), 0.4, m);
-	//scene.add(shape);
-	shape = new Sphere(Point(0,-1.1,10), 0.4, m);
-	//scene.add(shape);
-	shape = new Sphere(Point(0,-3.4,10), 0.4, m);
-	//scene.add(shape);
+	Sphere button1(Point(0,-2.2,10), 0.4, make_shared<BRDF>(m));
+	scene.add(make_shared<Sphere>(button1));
+	Sphere button2(Point(0,-1.1,10), 0.4, make_shared<BRDF>(m));
+	scene.add(make_shared<Sphere>(button2));
+	Sphere button3(Point(0,-3.4,10), 0.4, make_shared<BRDF>(m));
+	scene.add(make_shared<Sphere>(button3));
 	//mouth
-	shape = new Cylinder(Disk(Direction(1, 0, 0), Point(-0.5, -0.2, 11), 0.1), 1.1, m);
-	//scene.add(shape);
-	shape = new Parallelepiped(new Triangle(Point(-8, -9.9, 14), Point(-8, -9.9, 18), Point(-2, -9.9, 18)),
-					new Triangle(Point(-8, -9.9, 14), Point(-2, -9.9 ,14), Point(-2, -9.9, 18)), 12, new Refractive(4,true));
-	//scene.add(shape);
-	//shape = new Plane(Direction(0,0,1), Point(0,0,10), new Refractive(1.4, false));
-	//shape = new Triangle(Point(-5,-5,10),Point(5,-5,10), Point(0,5,10), new Refractive(2));
-	//scene.add(shape);
-	//shape = new Sphere(Point(5,0,10),2.5, new Refractive(4, false));
-	m = new BRDF(0.5, 0.3, 100, RGB((float)255/255, 0, (float)255/255));
-	shape = new Parallelepiped(new Triangle(Point(-9, -5, 20), Point(-7, -10, 15), Point(-7, -5, 10), ref),
-					new Triangle(Point(-9, -5, 20), Point(-7, 0, 15), Point(-7, -5, 10)), -1, ref);
-	//scene.add(shape);
-	shape = new Parallelepiped(new Triangle(Point(7, -5, 10), Point(7, -10, 15), Point(7, -5, 20), ref),
-					new Triangle(Point(7, -5, 10), Point(7, 0, 15), Point(7, -5, 20)), 3, new Refractive(4, true));
-	//scene.add(shape);
-	shape = new Sphere(Point(0,2,10),2, m);
-	shape = new Cylinder(Disk(Direction(0, 1, 0), Point(-6, -9.9, 16), 3), 14, new Reflective());
-	shape = new Sphere(Point(6,-6.9,16),3, new Refractive(4, true));
-	//scene.add(shape);
-	//shape = new Cylinder(Disk(Direction(0, -1, 0), Point(0, -6, 12), 2, m), Disk(Direction(0, -1, 0), Point(0, 4, 12), 2, m), new Refractive(2, true));
-	//shape = new Cylinder(Disk(Direction(0, -1, 0), Point(0, -10, 10), 1, m), Disk(Direction(0, -1, 0), Point(0, 4, 10), 1, m), m);
-	//scene.add(shape);
-	PointLight* pl = new PointLight(Point(0, 8, 10), new Light(250, RGB(1,1,1)));
-	scene.add(pl);
+	Cylinder mouth(Disk(Direction(1, 0, 0), Point(-0.5, -0.2, 11), 0.1), 1.1, make_shared<BRDF>(m));
+	scene.add(make_shared<Cylinder>(mouth));
+	Parallelepiped paralele(new Triangle(Point(-8, -9.9, 14), Point(-8, -9.9, 18), Point(-2, -9.9, 18)),
+					new Triangle(Point(-8, -9.9, 14), Point(-2, -9.9 ,14), Point(-2, -9.9, 18)), 12, make_shared<BRDF>(m));
+	//scene.add(make_shared<Parallelepiped>(paralele));
+	
+	PointLight pl = PointLight(Point(0, 8, 10), make_shared<Light>(Light(250, RGB(1,1,1))));
+	scene.add(make_shared<PointLight>(pl));
 	// MAIN CODE
 	Camera camera = Camera(Point(0, 0, 0), Direction(0, 0, 10), Direction(10, 0, 0), pixelX, pixelY);	camera.setL(camera.getL() * -1);
 	ofstream o(f + ".ppm");
@@ -154,6 +141,5 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 		cout << i << endl;
 	}
 	o.close();
-
 	return 0;
 }

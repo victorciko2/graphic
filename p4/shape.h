@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstring>
 #include <vector>
+#include <memory>
 #include <random>
 #include "point.h"
 #include "direction.h"
@@ -75,19 +76,19 @@ public:
 
 class Shape{
 protected:
-	Material* material;
+	shared_ptr<Material> material;
 	RGB color;
 public:
 	Shape();
 	~Shape();
-	Shape(Material* material);
+	Shape(shared_ptr<Material> material);
 	Shape(RGB color);
 	void setColor(RGB color);
 	RGB getColor();
 	RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth);
 	float getIntensity();
-	Material* getMaterial();
-	void setMaterial(Material* material);
+	shared_ptr<Material> getMaterial();
+	void setMaterial(shared_ptr<Material> material);
 	virtual Direction getNormal(Point x);
 	virtual float collision(Direction d, Point o, bool& collision);
 	virtual string showAsString();
@@ -112,24 +113,24 @@ protected:
 public:
 	PointLight();
 	~PointLight();
-	PointLight(Point o, Light* l); // Add Light as parameter?
+	PointLight(Point o, shared_ptr<Light> l); // Add Light as parameter?
 	Point getOrigin();
 };
 
 class Scene{
 protected:
-	vector<Shape*> objects;
-	vector<PointLight*> lights;
+	vector<shared_ptr<Shape>> objects;
+	vector<shared_ptr<PointLight>> lights;
 public:
 	Scene();
 	~Scene();
-	Scene(vector<Shape*> objects);
-	Scene(vector<PointLight*> lights);
-	Scene(vector<Shape*> objects, vector<PointLight*> lights);
-	void add(Shape* s);
-	void add(PointLight* l);
-	vector<Shape*> getObjects();
-	vector<PointLight*> getLights();
+	Scene(vector<shared_ptr<Shape>> objects);
+	Scene(vector<shared_ptr<PointLight>> lights);
+	Scene(vector<shared_ptr<Shape>> objects, vector<shared_ptr<PointLight>> lights);
+	void add(shared_ptr<Shape> s);
+	void add(shared_ptr<PointLight> l);
+	vector<shared_ptr<Shape>> getObjects();
+	vector<shared_ptr<PointLight>> getLights();
 };
 
 class Ray{
@@ -142,7 +143,7 @@ public:
 	~Ray();
 	Direction getDirection();
 	Point getPoint();
-	Shape* collision(Scene scene, Point& intersection, float& dist);
+	shared_ptr<Shape> collision(Scene scene, Point& intersection, float& dist);
 	RGB tracePath(Scene scene, int depth);
 };
 
@@ -154,13 +155,13 @@ public:
 	Sphere();
 	~Sphere();
 	Sphere(Point center, float radius, RGB color);
-	Sphere(Point center, float radius, Material* material);
+	Sphere(Point center, float radius, shared_ptr<Material> material);
 	Sphere(Point center, float radius);
 	void setCenter(Point center);
 	void setRadius(float radius);
 	void setColor(RGB color);
-	void setMaterial(Material* material);
-	Material* getMaterial();
+	void setMaterial(shared_ptr<Material> material);
+	shared_ptr<Material> getMaterial();
 	RGB getColor();
 	Point getCenter();
 	float getRadius();
@@ -179,13 +180,13 @@ public:
 	Plane();
 	~Plane();
 	Plane(Direction normal, Point o, RGB color);
-	Plane(Direction normal, Point o, Material* material);
+	Plane(Direction normal, Point o, shared_ptr<Material> material);
 	Plane(Direction normal, Point o);
 	void setO(Point o);
 	void setNormal(Direction normal);
 	void setColor(RGB color);
-	void setMaterial(Material* material);
-	Material* getMaterial();
+	void setMaterial(shared_ptr<Material> material);
+	shared_ptr<Material> getMaterial();
 	RGB getColor();
 	Point getO();
 	Direction getNormal();
@@ -203,14 +204,14 @@ public:
 	Disk();
 	~Disk();
 	Disk(Direction normal, Point o, float r, RGB color);
-	Disk(Direction normal, Point o, float radius, Material* material);
+	Disk(Direction normal, Point o, float radius, shared_ptr<Material> material);
 	Disk(Direction normal, Point o, float radius);
 	Point getO();
 	float getRadius();
 	Direction getNormal();
 	RGB getColor();
-	Material* getMaterial();
-	void setMaterial(Material* material);
+	shared_ptr<Material> getMaterial();
+	void setMaterial(shared_ptr<Material> material);
 	void setO(Point o);
 	void setRadius(float radius);
 	void setColor(RGB color);
@@ -237,13 +238,13 @@ public:
 	InfiniteCylinder();
 	~InfiniteCylinder();
 	InfiniteCylinder(Direction v, Point p, float r, RGB color);
-	InfiniteCylinder(Direction v, Point p, float r, Material* material);
+	InfiniteCylinder(Direction v, Point p, float r, shared_ptr<Material> material);
 	InfiniteCylinder(Direction v, Point p, float r);
 	Direction getDirection();
 	Point getPoint();
 	float getRadius();
-	Material* getMaterial();
-	void setMaterial(Material* material);
+	shared_ptr<Material> getMaterial();
+	void setMaterial(shared_ptr<Material> material);
 	RGB getColor();
 	void setDirection(Direction v);
 	void setPoint(Point p);
@@ -264,15 +265,15 @@ public:
 	Cylinder(Plane inf, float h, float radius, Direction v, Point p, RGB color);
 	Cylinder(Plane inf, Plane sup, float radius, Direction v, Point p, RGB color);	
 	Cylinder(Disk bot, Disk top, RGB color);
-	Cylinder(Disk bot, Disk top, Material* material);
+	Cylinder(Disk bot, Disk top, shared_ptr<Material> material);
 	Cylinder(Disk bot, Disk top);
-	Cylinder(Disk bot, float length, Material* material);
+	Cylinder(Disk bot, float length, shared_ptr<Material> material);
 	Cylinder(Disk bot, float length);
 	Direction getDirection();
 	Point getPoint();
 	float getRadius();
-	Material* getMaterial();
-	void setMaterial(Material* material);
+	shared_ptr<Material> getMaterial();
+	void setMaterial(shared_ptr<Material> material);
 	RGB getColor();
 	Plane getSup();
 	Plane getInf();
@@ -296,8 +297,8 @@ public:
 	~Triangle();
 	Triangle(Point a, Point b, Point c, Plane p, RGB color);
 	Triangle(Point a, Point b, Point c, RGB color);
-	Triangle(Point a, Point b, Point c, Plane p, Material* material);
-	Triangle(Point a, Point b, Point c, Material* material);
+	Triangle(Point a, Point b, Point c, Plane p, shared_ptr<Material> material);
+	Triangle(Point a, Point b, Point c, shared_ptr<Material> material);
 	Triangle(Point a, Point b, Point c);
 	void setA(Point a);
 	void setB(Point b);
@@ -305,8 +306,8 @@ public:
 	void setP(Plane p);
 	void setColor(RGB color);
 	RGB getColor();
-	Material* getMaterial();
-	void setMaterial(Material* material);
+	shared_ptr<Material> getMaterial();
+	void setMaterial(shared_ptr<Material> material);
 	Direction getNormal(Point x);
 	Point getA();
 	Point getB();
@@ -325,7 +326,7 @@ private:
 public:
 	Parallelepiped(Triangle* A, Triangle* B, float c, RGB color);
 	~Parallelepiped();
-	Parallelepiped(Triangle* A, Triangle* B, float c, Material* material);
+	Parallelepiped(Triangle* A, Triangle* B, float c, shared_ptr<Material> material);
 	float collision(Direction d, Point o, bool& collision);
 	void setColor(RGB color);
 	RGB getColor();

@@ -98,7 +98,7 @@ RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth)
 	float Or = acos((n * wo) / (wo.modulus() * n.modulus()));
 	RGB rgb = Material::getColor();
 	//cout << "color material: " << rgb.showAsString() << endl;
-	vector<PointLight*> lights = scene.getLights();
+	vector<shared_ptr<PointLight>> lights = scene.getLights();
 	for(int i = 0; i < lights.size(); i++){
 		PointLight pl = *lights[i];
 		float dist = (hit - pl.getOrigin()).modulus();
@@ -107,7 +107,7 @@ RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth)
 		Ray r = Ray(dirAux, hit + dirAux * 0.1f); 
 		Point collision;
 		float shadowDist = -1;
-		Shape* object = r.collision(scene, collision, shadowDist); 
+		shared_ptr<Shape> object = r.collision(scene, collision, shadowDist); 
 		if(object == nullptr || shadowDist > dist || shadowDist < 0 ){
 			//cout << "not found object" << endl;
 			float p = pl.getMaterial()->getIntensity();
@@ -278,7 +278,7 @@ RGB Refractive::getColor(Direction n, Point origin, Point hit, Scene scene, int 
 		Ray r(outRay, hit + outRay * 0.1f);
 		RGB Li = RGB(0, 0, 0);
 		Point intersection; float dist;
-		Shape* shape = nullptr;
+		shared_ptr<Shape> shape = nullptr;
  		Li = r.tracePath(scene, depth + 1);
  		return Li;
 	}
@@ -290,7 +290,7 @@ RGB Refractive::getColor(Direction n, Point origin, Point hit, Scene scene, int 
 		Ray r(outRay, hit + outRay * 0.1f);
 		RGB Li = RGB(0, 0, 0);
 		Point intersection; float dist;
-		Shape* shape = nullptr;
+		shared_ptr<Shape> shape = nullptr;
 		shape = r.collision(scene, intersection,dist);
 		//cout << "second : " << intersection.showAsString() << endl;
 		if(shape != nullptr){
@@ -338,7 +338,7 @@ PointLight::PointLight(){}
 
 PointLight::~PointLight(void){}
 
-PointLight::PointLight(Point o, Light* l) : Shape(l){
+PointLight::PointLight(Point o, shared_ptr<Light> l) : Shape(l){
 	this->o = o;
 }
 
@@ -350,47 +350,47 @@ Scene::Scene(){}
 
 Scene::~Scene(void){}
 
-Scene::Scene(vector<Shape*> objects){
-	this->objects = vector<Shape*>();
+Scene::Scene(vector<shared_ptr<Shape>> objects){
+	this->objects = vector<shared_ptr<Shape>>();
 }
 
-Scene::Scene(vector<PointLight*> lights){
+Scene::Scene(vector<shared_ptr<PointLight>> lights){
 	this->lights = lights;
 }
 
-Scene::Scene(vector<Shape*> objects, vector<PointLight*> lights){
+Scene::Scene(vector<shared_ptr<Shape>> objects, vector<shared_ptr<PointLight>> lights){
 	this->objects = objects;
 	this->lights = lights;
 }
 
-void Scene::add(Shape* s){
+void Scene::add(shared_ptr<Shape> s){
 	this->objects.push_back(s);
 }
 
-void Scene::add(PointLight* l){
+void Scene::add(shared_ptr<PointLight> l){
 	this->lights.push_back(l);
 }
 
-vector<Shape*> Scene::getObjects(){
+vector<shared_ptr<Shape>> Scene::getObjects(){
 	return this->objects;
 }
 
-vector<PointLight*> Scene::getLights(){
+vector<shared_ptr<PointLight>> Scene::getLights(){
 	return this->lights;
 }
 
 Shape::Shape(){
 	this->color = RGB();
-	this->material = new Material();
+	this->material = make_shared<Material>(Material());
 }
 
 Shape::~Shape(void){}
 Shape::Shape(RGB color){
 	this->color = color;
-	this->material = new Material();
+	this->material = make_shared<Material>(Material());
 }
 
-Shape::Shape(Material* material){
+Shape::Shape(shared_ptr<Material> material){
 	this->material = material;
 	this->color = RGB();
 }
@@ -399,11 +399,11 @@ void Shape::setColor(RGB color){
 	this->color = color;
 }
 
-void Shape::setMaterial(Material* material){
+void Shape::setMaterial(shared_ptr<Material> material){
 	this->material = material;
 }
 
-Material* Shape::getMaterial(){
+shared_ptr<Material> Shape::getMaterial(){
 	return this->material;
 }
 
@@ -453,16 +453,16 @@ Point Ray::getPoint(){
 	return this->p;
 }
 
-Shape* Ray::collision(Scene scene, Point& intersection, float& dist){
+shared_ptr<Shape> Ray::collision(Scene scene, Point& intersection, float& dist){
 	float minDist = numeric_limits<float>::max();
-	vector<Shape*> es = scene.getObjects();
+	vector<shared_ptr<Shape>> es = scene.getObjects();
 	Point minInter = Point();
 	bool collision;
-	Shape* min = nullptr;
+	shared_ptr<Shape> min = nullptr;
 	float dist2 = 0;
 	for(int i = 0; i < es.size(); i++){
 		dist = 0;
-		Shape* o;
+		shared_ptr<Shape> o;
 		o = es[i];
 		dist2 = es[i]->collision(this->dir, this->p, collision);
 		//es[i]->show();
@@ -482,7 +482,7 @@ Shape* Ray::collision(Scene scene, Point& intersection, float& dist){
 RGB Ray::tracePath(Scene scene, int depth){
 	float minDist;
 	Point minInter;
-	Shape* min = collision(scene, minInter, minDist);
+	shared_ptr<Shape> min = collision(scene, minInter, minDist);
 	if(min != nullptr){
 		return min->getColor(min->getNormal(minInter),
 				p, minInter, scene, depth);
@@ -496,7 +496,7 @@ Sphere::Sphere(){
 	this->center = Point();
 	this->radius = -1; //poner un float
 	this->color = RGB();
-	this->material = new Material();
+	this->material = make_shared<Material>(Material());
 }
 
 Sphere::~Sphere(void){}
@@ -507,7 +507,7 @@ Sphere::Sphere(Point center, float radius, RGB color){
 	this->radius = radius;
 }
 
-Sphere::Sphere(Point center, float radius, Material* material){
+Sphere::Sphere(Point center, float radius, shared_ptr<Material> material){
 	this->center = center;
 	this->material = material;
 	this->radius = radius;
@@ -530,11 +530,11 @@ void Sphere::setColor(RGB color){
 	this->color = color;
 }
 
-void Sphere::setMaterial(Material* material){
+void Sphere::setMaterial(shared_ptr<Material> material){
 	this->material = material;
 }
 
-Material* Sphere::getMaterial(){
+shared_ptr<Material> Sphere::getMaterial(){
 	return this->material;
 }
 
@@ -599,7 +599,7 @@ Plane::Plane(){
 	this->o = Point();
 	this->normal = Direction();
 	this->color = RGB();
-	this->material = new Material(); 
+	this->material = make_shared<Material>(Material()); 
 }
 
 Plane::~Plane(void){}
@@ -610,7 +610,7 @@ Plane::Plane(Direction normal, Point o, RGB color){
 	this->normal = normal;
 }
 
-Plane::Plane(Direction normal, Point o, Material* material){
+Plane::Plane(Direction normal, Point o, shared_ptr<Material> material){
 	this->o = o;
 	this->material = material;
 	this->normal = normal;
@@ -633,11 +633,11 @@ void Plane::setColor(RGB color){
 	this->color = color;
 }
 
-void Plane::setMaterial(Material* material){
+void Plane::setMaterial(shared_ptr<Material> material){
 	this->material = material;
 }
 
-Material* Plane::getMaterial(){
+shared_ptr<Material> Plane::getMaterial(){
 	return this->material;
 }
 
@@ -701,7 +701,7 @@ Disk::Disk(){
 	this->o = Point();
 	this->radius = -1;
 	this->color = RGB();
-	this->material = new Material();
+	this->material = make_shared<Material>(Material());
 
 }
 
@@ -714,7 +714,7 @@ Disk::Disk(Direction normal, Point o, float radius, RGB color){
 	this->color = color;
 }
 
-Disk::Disk(Direction normal, Point o, float radius, Material* material){
+Disk::Disk(Direction normal, Point o, float radius, shared_ptr<Material> material){
 	this->normal = normal;
 	this->radius = radius;
 	this->o = o;
@@ -743,11 +743,11 @@ RGB Disk::getColor(){
 	return this->color;
 }
 
-Material* Disk::getMaterial(){
+shared_ptr<Material> Disk::getMaterial(){
 	return this->material;
 }
 
-void Disk::setMaterial(Material* material){
+void Disk::setMaterial(shared_ptr<Material> material){
 	this->material = material;
 }
 
@@ -793,7 +793,7 @@ InfiniteCylinder::InfiniteCylinder(){
 	this->p = Point();
 	this->radius = -1;
 	this->color = RGB();
-	this->material = new Material();
+	this->material = make_shared<Material>(Material());
 }
 
 InfiniteCylinder::~InfiniteCylinder(void){}
@@ -806,7 +806,7 @@ InfiniteCylinder::InfiniteCylinder(Direction v, Point p, float radius, RGB color
 	this->color = color;
 }
 
-InfiniteCylinder::InfiniteCylinder(Direction v, Point p, float radius, Material* material){
+InfiniteCylinder::InfiniteCylinder(Direction v, Point p, float radius, shared_ptr<Material> material){
 	this->v = v;
 	this->v.normalize();
 	this->p = p;
@@ -837,11 +837,11 @@ RGB InfiniteCylinder::getColor(){
 	return this->color;
 }
 
-Material* InfiniteCylinder::getMaterial(){
+shared_ptr<Material> InfiniteCylinder::getMaterial(){
 	return this->material;
 }
 
-void InfiniteCylinder::setMaterial(Material* material){
+void InfiniteCylinder::setMaterial(shared_ptr<Material> material){
 	this->material = material;
 }
 
@@ -902,7 +902,7 @@ Cylinder::Cylinder(){
 	this->color = RGB();
 	this->sup = Plane();
 	this->inf = Plane();
-	this->material = new Material();
+	this->material = make_shared<Material>(Material());
 }
 
 Cylinder::~Cylinder(void){}
@@ -939,7 +939,7 @@ Cylinder::Cylinder(Disk bot, Disk top, RGB color){
 
 //bot normal must point to where the cylinder grows, but then must be point outwards
 //for light interaction
-Cylinder::Cylinder(Disk bot, float length, Material* material){
+Cylinder::Cylinder(Disk bot, float length, shared_ptr<Material> material){
 	this->bot = bot;
 	this->top = Disk(bot.getNormal(), bot.getO() + bot.getNormal() * length, bot.getRadius());
 	this->v = bot.getNormal();
@@ -960,7 +960,7 @@ Cylinder::Cylinder(Disk bot, float length){
 	this->radius = bot.getRadius();
 }
 
-Cylinder::Cylinder(Disk bot, Disk top, Material* material){
+Cylinder::Cylinder(Disk bot, Disk top, shared_ptr<Material> material){
 	this->bot = bot;
 	this->top = top;
 	this->v = top.getNormal();
@@ -995,11 +995,11 @@ RGB Cylinder::getColor(){
 	return this->color;
 }
 
-Material* Cylinder::getMaterial(){
+shared_ptr<Material> Cylinder::getMaterial(){
 	return this->material;
 }
 
-void Cylinder::setMaterial(Material* material){
+void Cylinder::setMaterial(shared_ptr<Material> material){
 	this->material = material;
 }
 
@@ -1153,7 +1153,7 @@ Triangle::Triangle() {
 	this->c = Point();
 	this->p = Plane();
 	this->color = RGB();
-	this->material = new Material();
+	this->material = make_shared<Material>(Material());
 }
 
 Triangle::~Triangle(void){}
@@ -1178,7 +1178,7 @@ Triangle::Triangle(Point a, Point b, Point c, Plane p, RGB color) {
 	this->color = color;
 }
 
-Triangle::Triangle(Point a, Point b, Point c, Plane p, Material* material) {
+Triangle::Triangle(Point a, Point b, Point c, Plane p, shared_ptr<Material> material) {
 	this->a = a;
 	this->b = b;
 	this->c = c;
@@ -1187,7 +1187,7 @@ Triangle::Triangle(Point a, Point b, Point c, Plane p, Material* material) {
 }
 
 
-Triangle::Triangle(Point a, Point b, Point c, Material* material) {
+Triangle::Triangle(Point a, Point b, Point c, shared_ptr<Material> material) {
 	this->a = a;
 	this->b = b;
 	this->c = c;
@@ -1236,11 +1236,11 @@ RGB Triangle::getColor(){
 	return this->color;
 }
 
-Material* Triangle::getMaterial(){
+shared_ptr<Material> Triangle::getMaterial(){
 	return this->material;
 }
 
-void Triangle::setMaterial(Material* material){
+void Triangle::setMaterial(shared_ptr<Material> material){
 	this->material = material;
 }
 
@@ -1348,7 +1348,7 @@ Parallelepiped::Parallelepiped(Triangle* A, Triangle* B, float c, RGB color){
 
 Parallelepiped::~Parallelepiped(void){}
 
-Parallelepiped::Parallelepiped(Triangle* A, Triangle* B, float c, Material* material){
+Parallelepiped::Parallelepiped(Triangle* A, Triangle* B, float c, shared_ptr<Material> material){
 	// Triangle A: b point alone, a and c shared with triangle B
 	// Triangle B: b point alone, a and c shared with triangle A
 	this->color = color;
