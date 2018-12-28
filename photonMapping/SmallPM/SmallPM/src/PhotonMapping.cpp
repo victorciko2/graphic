@@ -17,15 +17,10 @@ In no event shall copyright holders be liable for any damage.
 #include "Ray.h"
 #include "BSDF.h"
 #include <random>
+#include <cstdlib>
 #include "KDTree.h"
 
 using namespace std;
-
-random_device rd;
-mt19937 gen = mt19937(rd());
-uniform_real_distribution<float> distribution = uniform_real_distribution<float>(-1, 1);
-KDTree<Vector3, 20U> kdTree;
-
 
 //*********************************************************************
 // Compute the photons by tracing the Ray 'r' from the light source
@@ -159,49 +154,36 @@ bool PhotonMapping::trace_ray(const Ray& r, const Vector3 &p,
 //---------------------------------------------------------------------
 
 
+random_device rd;
+mt19937 gen = mt19937(rd());
+uniform_real_distribution<float> distribution = uniform_real_distribution<float>(0.0, 1.0);
+KDTree<Vector3, 20U> kdTree;
+
 void PhotonMapping::preprocess()
 {
+	//full intensity of the scene adding all lights
 	list<Photon> global_photons;
 	list<Photon> caustic_photons;
-
-	Vector3 randomDirection(0);
-	Vector3 lightPosition(0);
-	Ray r(lightPosition, randomDirection, 0);
-	bool morePhotons;
-
-	for (int i = 0; i < world->light_source_list.size(); i++) {
-		for (int j = 0; j < 1; j++) {
-			lightPosition = world->light_source_list[i]->get_position();
-			randomDirection = Vector3(distribution(gen), distribution(gen), distribution(gen));
-			randomDirection.normalize();
-			r = Ray(lightPosition, randomDirection, 0);
-			morePhotons = trace_ray(r, world->light_source_list[i]->get_intensities(), global_photons, caustic_photons, false, false);
+	LightSource* light;
+	Vector3 direction;
+	int num_photons = 0;
+	float phi, theta;
+	float total_intensity = 0;
+	for(int i = 0; i < world->light_source_list.size(); i++){
+		total_intensity += world->light_source_list[i]->get_intensities().length();
+	}
+	for(int i = 0; i < world->light_source_list.size(); i++){
+		light = world->light_source_list[i];
+		//throw photons according to the amount of relevance of each given light
+		num_photons = m_nb_photons * (light->get_intensities().length() * total_intensity);
+		for(int i = 0; i < num_photons; i++){
+			theta = 2 * _Pi * distribution(gen);
+			phi = acos(1 - 2 * distribution(gen));
+			direction = Vector3(sin(phi) * cos(theta), sin(phi) * sin(theta), cos(phi));
+			cout << "{ " << direction[0] << ", " << direction[1] << ", " << direction[2] << "}" << endl;
 		}
+		cout << "---------------------------------------------" << endl;
 	}
-	// Iterator to iterate the photons list
-	list<Photon>::iterator it;
-	vector<float> direction(3, 0);
-	int hola = 0;
-	for (it = global_photons.begin(); it != global_photons.end(); ++it) {
-		cout << "Estamos en global_photons (" << hola << ")" << endl;
-		direction[0] = it->direction[0];
-		direction[1] = it->direction[1];
-		direction[2] = it->direction[2];
-		cout << "eyyo" << endl;
-		kdTree.store(direction, it->flux);
-		cout << "k" << endl;
-		hola++;
-	}
-	hola = 0;
-	for (it = caustic_photons.begin(); it != caustic_photons.end(); ++it) {
-		cout << "Estamos en caustics (" << hola << ")" << endl;
-		direction[0] = it->direction[0];
-		direction[1] = it->direction[1];
-		direction[2] = it->direction[2];
-		kdTree.store(direction, it->flux);
-		hola++;
-	}
-	kdTree.balance();
 }
 
 //*********************************************************************
@@ -229,7 +211,7 @@ Vector3 PhotonMapping::shade(Intersection &it0)const
 	// will need when doing the work. Goes without saying: remove the 
 	// pieces of code that you won't be using.
 	//
-	unsigned int debug_mode = 7;
+	unsigned int debug_mode = 8;
 
 	switch (debug_mode)
 	{
@@ -282,7 +264,7 @@ Vector3 PhotonMapping::shade(Intersection &it0)const
 			world->first_intersection(r, it);
 		}
 		L = it.intersected()->material()->get_albedo(it);
-
+	
 	}
 	// End of exampled code
 	//**********************************************************************

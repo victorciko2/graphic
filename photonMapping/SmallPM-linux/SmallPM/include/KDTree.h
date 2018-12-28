@@ -77,8 +77,8 @@ public:
 
 private:
 	int closest(const std::vector<Real>& p, int index, int best) const;
-	void find(const std::vector<Real>& p, int index, Real radius, list<const Node*> &nodes) const;
-	void find(const std::vector<Real>& p, int index, int nb_elements, float &dist_worst, std::vector<const Node*> &nodes, std::vector<pair<int,float> > &dist) const;
+	void find(const std::vector<Real>& p, int index, Real radius, list<const Node*> &nodes) const;//buscar fotones en un radio
+	void find(const std::vector<Real>& p, int index, int nb_elements, float &dist_worst, std::vector<const Node*> &nodes, std::vector<pair<int,float> > &dist) const; //buscar nº concret de fotos mas cercanos
 	//I've removed static for compiling problems 
 	//static class HeapComparison
 	class HeapComparison

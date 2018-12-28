@@ -15,8 +15,14 @@ In no event shall copyright holders be liable for any damage.
 #include "World.h"
 #include "Intersection.h"
 #include "Ray.h"
+#include <random>
+#include <cmath>
+#include <cstdlib>
+#include "globals.h"
 #include "BSDF.h"
 
+const int MAX_NB_BOUNCES = 20;
+using namespace std;
 //*********************************************************************
 // Compute the photons by tracing the Ray 'r' from the light source
 // through the scene, and by storing the intersections with matter
@@ -32,7 +38,7 @@ In no event shall copyright holders be liable for any damage.
 // or diffuse) to be shot, and false otherwise.
 //---------------------------------------------------------------------
 bool PhotonMapping::trace_ray(const Ray& r, const Vector3 &p, 
-			   std::list<Photon> &global_photons, std::list<Photon> &caustic_photons, bool direct)
+			   std::list<Photon> &global_photons, std::list<Photon> &caustic_photons, bool direct)//bool direct para trazar o no iluminacion directa
 {
 
 	//Check if max number of shots done...
@@ -132,8 +138,62 @@ bool PhotonMapping::trace_ray(const Ray& r, const Vector3 &p,
 //		for rendering. 
 //		NOTE: Careful with function
 //---------------------------------------------------------------------
+//muestrear fuentes de luz
+
+random_device rd;
+mt19937 gen = mt19937(rd());
+uniform_real_distribution<float> distribution = uniform_real_distribution<float>(0.0, 1.0);
+
 void PhotonMapping::preprocess()
 {
+	//full intensity of the scene adding all lights
+	list<Photon> global_photons;
+	list<Photon> caustic_photons;
+	LightSource* light;
+	Vector3 direction;
+	int num_photons = 0;
+	float phi, theta;
+	float total_intensity = 0;
+	for(int i = 0; i < world->light_source_list.size(); i++){
+		total_intensity += world->light_source_list[i]->get_intensities().length();
+	}
+	for(int i = 0; i < world->light_source_list.size(); i++){
+		light = world->light_source_list[i];
+		//throw photons according to the amount of relevance of each given light
+		num_photons = m_nb_photons * (light->get_intensities().length() * total_intensity);
+		for(int i = 0; i < num_photons; i++){
+			theta = 2 * M_PI * distribution(gen);
+			phi = acos(1 - 2 * distribution(gen));
+			direction = Vector3(sin(phi) * cos(theta), sin(phi) * sin(theta), cos(phi));
+			direction.normalize();
+			trace_ray(Ray(light->get_position(), direction), 4 * M_PI * light->get_intensities() / num_photons,
+					global_photons, caustic_photons, false);
+			//cout << "{ " << direction[0] << ", " << direction[1] << ", " << direction[2] << "}" << endl;
+		}
+	}
+	bool balanced = true;
+	list<Photon>::const_iterator iterator;
+	Photon photon;
+	for(iterator = global_photons.begin(); iterator != global_photons.end(); ++iterator){
+		photon = *iterator;
+		vector<Real> real_vector(photon.position.data, photon.position.data + 3);
+		m_global_map.store(real_vector, photon);
+		balanced = false;
+	}
+	if(!balanced){
+		m_global_map.balance();
+		balanced = true;
+	}
+	balanced = true;
+	for (iterator = caustic_photons.begin(); iterator != caustic_photons.end(); ++iterator) {
+		photon = *iterator;
+		std::vector<Real> real_vector(photon.position.data, photon.position.data + 3);
+		m_caustics_map.store(real_vector, photon);
+		balanced = false;
+	}
+	if (!balanced) {
+		m_caustics_map.balance();
+	}
 }
 
 //*********************************************************************
@@ -147,9 +207,11 @@ void PhotonMapping::preprocess()
 // using k-nearest neighbors ('m_nb_photons') to define the bandwidth
 // of the kernel.
 //---------------------------------------------------------------------
+//impementar la etimacion de radiancia
 Vector3 PhotonMapping::shade(Intersection &it0)const
 {
 	Vector3 L(0);
+	Vector3 W(1,1,1);
 	Intersection it(it0);
 
 	//**********************************************************************
@@ -159,7 +221,7 @@ Vector3 PhotonMapping::shade(Intersection &it0)const
 	// will need when doing the work. Goes without saying: remove the 
 	// pieces of code that you won't be using.
 	//
-	unsigned int debug_mode = 1;
+	unsigned int debug_mode = 8;
 
 	switch (debug_mode)
 	{
@@ -197,6 +259,108 @@ Vector3 PhotonMapping::shade(Intersection &it0)const
 		if (world->light(0).is_visible(it.get_position()))
 			L = Vector3(1.);
 		break;
+	case 8:
+	{
+		Vector3 direct_light(0, 0, 0), caustic_light(0, 0, 0), indirect_light(0, 0, 0);
+		
+		int num_bounces = 0;
+		Ray ray;
+		float pdf;
+		//specular
+		while(it.intersected()->material()->is_delta() && ++num_bounces < MAX_NB_BOUNCES){
+			ray = it.get_ray();
+			it.intersected()->material()->get_outgoing_sample_ray(it, ray, pdf);
+			W = W * it.intersected()->material()->get_albedo(it) / pdf;
+
+			ray.shift();
+			world->first_intersection(ray, it);
+		}
+
+		//direct light
+		if(!it.intersected()->material()->is_delta()){
+			LightSource* light;
+			for(int i = 0; i < world->light_source_list.size(); i++){
+				light = world->light_source_list[i];
+				if(light->is_visible(it.get_position())){
+					direct_light += it.intersected()->material()->get_albedo(it) / 
+						M_PI * (light->get_incoming_direction(it.get_position()).dot_abs(it.get_normal())) * 
+						light->get_incoming_light(it.get_position()); 
+				}
+			}
+		}
+		Real k = 1.5;
+		//caustics
+		if(!it.intersected()->material()->is_delta()){
+			vector<const KDTree<Photon, 3>::Node *> nodes;
+			Real radius = 0;
+			Vector3 point = it.get_position();
+			m_caustics_map.find(vector<Real>(point.data, point.data + sizeof(point.data) 
+				/ sizeof(*point.data)), m_nb_photons, nodes, radius);
+			for (int i = 0;i < nodes.size();i++) {
+				caustic_light += nodes[i]->data().flux * (it.intersected()->material()->get_albedo(it) / M_PI);
+			}
+			caustic_light = caustic_light / ((1 - 2 / (3 * k)) * M_PI * radius * radius);
+		}
+
+		//indirect light
+		if (!it.intersected()->material()->is_delta()) {
+			vector<const KDTree<Photon, 3>::Node *> nodes;
+			Real radius = 0;
+			Vector3 point = it.get_position();
+			m_global_map.find(vector<Real>(point.data, point.data + sizeof(point.data) / sizeof(*point.data)), m_nb_photons, nodes, radius);
+			for (int i = 0;i < nodes.size();i++) {
+				indirect_light += nodes[i]->data().flux*(it.intersected()->material()->get_albedo(it) / M_PI);
+			}
+			indirect_light = indirect_light / ((1 - 2 / (3 * k)) * M_PI * radius * radius);
+		}
+		L = direct_light + caustic_light + indirect_light;
+		break;
+	}
+	case 9:
+	{
+		Vector3 direct_light(0, 0, 0), caustic_light(0, 0, 0), indirect_light(0, 0, 0);
+		
+		int num_bounces = 0;
+		Ray ray;
+		float pdf;
+		//specular
+		while(it.intersected()->material()->is_delta() && ++num_bounces < MAX_NB_BOUNCES){
+			ray = it.get_ray();
+			it.intersected()->material()->get_outgoing_sample_ray(it, ray, pdf);
+			W = W * it.intersected()->material()->get_albedo(it) / pdf;
+
+			ray.shift();
+			world->first_intersection(ray, it);
+		}
+
+		Real k = 1.5;
+		//caustics
+		if(!it.intersected()->material()->is_delta()){
+			vector<const KDTree<Photon, 3>::Node *> nodes;
+			Real radius = 0;
+			Vector3 point = it.get_position();
+			m_caustics_map.find(vector<Real>(point.data, point.data + sizeof(point.data) 
+				/ sizeof(*point.data)), m_nb_photons, nodes, radius);
+			for (int i = 0;i < nodes.size();i++) {
+				caustic_light += nodes[i]->data().flux * (it.intersected()->material()->get_albedo(it) / M_PI);
+			}
+			caustic_light = caustic_light / ((1 - 2 / (3 * k)) * M_PI * radius * radius);
+		}
+
+		//indirect light
+		if (!it.intersected()->material()->is_delta()) {
+			vector<const KDTree<Photon, 3>::Node *> nodes;
+			Real radius = 0;
+			Vector3 point = it.get_position();
+			m_global_map.find(vector<Real>(point.data, point.data + sizeof(point.data) / sizeof(*point.data)), m_nb_photons, nodes, radius);
+			for (int i = 0;i < nodes.size();i++) {
+				indirect_light += nodes[i]->data().flux*(it.intersected()->material()->get_albedo(it) / M_PI);
+			}
+			indirect_light = indirect_light / ((1 - 2 / (3 * k)) * M_PI * radius * radius);
+		}
+		L = direct_light + caustic_light + indirect_light;
+		break;
+	}
 	}
 	// End of exampled code
 	//**********************************************************************

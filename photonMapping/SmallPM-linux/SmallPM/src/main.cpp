@@ -23,7 +23,7 @@ In no event shall copyright holders be liable for any damage.
 #include "Sphere.h"
 #include "Triangle.h"
 #include "Plane.h"
-//#include "Mesh.h"
+#include "Mesh.h"
 #include "BSDF.h"
 #include "Phong.h"
 #include "Lambertian.h"
@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 	unsigned int photons_global = 10000, 
 				 photons_caustic = 10000, 
 				 max_shots = 100000, 
-				 nb_nearest_photons = 10;
+				 nb_nearest_photons = 300;
 
 	// ---------------------------------------------------------------------
 	// Parse input
@@ -166,8 +166,8 @@ int main(int argc, char* argv[])
 		w->add_object(sphere1);
 
 
-		//Mesh* bunny = new Mesh("data\\bunny.obj", mirror);
-		//w->add_object(bunny);
+		Mesh* bunny = new Mesh("data\\bunny.obj", mirror);
+		w->add_object(bunny);
 	}
 	break;
 	default:
