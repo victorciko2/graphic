@@ -13,9 +13,8 @@ In no event shall copyright holders be liable for any damage.
 **********************************************************************************/
 
 #include <iostream>
-#include <string.h>
 #include "globals.h"
-
+#include <string.h>
 #include "World.h"
 #include "RenderEngine.h"
 #include "PhotonMapping.h"
@@ -25,7 +24,6 @@ In no event shall copyright holders be liable for any damage.
 #include "Plane.h"
 #include "Mesh.h"
 #include "BSDF.h"
-#include "Phong.h"
 #include "Lambertian.h"
 #include "Specular.h"
 #include "Transmissive.h"
@@ -36,7 +34,7 @@ namespace {
 	Film *film;
 	RenderEngine *engine;
 	PhotonMapping *pm;
-	int sizex = 512, sizey = 512;
+	int sizex = 1024, sizey = 1024;
 }
 
 
@@ -47,13 +45,13 @@ int main(int argc, char* argv[])
 
 	Real focal_distance = 2.6;
 
-	char *name_file = NULL, *default_name_file = "name_file";
+	char *name_file = NULL, *default_name_file = "mapaPORTADA";
 	name_file = default_name_file;
 
-	unsigned int scene = 0;
+	unsigned int scene = 3;
 
-	unsigned int photons_global = 10000, 
-				 photons_caustic = 10000, 
+	unsigned int photons_global = 100000, 
+				 photons_caustic = 100000, 
 				 max_shots = 100000, 
 				 nb_nearest_photons = 300;
 
@@ -100,6 +98,7 @@ int main(int argc, char* argv[])
 	BSDF* white = new Lambertian(w, Vector3(.85,.85,.85));
 	BSDF* red = new Lambertian(w, Vector3(.85,.085,.085));
 	BSDF* green = new Lambertian(w, Vector3(.085,.85,.085));
+	BSDF* orange = new Lambertian(w, Vector3(.85,.6,.02));
 
 	Triangle* floor1 = new Triangle( Vector3(-1.5,0,1.5),Vector3(1.5,0.,1.5),
 									 Vector3(-1.5,0.,-1.5), white);
@@ -141,15 +140,19 @@ int main(int argc, char* argv[])
 	{
 	case 1:
 	{	
+
+		cout << "case 1" << endl;
 		Object3D* sphere1 = new Sphere(Vector3(0.5,0.3,.5), 0.3, glass);
 		w->add_object(sphere1);
 
 		Object3D* sphere2 = new Sphere(Vector3(-0.5,0.5,.5), 0.3, mirror);
 		w->add_object(sphere2);
+		break;
 	}
-	break;
 	case 2:
 	{	
+
+		cout << "case 2" << endl;
 		Object3D* sphere1 = new Sphere(Vector3(0.5,0.3,.5), 0.3, white);
 		w->add_object(sphere1);
 
@@ -158,28 +161,45 @@ int main(int argc, char* argv[])
 
 		Object3D* sphere3 = new Sphere(Vector3(0.,0.3,.0), 0.3, white);
 		w->add_object(sphere3);
+
+		Object3D* sphere4 = new Sphere(Vector3(0.5, 1, .5), 0.3, glass);
+		w->add_object(sphere4);
+		break;
 	}
-	break;
 	case 3:
 	{	
+		cout << "case 3" << endl;
 		Object3D* sphere1 = new Sphere(Vector3(0.5,0.3,.5), 0.3, glass);
 		w->add_object(sphere1);
 
 
-		Mesh* bunny = new Mesh("data\\bunny.obj", mirror);
-		w->add_object(bunny);
+		/*Mesh* bunny = new Mesh("data\\bunny.obj", mirror);
+		w->add_object(bunny);*/
+		break;
 	}
-	break;
+	case 4:
+	{	
+
+		cout << "case 4" << endl;
+		Object3D* sphere1 = new Sphere(Vector3(0,0.8,0), 0.6, glass);
+		w->add_object(sphere1);
+		Object3D* sphere2 = new Sphere(Vector3(0,0.8,0), 0.3, orange);
+		w->add_object(sphere2);
+		break;
+	}
 	default:
 	{
-		Object3D* sphere1 = new Sphere(Vector3(0.5,0.3,.5), 0.3, white);
+
+		cout << "case default" << endl;
+		Object3D* sphere1 = new Sphere(Vector3(0,0.3,.5), 0.3, white);
 		w->add_object(sphere1);
 
 		Object3D* sphere2 = new Sphere(Vector3(-0.5,0.5,1.5), 0.3, red);
 		w->add_object(sphere2);
+		break;
 	}
 	}
-	LightSource* ls = new PointLightSource(w, Vector3(0,1.9,0), Vector3(5,5,5));
+	LightSource* ls = new PointLightSource(w, Vector3(0,1.9,0), Vector3(1,1,1));
 	w->add_light(ls);
 
 	w->fix();

@@ -1,1 +1,86 @@
-﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Platforms\Win32\PlatformToolsets\v141\Toolset.targets(34,5): error MSB8036: No se encontró la versión del SDK de Windows 8.1. Instale la versión requerida del SDK de Windows o cambie la versión del SDK en las páginas de propiedades de proyecto o haciendo clic con el botón derecho en la solución y seleccionando "Redestinar solución".
+﻿cl : Línea de comandos warning D9035: La opción 'Gm' está desusada y se quitará en próximas versiones
+  main.cpp
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\smallrt\include\ray.h(26): warning C4305: 'inicializando': truncamiento de 'double' a 'float'
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\smallrt\include\lambertian.h(28): warning C4305: 'argumento': truncamiento de 'double' a 'const float'
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\main.cpp(46): warning C4305: 'inicializando': truncamiento de 'double' a 'float'
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\main.cpp(98): warning C4305: 'argumento': truncamiento de 'double' a 'const float'
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\main.cpp(99): warning C4305: 'argumento': truncamiento de 'double' a 'const float'
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\main.cpp(100): warning C4305: 'argumento': truncamiento de 'double' a 'const float'
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\main.cpp(101): warning C4305: 'argumento': truncamiento de 'double' a 'const float'
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\main.cpp(143): warning C4305: 'argumento': truncamiento de 'double' a 'const float'
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\main.cpp(146): warning C4305: 'argumento': truncamiento de 'double' a 'const float'
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\main.cpp(152): warning C4305: 'argumento': truncamiento de 'double' a 'const float'
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\main.cpp(155): warning C4305: 'argumento': truncamiento de 'double' a 'const float'
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\main.cpp(158): warning C4305: 'argumento': truncamiento de 'double' a 'const float'
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\main.cpp(164): warning C4305: 'argumento': truncamiento de 'double' a 'const float'
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\main.cpp(173): warning C4305: 'argumento': truncamiento de 'double' a 'const float'
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\main.cpp(175): warning C4305: 'argumento': truncamiento de 'double' a 'const float'
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\main.cpp(181): warning C4305: 'argumento': truncamiento de 'double' a 'const float'
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\main.cpp(184): warning C4305: 'argumento': truncamiento de 'double' a 'const float'
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\main.cpp(188): warning C4305: 'argumento': truncamiento de 'double' a 'const float'
+  PhotonMapping.cpp
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\smallrt\include\ray.h(26): warning C4305: 'inicializando': truncamiento de 'double' a 'float'
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\photonmapping.cpp(117): warning C4244: 'argumento': conversión de 'double' a 'const float'; posible pérdida de datos
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\photonmapping.cpp(150): warning C4018: '<': no coinciden signed/unsigned
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\photonmapping.cpp(154): warning C4018: '<': no coinciden signed/unsigned
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\photonmapping.cpp(169): warning C4244: 'inicializando': conversión de 'float' a 'int'; posible pérdida de datos
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\photonmapping.cpp(180): warning C4305: 'argumento': truncamiento de 'long double' a 'const float'
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\photonmapping.cpp(180): warning C4244: 'argumento': conversión de 'int' a 'const float'; posible pérdida de datos
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\photonmapping.cpp(313): warning C4018: '<': no coinciden signed/unsigned
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\photonmapping.cpp(316): warning C4305: 'argumento': truncamiento de 'const long double' a 'const float'
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\photonmapping.cpp(327): warning C4018: '<': no coinciden signed/unsigned
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\photonmapping.cpp(328): warning C4305: 'argumento': truncamiento de 'const long double' a 'const float'
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\photonmapping.cpp(330): warning C4244: 'argumento': conversión de 'long double' a 'const float'; posible pérdida de datos
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\photonmapping.cpp(339): warning C4018: '<': no coinciden signed/unsigned
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\photonmapping.cpp(340): warning C4305: 'argumento': truncamiento de 'const long double' a 'const float'
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\photonmapping.cpp(342): warning C4244: 'argumento': conversión de 'long double' a 'const float'; posible pérdida de datos
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\photonmapping.cpp(373): warning C4018: '<': no coinciden signed/unsigned
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\photonmapping.cpp(374): warning C4305: 'argumento': truncamiento de 'const long double' a 'const float'
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\photonmapping.cpp(376): warning C4244: 'argumento': conversión de 'long double' a 'const float'; posible pérdida de datos
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\photonmapping.cpp(385): warning C4018: '<': no coinciden signed/unsigned
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\photonmapping.cpp(386): warning C4305: 'argumento': truncamiento de 'const long double' a 'const float'
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\photonmapping.cpp(388): warning C4244: 'argumento': conversión de 'long double' a 'const float'; posible pérdida de datos
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\include\kdtree.h(222): warning C4018: '<': no coinciden signed/unsigned
+  c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\include\kdtree.h(216): note: durante la compilación de la función miembro de plantilla clase de 'void KDTree<PhotonMapping::Photon,3>::find(const std::vector<float,std::allocator<_Ty>> &,int,int,float &,std::vector<const KDTree<PhotonMapping::Photon,3>::Node *,std::allocator<const KDTree<PhotonMapping::Photon,3>::Node*>> &,std::vector<std::pair<int,float>,std::allocator<std::pair<int,float>>> &) const'
+          with
+          [
+              _Ty=float
+          ]
+  c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\include\kdtree.h(123): note: vea la referencia a la creación de instancias de plantilla de función 'void KDTree<PhotonMapping::Photon,3>::find(const std::vector<float,std::allocator<_Ty>> &,int,int,float &,std::vector<const KDTree<PhotonMapping::Photon,3>::Node *,std::allocator<const KDTree<PhotonMapping::Photon,3>::Node*>> &,std::vector<std::pair<int,float>,std::allocator<std::pair<int,float>>> &) const' que se está compilando
+          with
+          [
+              _Ty=float
+          ]
+  c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\include\photonmapping.h(58): note: vea la referencia a la creación de instancias de plantilla clase de 'KDTree<PhotonMapping::Photon,3>' que se está compilando
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\include\kdtree.h(226): warning C4018: '<': no coinciden signed/unsigned
+c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\include\kdtree.h(175): warning C4018: '<': no coinciden signed/unsigned
+  c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\include\kdtree.h(173): note: durante la compilación de la función miembro de plantilla clase de 'void KDTree<PhotonMapping::Photon,3>::update_heap_nodes(const KDTree<PhotonMapping::Photon,3>::Node &,const float,int,std::vector<const KDTree<PhotonMapping::Photon,3>::Node *,std::allocator<_Ty>> &,std::vector<std::pair<int,float>,std::allocator<std::pair<int,float>>> &) const'
+          with
+          [
+              _Ty=const KDTree<PhotonMapping::Photon,3>::Node *
+          ]
+  c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\include\kdtree.h(221): note: vea la referencia a la creación de instancias de plantilla de función 'void KDTree<PhotonMapping::Photon,3>::update_heap_nodes(const KDTree<PhotonMapping::Photon,3>::Node &,const float,int,std::vector<const KDTree<PhotonMapping::Photon,3>::Node *,std::allocator<_Ty>> &,std::vector<std::pair<int,float>,std::allocator<std::pair<int,float>>> &) const' que se está compilando
+          with
+          [
+              _Ty=const KDTree<PhotonMapping::Photon,3>::Node *
+          ]
+  c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\include\kdtree.h(368): note: durante la compilación de la función miembro de plantilla clase de 'void KDTree<PhotonMapping::Photon,3>::balance(void)'
+  c:\users\portatil\desktop\davy\7cuatri\ig\graphic\photonmapping\smallpm\smallpm\src\photonmapping.cpp(193): note: vea la referencia a la creación de instancias de plantilla de función 'void KDTree<PhotonMapping::Photon,3>::balance(void)' que se está compilando
+  Generando código...
+main.obj : warning LNK4075: se omite '/EDITANDCONTINUE' debido a la especificaci¾n '/SAFESEH'
+SmallRT_VS2017d.lib(Camera.obj) : warning LNK4099: no se encontr¾ PDB 'SmallRT.pdb' con 'SmallRT_VS2017d.lib(Camera.obj)' o en 'C:\Users\Portatil\Desktop\Davy\7CUATRI\IG\graphic\photonMapping\SmallPM\VS2017\Debug\SmallRT.pdb'; se vincularß el objeto sin tener en cuenta informaci¾n de depuraci¾n
+SmallRT_VS2017d.lib(Film.obj) : warning LNK4099: no se encontr¾ PDB 'SmallRT.pdb' con 'SmallRT_VS2017d.lib(Film.obj)' o en 'C:\Users\Portatil\Desktop\Davy\7CUATRI\IG\graphic\photonMapping\SmallPM\VS2017\Debug\SmallRT.pdb'; se vincularß el objeto sin tener en cuenta informaci¾n de depuraci¾n
+SmallRT_VS2017d.lib(Intersection.obj) : warning LNK4099: no se encontr¾ PDB 'SmallRT.pdb' con 'SmallRT_VS2017d.lib(Intersection.obj)' o en 'C:\Users\Portatil\Desktop\Davy\7CUATRI\IG\graphic\photonMapping\SmallPM\VS2017\Debug\SmallRT.pdb'; se vincularß el objeto sin tener en cuenta informaci¾n de depuraci¾n
+SmallRT_VS2017d.lib(LightSource.obj) : warning LNK4099: no se encontr¾ PDB 'SmallRT.pdb' con 'SmallRT_VS2017d.lib(LightSource.obj)' o en 'C:\Users\Portatil\Desktop\Davy\7CUATRI\IG\graphic\photonMapping\SmallPM\VS2017\Debug\SmallRT.pdb'; se vincularß el objeto sin tener en cuenta informaci¾n de depuraci¾n
+SmallRT_VS2017d.lib(Ray.obj) : warning LNK4099: no se encontr¾ PDB 'SmallRT.pdb' con 'SmallRT_VS2017d.lib(Ray.obj)' o en 'C:\Users\Portatil\Desktop\Davy\7CUATRI\IG\graphic\photonMapping\SmallPM\VS2017\Debug\SmallRT.pdb'; se vincularß el objeto sin tener en cuenta informaci¾n de depuraci¾n
+SmallRT_VS2017d.lib(Vector2.obj) : warning LNK4099: no se encontr¾ PDB 'SmallRT.pdb' con 'SmallRT_VS2017d.lib(Vector2.obj)' o en 'C:\Users\Portatil\Desktop\Davy\7CUATRI\IG\graphic\photonMapping\SmallPM\VS2017\Debug\SmallRT.pdb'; se vincularß el objeto sin tener en cuenta informaci¾n de depuraci¾n
+SmallRT_VS2017d.lib(Vector3.obj) : warning LNK4099: no se encontr¾ PDB 'SmallRT.pdb' con 'SmallRT_VS2017d.lib(Vector3.obj)' o en 'C:\Users\Portatil\Desktop\Davy\7CUATRI\IG\graphic\photonMapping\SmallPM\VS2017\Debug\SmallRT.pdb'; se vincularß el objeto sin tener en cuenta informaci¾n de depuraci¾n
+SmallRT_VS2017d.lib(World.obj) : warning LNK4099: no se encontr¾ PDB 'SmallRT.pdb' con 'SmallRT_VS2017d.lib(World.obj)' o en 'C:\Users\Portatil\Desktop\Davy\7CUATRI\IG\graphic\photonMapping\SmallPM\VS2017\Debug\SmallRT.pdb'; se vincularß el objeto sin tener en cuenta informaci¾n de depuraci¾n
+SmallRT_VS2017d.lib(Lambertian.obj) : warning LNK4099: no se encontr¾ PDB 'SmallRT.pdb' con 'SmallRT_VS2017d.lib(Lambertian.obj)' o en 'C:\Users\Portatil\Desktop\Davy\7CUATRI\IG\graphic\photonMapping\SmallPM\VS2017\Debug\SmallRT.pdb'; se vincularß el objeto sin tener en cuenta informaci¾n de depuraci¾n
+SmallRT_VS2017d.lib(Specular.obj) : warning LNK4099: no se encontr¾ PDB 'SmallRT.pdb' con 'SmallRT_VS2017d.lib(Specular.obj)' o en 'C:\Users\Portatil\Desktop\Davy\7CUATRI\IG\graphic\photonMapping\SmallPM\VS2017\Debug\SmallRT.pdb'; se vincularß el objeto sin tener en cuenta informaci¾n de depuraci¾n
+SmallRT_VS2017d.lib(Transmissive.obj) : warning LNK4099: no se encontr¾ PDB 'SmallRT.pdb' con 'SmallRT_VS2017d.lib(Transmissive.obj)' o en 'C:\Users\Portatil\Desktop\Davy\7CUATRI\IG\graphic\photonMapping\SmallPM\VS2017\Debug\SmallRT.pdb'; se vincularß el objeto sin tener en cuenta informaci¾n de depuraci¾n
+SmallRT_VS2017d.lib(BVH.obj) : warning LNK4099: no se encontr¾ PDB 'SmallRT.pdb' con 'SmallRT_VS2017d.lib(BVH.obj)' o en 'C:\Users\Portatil\Desktop\Davy\7CUATRI\IG\graphic\photonMapping\SmallPM\VS2017\Debug\SmallRT.pdb'; se vincularß el objeto sin tener en cuenta informaci¾n de depuraci¾n
+SmallRT_VS2017d.lib(Object3D.obj) : warning LNK4099: no se encontr¾ PDB 'SmallRT.pdb' con 'SmallRT_VS2017d.lib(Object3D.obj)' o en 'C:\Users\Portatil\Desktop\Davy\7CUATRI\IG\graphic\photonMapping\SmallPM\VS2017\Debug\SmallRT.pdb'; se vincularß el objeto sin tener en cuenta informaci¾n de depuraci¾n
+SmallRT_VS2017d.lib(Sphere.obj) : warning LNK4099: no se encontr¾ PDB 'SmallRT.pdb' con 'SmallRT_VS2017d.lib(Sphere.obj)' o en 'C:\Users\Portatil\Desktop\Davy\7CUATRI\IG\graphic\photonMapping\SmallPM\VS2017\Debug\SmallRT.pdb'; se vincularß el objeto sin tener en cuenta informaci¾n de depuraci¾n
+SmallRT_VS2017d.lib(Triangle.obj) : warning LNK4099: no se encontr¾ PDB 'SmallRT.pdb' con 'SmallRT_VS2017d.lib(Triangle.obj)' o en 'C:\Users\Portatil\Desktop\Davy\7CUATRI\IG\graphic\photonMapping\SmallPM\VS2017\Debug\SmallRT.pdb'; se vincularß el objeto sin tener en cuenta informaci¾n de depuraci¾n
+  SmallPM.vcxproj -> C:\Users\Portatil\Desktop\Davy\7CUATRI\IG\graphic\photonMapping\SmallPM\VS2017\Debug\SmallPM.exe

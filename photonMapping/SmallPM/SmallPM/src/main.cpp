@@ -45,15 +45,15 @@ int main(int argc, char* argv[])
 
 	Real focal_distance = 2.6;
 
-	char *name_file = NULL, *default_name_file = "name_file";
+	char *name_file = NULL, *default_name_file = "negraso_windows";
 	name_file = default_name_file;
 
-	unsigned int scene = 0;
+	unsigned int scene = 3;
 
 	unsigned int photons_global = 10000, 
 				 photons_caustic = 10000, 
 				 max_shots = 100000, 
-				 nb_nearest_photons = 10;
+				 nb_nearest_photons = 30;
 
 	// ---------------------------------------------------------------------
 	// Parse input
@@ -165,8 +165,8 @@ int main(int argc, char* argv[])
 		w->add_object(sphere1);
 
 
-		Mesh* bunny = new Mesh("data\\bunny.obj", mirror);
-		w->add_object(bunny);
+		/*Mesh* bunny = new Mesh("data\\bunny.obj", mirror);
+		w->add_object(bunny);*/
 	}
 	case 4:
 	{	
