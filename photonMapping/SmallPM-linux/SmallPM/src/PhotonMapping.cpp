@@ -20,7 +20,6 @@ In no event shall copyright holders be liable for any damage.
 #include "BSDF.h"
 #include <iostream>
 
-float _Pi = M_PI;
 int MAX_NB_BOUNCES = 20;
 //*********************************************************************
 // Compute the photons by tracing the Ray 'r' from the light source
@@ -151,43 +150,45 @@ void PhotonMapping::preprocess()
 	mt19937 gen = mt19937(rd());
 	uniform_real_distribution<float> distribution = uniform_real_distribution<float>(0.0, 1.0);
 	float phi, theta;
-	float total_p = 0;
+	float total_intensity = 0;
+	int num_samples;
+	LightSource* light = nullptr;
+	list<Photon> global_photons, caustic_photons;
+	Vector3 direction = Vector3(0, 0, 0);
 	for (int i = 0; i < world->light_source_list.size(); i++) {
-		total_p += world->light_source_list[i]->get_intensities().length();
+		total_intensity += world->light_source_list[i]->get_intensities().length();
 	}
-	list<Photon> global, caustic;
 	for (int i = 0; i < world->light_source_list.size(); i++) {
-		LightSource * luz = world->light_source_list[i];
-		int nSamples = m_nb_global_photons * (luz->get_intensities().length() / total_p);
+		light = world->light_source_list[i];
+		num_samples = m_nb_global_photons * (light->get_intensities().length() / total_intensity);
 
-		for(int i = 0; i < nSamples; i++){
+		for(int i = 0; i < num_samples; i++){
 			theta = 2 * M_PI * distribution(gen);
 			phi = acos(1 - 2 * distribution(gen));
-			Vector3 direction = Vector3(sin(phi) * cos(theta), sin(phi) * sin(theta), cos(phi));
+			direction = Vector3(sin(phi) * cos(theta), sin(phi) * sin(theta), cos(phi));
 			direction.normalize();
-			trace_ray(Ray(luz->get_position(), direction), 4 * M_PI * luz->get_intensities() / nSamples,
-					global, caustic, false, false);
+			trace_ray(Ray(light->get_position(), direction), 4 * M_PI * light->get_intensities() / num_samples,
+					global_photons, caustic_photons, false, false);
 		}
-	}
+	}	
 
 	bool balanced = true;
 	std::list<Photon>::const_iterator iterator;
-	for (iterator = global.begin(); iterator != global.end(); ++iterator) {
-		Photon p = *iterator;
-		std::vector<Real> r(p.position.data, p.position.data + 3);
-		m_global_map.store(r, p);
+	Photon photon;
+	for (iterator = global_photons.begin(); iterator != global_photons.end(); ++iterator) {
+		photon = *iterator;
+		std::vector<Real> photon_position(photon.position.data, photon.position.data + 3);
+		m_global_map.store(photon_position, photon);
 		balanced = false;
 	}
 	if (!balanced) {
 		m_global_map.balance();
 		balanced = true;
 	}
-
-	balanced = true;
-	for (iterator = caustic.begin(); iterator != caustic.end(); ++iterator) {
-		Photon p = *iterator;
-		std::vector<Real> r(p.position.data, p.position.data + 3);
-		m_caustics_map.store(r, p);
+	for (iterator = caustic_photons.begin(); iterator != caustic_photons.end(); ++iterator) {
+		photon = *iterator;
+		std::vector<Real> photon_position(photon.position.data, photon.position.data + 3);
+		m_caustics_map.store(photon_position, photon);
 		balanced = false;
 	}
 	if (!balanced) {
@@ -260,6 +261,7 @@ Vector3 PhotonMapping::shade(Intersection &it0)const
 			L = Vector3(1.);
 		break;
 	case 7:
+	{
 		// ----------------------------------------------------------------
 		// Reflect and refract until a diffuse surface is found, then show its albedo...
 		int nb_bounces = 0;
@@ -274,11 +276,113 @@ Vector3 PhotonMapping::shade(Intersection &it0)const
 			world->first_intersection(r, it);
 		}
 		L = it.intersected()->material()->get_albedo(it);
+		break;
+	}
+	case 8:
+	{
+		Vector3 Ld(0, 0, 0), Lc(0, 0, 0), Li(0, 0, 0);
+		//specular light
+		int nb_bounces = 0;
+		// MAX_NB_BOUNCES defined in ./SmallRT/include/globals.h
+		Ray ray;
+		float pdf;
+		while (it.intersected()->material()->is_delta() && ++nb_bounces < MAX_NB_BOUNCES)
+		{
+			ray = it.get_ray();
+			it.intersected()->material()->get_outgoing_sample_ray(it, ray, pdf);
+			W = W * it.intersected()->material()->get_albedo(it) / pdf;
 
+			ray.shift();
+			world->first_intersection(ray, it);
+		}
+
+		//direct
+		LightSource* light = nullptr;
+		if (!it.intersected()->material()->is_delta()) {
+			for (int i = 0; i < world->light_source_list.size(); i++) {
+				light = world->light_source_list[i];
+				if (light->is_visible(it.get_position())) {
+					Ld += it.intersected()->material()->get_albedo(it) / M_PI * (light->get_incoming_direction(it.get_position()).dot_abs(it.get_normal())) 
+							* light->get_incoming_light(it.get_position());
+				}
+			}
+		}
+		Real k = 1.5;
+		//caustic
+		Real radius = 0;
+		if (!it.intersected()->material()->is_delta()) {
+			vector<const KDTree<Photon, 3>::Node*> nodes;
+			radius = 0;
+			Vector3 point = it.get_position();
+			m_caustics_map.find(vector<Real>(point.data, point.data + sizeof(point.data) / sizeof(*point.data)), m_nb_photons, nodes, radius);
+			for (int i = 0; i < nodes.size(); i++) {
+				Lc += nodes[i]->data().flux * (it.intersected()->material()->get_albedo(it) / M_PI);
+			}
+			Lc = Lc / ((1 - 2 / (3 * k)) * M_PI * radius * radius);
+		}
+
+		//indirect
+		if (!it.intersected()->material()->is_delta()) {
+			vector<const KDTree<Photon, 3>::Node*> nodes;
+			radius = 0;
+			Vector3 point = it.get_position();
+			m_global_map.find(vector<Real>(point.data, point.data + sizeof(point.data) / sizeof(*point.data)), m_nb_photons, nodes, radius);
+			for (int i = 0; i < nodes.size(); i++) {
+				Li += nodes[i]->data().flux * (it.intersected()->material()->get_albedo(it) / M_PI);
+			}
+			Li = Li / ((1 - 2 / (3 * k)) * M_PI * radius * radius);
+		}
+
+		L = Li + Lc + Ld;
+		break;
+	}
+	case 9:
+	{
+		Vector3 Ld(0, 0, 0), Lc(0, 0, 0), Li(0, 0, 0);
+		//specular
+		int nb_bounces = 0;
+		// MAX_NB_BOUNCES defined in ./SmallRT/include/globals.h
+		while (it.intersected()->material()->is_delta() && ++nb_bounces < MAX_NB_BOUNCES)
+		{
+			Ray r = it.get_ray(); float pdf;
+			it.intersected()->material()->get_outgoing_sample_ray(it, r, pdf);
+			W = W * it.intersected()->material()->get_albedo(it) / pdf;
+
+			r.shift();
+			world->first_intersection(r, it);
+		}
+
+		Real k = 1.5, radius = 0;;
+		//caustics
+		if (!it.intersected()->material()->is_delta()) {
+			vector<const KDTree<Photon, 3>::Node*> nodes;
+			radius = 0;
+			Vector3 point = it.get_position();
+			m_caustics_map.find(vector<Real>(point.data, point.data + sizeof(point.data) / sizeof(*point.data)), 1, nodes, radius);
+			for (int i = 0; i < nodes.size(); i++) {
+				Lc += nodes[i]->data().flux * (it.intersected()->material()->get_albedo(it) / M_PI);
+			}
+			Lc = Lc / ((1 - 2 / (3 * k)) * M_PI * radius * radius);
+		}
+
+		//indirect
+		if (!it.intersected()->material()->is_delta()) {
+			vector<const KDTree<Photon, 3>::Node*> nodes;
+			radius = 0;
+			Vector3 point = it.get_position();
+			m_global_map.find(vector<Real>(point.data, point.data + sizeof(point.data) / sizeof(*point.data)), 1, nodes, radius);
+			for (int i = 0; i < nodes.size(); i++) {
+				Li += nodes[i]->data().flux * (it.intersected()->material()->get_albedo(it) / M_PI);
+			}
+			Li = Li / ((1 - 2 / (3 * k)) * M_PI * radius * radius);
+		}
+		L = Li + Lc + Ld;
+		break;
+	}
 	}
 	// End of exampled code
 	//**********************************************************************
-
+/*
 	if (debug_mode == 8) {
 		Vector3 Ld(0, 0, 0), Lc(0, 0, 0), Li(0, 0, 0);
 
@@ -302,33 +406,33 @@ Vector3 PhotonMapping::shade(Intersection &it0)const
 			for (int i = 0; i < world->light_source_list.size(); i++) {
 				LightSource * l = world->light_source_list[i];
 				if (l->is_visible(it.get_position())) {
-					Ld += it.intersected()->material()->get_albedo(it) / _Pi * (l->get_incoming_direction(it.get_position()).dot_abs(it.get_normal())) * l->get_incoming_light(it.get_position());
+					Ld += it.intersected()->material()->get_albedo(it) / M_PI * (l->get_incoming_direction(it.get_position()).dot_abs(it.get_normal())) * l->get_incoming_light(it.get_position());
 				}
 			}
 		}
 		Real k = 1.5;
 		//Luz causticas
 		if (!it.intersected()->material()->is_delta()) {
-			vector<const KDTree<Photon, 3>::Node *> nodos;
-			Real radio = 0;
+			vector<const KDTree<Photon, 3>::Node *> nodes;
+			Real radius = 0;
 			Vector3 point = it.get_position();
-			m_caustics_map.find(vector<Real>(point.data, point.data + sizeof(point.data) / sizeof(*point.data)), m_nb_photons, nodos, radio);
-			for (int i = 0; i < nodos.size(); i++) {
-				Lc += nodos[i]->data().flux*(it.intersected()->material()->get_albedo(it) / _Pi);
+			m_caustics_map.find(vector<Real>(point.data, point.data + sizeof(point.data) / sizeof(*point.data)), m_nb_photons, nodes, radius);
+			for (int i = 0; i < nodes.size(); i++) {
+				Lc += nodes[i]->data().flux*(it.intersected()->material()->get_albedo(it) / M_PI);
 			}
-			Lc = Lc / ((1 - 2 / (3 * k))*_Pi*radio*radio);
+			Lc = Lc / ((1 - 2 / (3 * k))*M_PI*radius*radius);
 		}
 
 		//Luz indirecta
 		if (!it.intersected()->material()->is_delta()) {
-			vector<const KDTree<Photon, 3>::Node *> nodos;
-			Real radio = 0;
+			vector<const KDTree<Photon, 3>::Node *> nodes;
+			Real radius = 0;
 			Vector3 point = it.get_position();
-			m_global_map.find(vector<Real>(point.data, point.data + sizeof(point.data) / sizeof(*point.data)), m_nb_photons, nodos, radio);
-			for (int i = 0; i < nodos.size(); i++) {
-				Li += nodos[i]->data().flux*(it.intersected()->material()->get_albedo(it) / _Pi);
+			m_global_map.find(vector<Real>(point.data, point.data + sizeof(point.data) / sizeof(*point.data)), m_nb_photons, nodes, radius);
+			for (int i = 0; i < nodes.size(); i++) {
+				Li += nodes[i]->data().flux*(it.intersected()->material()->get_albedo(it) / M_PI);
 			}
-			Li = Li / ((1 - 2 / (3 * k))*_Pi*radio*radio);
+			Li = Li / ((1 - 2 / (3 * k))*M_PI*radius*radius);
 		}
 
 		L = Li + Lc + Ld;
@@ -355,30 +459,30 @@ Vector3 PhotonMapping::shade(Intersection &it0)const
 		Real k = 1.5;
 		//Luz causticas
 		if (!it.intersected()->material()->is_delta()) {
-			vector<const KDTree<Photon, 3>::Node *> nodos;
-			Real radio = 0;
+			vector<const KDTree<Photon, 3>::Node *> nodes;
+			Real radius = 0;
 			Vector3 point = it.get_position();
-			m_caustics_map.find(vector<Real>(point.data, point.data + sizeof(point.data) / sizeof(*point.data)), 1, nodos, radio);
-			for (int i = 0; i < nodos.size(); i++) {
-				Lc += nodos[i]->data().flux*(it.intersected()->material()->get_albedo(it) / _Pi);
+			m_caustics_map.find(vector<Real>(point.data, point.data + sizeof(point.data) / sizeof(*point.data)), 1, nodes, radius);
+			for (int i = 0; i < nodes.size(); i++) {
+				Lc += nodes[i]->data().flux*(it.intersected()->material()->get_albedo(it) / M_PI);
 			}
-			Lc = Lc / ((1 - 2 / (3 * k))*_Pi*radio*radio);
+			Lc = Lc / ((1 - 2 / (3 * k))*M_PI*radius*radius);
 		}
 
 		//Luz indirecta
 		if (!it.intersected()->material()->is_delta()) {
-			vector<const KDTree<Photon, 3>::Node *> nodos;
-			Real radio = 0;
+			vector<const KDTree<Photon, 3>::Node *> nodes;
+			Real radius = 0;
 			Vector3 point = it.get_position();
-			m_global_map.find(vector<Real>(point.data, point.data + sizeof(point.data) / sizeof(*point.data)), 1, nodos, radio);
-			for (int i = 0; i < nodos.size(); i++) {
-				Li += nodos[i]->data().flux*(it.intersected()->material()->get_albedo(it) / _Pi);
+			m_global_map.find(vector<Real>(point.data, point.data + sizeof(point.data) / sizeof(*point.data)), 1, nodes, radius);
+			for (int i = 0; i < nodes.size(); i++) {
+				Li += nodes[i]->data().flux*(it.intersected()->material()->get_albedo(it) / M_PI);
 			}
-			Li = Li / ((1 - 2 / (3 * k))*_Pi*radio*radio);
+			Li = Li / ((1 - 2 / (3 * k))*M_PI*radius*radius);
 		}
 
 		L = Li + Lc + Ld;
 	}
-
+	*/
 	return L * W;
 }

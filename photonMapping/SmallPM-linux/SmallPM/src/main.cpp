@@ -50,10 +50,10 @@ int main(int argc, char* argv[])
 
 	unsigned int scene = 3;
 
-	unsigned int photons_global = 100000, 
-				 photons_caustic = 100000, 
-				 max_shots = 100000, 
-				 nb_nearest_photons = 300;
+	unsigned int photons_global = 1000000, 
+				 photons_caustic = 1000000, 
+				 max_shots = 1000000, 
+				 nb_nearest_photons = 3000;
 
 	// ---------------------------------------------------------------------
 	// Parse input
@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
 
 		cout << "case 1" << endl;
 		Object3D* sphere1 = new Sphere(Vector3(0.5,0.3,.5), 0.3, glass);
-		w->add_object(sphere1);
+		//w->add_object(sphere1);
 
 		Object3D* sphere2 = new Sphere(Vector3(-0.5,0.5,.5), 0.3, mirror);
 		w->add_object(sphere2);
