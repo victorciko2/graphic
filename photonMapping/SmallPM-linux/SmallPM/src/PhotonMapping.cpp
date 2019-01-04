@@ -281,11 +281,11 @@ Vector3 PhotonMapping::shade(Intersection &it0)const
 	case 8:
 	{
 		Vector3 Ld(0, 0, 0), Lc(0, 0, 0), Li(0, 0, 0);
-		//specular light
 		int nb_bounces = 0;
 		// MAX_NB_BOUNCES defined in ./SmallRT/include/globals.h
 		Ray ray;
 		float pdf;
+		//specular light
 		while (it.intersected()->material()->is_delta() && ++nb_bounces < MAX_NB_BOUNCES)
 		{
 			ray = it.get_ray();
@@ -310,7 +310,7 @@ Vector3 PhotonMapping::shade(Intersection &it0)const
 		Real k = 1.5;
 		//caustic
 		Real radius = 0;
-		if (!it.intersected()->material()->is_delta()) {
+		/*if (!it.intersected()->material()->is_delta()) {
 			vector<const KDTree<Photon, 3>::Node*> nodes;
 			radius = 0;
 			Vector3 point = it.get_position();
@@ -319,10 +319,10 @@ Vector3 PhotonMapping::shade(Intersection &it0)const
 				Lc += nodes[i]->data().flux * (it.intersected()->material()->get_albedo(it) / M_PI);
 			}
 			Lc = Lc / ((1 - 2 / (3 * k)) * M_PI * radius * radius);
-		}
+		}*/
 
 		//indirect
-		if (!it.intersected()->material()->is_delta()) {
+		/*if (!it.intersected()->material()->is_delta()) {
 			vector<const KDTree<Photon, 3>::Node*> nodes;
 			radius = 0;
 			Vector3 point = it.get_position();
@@ -331,7 +331,7 @@ Vector3 PhotonMapping::shade(Intersection &it0)const
 				Li += nodes[i]->data().flux * (it.intersected()->material()->get_albedo(it) / M_PI);
 			}
 			Li = Li / ((1 - 2 / (3 * k)) * M_PI * radius * radius);
-		}
+		}*/
 
 		L = Li + Lc + Ld;
 		break;
