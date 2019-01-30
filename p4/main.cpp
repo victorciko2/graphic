@@ -31,11 +31,12 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 	scene.add(make_shared<Plane>(left));
 	Plane right(Direction(-1, 0, 0), Point(10, 0, -10), make_shared<BRDF>(BRDF(0.7, 0, 100, RGB(0, (float)255/255, 0)))); //RIGHT
 	scene.add(make_shared<Plane>(right));
-	Plane down(Direction(0, 1, 0), Point(0,-10, 10), make_shared<BRDF>(BRDF(0.7, 0, 100, RGB((float)230/255, (float)230/255, (float)230/255)))); //DOWN
+	Plane down(Direction(0, 1, 0), Point(0,-10, 10), make_shared<Reflective>(Reflective()/*BRDF(0.7, 0, 100, RGB((float)230/255, (float)230/255, (float)230/255))*/)); //DOWN
 	scene.add(make_shared<Plane>(down));
-	Plane up(Direction(0, -1, 0), Point(0, 10, 10), make_shared<BRDF>(BRDF(0.7, 0, 100, RGB((float)140/255, (float)140/255, (float)140/255)))); //UP
+	Plane up(Direction(0, -1, 0), Point(0, 10, 10), make_shared<Reflective>(Reflective()/*BRDF(0.7, 0, 100, RGB((float)140/255, (float)140/255, (float)140/255))*/)); //UP
 	scene.add(make_shared<Plane>(up));
-	Plane back(Direction(0, 0, -1), Point(0, 0, 20), make_shared<BRDF>(BRDF(0.7, 0, 100, RGB((float)191/255, (float)191/255, (float)191/255)))); //BACK
+	Plane back(Direction(0, 0, -1), Point(0, 0, 20), make_shared<Reflective>(Reflective()/*BRDF(0.7, 0, 100, RGB((float)191/255, (float)191/255, (float)191/255))*/)); //BACK
+	
 	scene.add(make_shared<Plane>(back));
 	scene.addPM(0.0250, 0.01);//extincion and scattering (que putos datos poner)
 
