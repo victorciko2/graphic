@@ -568,13 +568,14 @@ RGB Ray::tracePath(Scene scene, int depth){
 					RGB L = r.tracePath(scene, depth + 1); 
 					return RGB(dirLTr[0] + L[0], dirLTr[1] + L[1], dirLTr[2] + L[2]);
 				}
-				else{
+				else{ //absorcion
+					Ray r = Ray(this->dir, this->p + this->dir * l);
 					float tr = exp(l * -scene.getSigmaT());
 					RGB dirLight = addLights(scene, r);
 					RGB dirLTr = RGB(dirLight[0] * tr * scene.getSigmaT(),
 							dirLight[1] * tr * scene.getSigmaT(), dirLight[2] * tr * scene.getSigmaT()); 
-					RGB L = this->tracePath(scene, depth + 1); 
-					return RGB(dirLTr[0] + L[0], dirLTr[1] + L[1], dirLTr[2] + L[2]);
+					RGB L = tracePath(scene, depth + 1); 
+					return RGB(-dirLTr[0] + L[0], -dirLTr[1] + L[1], -dirLTr[2] + L[2]);
 				}
 				 
 			}
