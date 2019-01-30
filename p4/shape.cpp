@@ -370,9 +370,10 @@ void Scene::add(shared_ptr<PointLight> l){
 	this->lights.push_back(l);
 }
 
-void Scene::addPM(float sigmaT, float sigmaS){
-	this->sigmaT = sigmaT;
+void Scene::addPM(float sigmaA, float sigmaS){
+	this->sigmaA = sigmaA;
 	this->sigmaS = sigmaS;
+	this->sigmaT = sigmaA + sigmaS;
 }
 
 float Scene::getSigmaT(){
@@ -381,6 +382,10 @@ float Scene::getSigmaT(){
 
 float Scene::getSigmaS(){
 	return this->sigmaS;
+}
+
+float Scene::getSigmaA(){
+	return sigmaA;
 }
 
 vector<shared_ptr<Shape>> Scene::getObjects(){
@@ -495,14 +500,13 @@ float FLT_MAX = numeric_limits<float>::max();
 
 float sampleDistance(Scene scene, float dist){
 	float p = rnd(gen);
-	if(p <= 0.7){
-		float r = rnd(gen);
-		if(r == 0 || r == 1){
-			return FLT_MAX;
-		}
-		return dist * r;
+	float t = log(1 - p)/scene.getSigmaT();
+	if(t > dist){ // cae fuera de la caja
+		return FLT_MAX; 
 	}
-	return FLT_MAX;
+	else{
+		return t;
+	}
 }
 
 Direction scatteredDirection(){
@@ -544,7 +548,7 @@ RGB addLights(Scene scene, Ray ray){
 				dirLight[2] + rgbL[2] * a * scene.getSigmaS());
 		}
 	}
-	dirLight = RGB(dirLight[0] * (1/4*M_PI), dirLight[1] * (1/4*M_PI), dirLight[2] * (1/4*M_PI));
+	dirLight = RGB(dirLight[0] * (1/(4*M_PI)), dirLight[1] * (1/(4*M_PI)), dirLight[2] * (1/(4*M_PI)));
 	return dirLight; 
 }
 
@@ -559,14 +563,14 @@ RGB Ray::tracePath(Scene scene, int depth){
 			if(l != FLT_MAX){// scatter event 
 				random_device rd2;
 				mt19937 gen2 = mt19937 (rd2());
-				uniform_real_distribution<float> rnd2 = uniform_real_distribution<float>(0, scene.getSigmaT() + scene.getSigmaS());
-				if(rnd2(gen2) <= scene.getSigmaS()/*||true*/){
+				uniform_real_distribution<float> rnd2 = uniform_real_distribution<float>(0, 1);
+				if(rnd2(gen2) < scene.getSigmaS() / scene.getSigmaT()/*||true*/){//scatter
 					Ray r = Ray(scatteredDirection(), this->p + this->dir * l);
 					float tr = exp(l * -scene.getSigmaT());
 					RGB dirLight = addLights(scene, r);
 					RGB dirLTr = RGB(dirLight[0] * tr, dirLight[1] * tr, dirLight[2] * tr); 
 					RGB L = r.tracePath(scene, depth + 1); 
-					return RGB(dirLTr[0] + L[0], dirLTr[1] + L[1], dirLTr[2] + L[2]);
+					return RGB(-dirLTr[0] + L[0], -dirLTr[1] + L[1], -dirLTr[2] + L[2]);
 				}
 				else{ //absorcion
 					Ray r = Ray(this->dir, this->p + this->dir * l);
@@ -574,7 +578,7 @@ RGB Ray::tracePath(Scene scene, int depth){
 					RGB dirLight = addLights(scene, r);
 					RGB dirLTr = RGB(dirLight[0] * tr * scene.getSigmaT(),
 							dirLight[1] * tr * scene.getSigmaT(), dirLight[2] * tr * scene.getSigmaT()); 
-					RGB L = tracePath(scene, depth + 1); 
+					RGB L = r.tracePath(scene, depth + 1); 
 					return RGB(-dirLTr[0] + L[0], -dirLTr[1] + L[1], -dirLTr[2] + L[2]);
 				}
 				 
@@ -582,7 +586,7 @@ RGB Ray::tracePath(Scene scene, int depth){
 			else{
 				RGB rgb = min->getColor(min->getNormal(minInter),
 							p, minInter, scene, depth); 
-	 			float tr = exp(minDist * scene.getSigmaT());
+	 			float tr = exp(minDist * -scene.getSigmaT());
 				rgb = RGB(rgb[0] * tr, rgb[1] * tr, rgb[2] * tr);
 				return rgb;
 			}

@@ -122,7 +122,7 @@ class Scene{
 protected:
 	vector<shared_ptr<Shape>> objects;
 	vector<shared_ptr<PointLight>> lights;
-	float sigmaT, sigmaS, sigmaA; //extinction and scattering
+	float sigmaT, sigmaS, sigmaA; //extinction and scattering and absorcion
 public:
 	Scene();
 	~Scene();
@@ -131,9 +131,10 @@ public:
 	Scene(vector<shared_ptr<Shape>> objects, vector<shared_ptr<PointLight>> lights);
 	void add(shared_ptr<Shape> s);
 	void add(shared_ptr<PointLight> l);
-	void addPM(float sigmaT, float sigmaS);
+	void addPM(float sigmaA, float sigmaS);
 	float getSigmaT();
 	float getSigmaS();
+	float getSigmaA();
 	vector<shared_ptr<Shape>> getObjects();
 	vector<shared_ptr<PointLight>> getLights();
 };

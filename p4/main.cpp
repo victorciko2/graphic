@@ -38,8 +38,9 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 	Plane back(Direction(0, 0, -1), Point(0, 0, 20), make_shared<BRDF>(BRDF(0.7, 0, 100, RGB((float)191/255, (float)191/255, (float)191/255)))); //BACK
 	
 	scene.add(make_shared<Plane>(back));
-	scene.addPM(0.0250, 0.01);//extincion and scattering (que putos datos poner)
-
+	scene.addPM(0.0250, 0.01);//absorcion and scattering (que putos datos poner)
+	cout << "Sigma T = sigmaA + sigmaS" << endl;
+	cout << scene.getSigmaT() << " = " << scene.getSigmaA() << " + " << scene.getSigmaS() << endl;
 
  	// ******************************************* EL MARAVILLOSO PENE *********************************************************
 	BRDF m = BRDF(0.7, 0.1, 1, RGB((float)252/255, (float)123/255, (float)220/255));
@@ -133,9 +134,12 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 				mean = RGB(mean[0] + result[0], mean[1] + result[1], mean[2] + result[2]);
 			}
 			mean = RGB((mean[0] / numPaths) * colorRange, (mean[1] / numPaths) * colorRange, (mean[2] / numPaths) * colorRange);
-			if(mean[0] > colorRange || mean[0] < 0) mean = RGB(colorRange, mean[1], mean[2]); 
-			if(mean[1] > colorRange || mean[1] < 0) mean = RGB(mean[0], colorRange, mean[2]);
-			if(mean[2] > colorRange || mean[2] < 0) mean = RGB(mean[0], mean[1], colorRange);
+			if(mean[0] > colorRange) mean = RGB(colorRange, mean[1], mean[2]); 
+			if(mean[1] > colorRange) mean = RGB(mean[0], colorRange, mean[2]);
+			if(mean[2] > colorRange) mean = RGB(mean[0], mean[1], colorRange);
+			if(mean[0] < 0) mean = RGB(0, mean[1], mean[2]); 
+			if(mean[1] < 0) mean = RGB(mean[0], 0, mean[2]);
+			if(mean[2] < 0) mean = RGB(mean[0], mean[1], 0);
 			o << (int) mean[0] << " " << (int) mean[1] << " " << (int) mean[2] << " ";
 		}
 		o << endl;
