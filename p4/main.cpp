@@ -37,7 +37,7 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 	scene.add(make_shared<Plane>(up));
 	Plane back(Direction(0, 0, -1), Point(0, 0, 20), make_shared<BRDF>(BRDF(0.7, 0, 100, RGB((float)191/255, (float)191/255, (float)191/255)))); //BACK
 	scene.add(make_shared<Plane>(back));
-
+	scene.addPM(0.0250, 0.01);//extincion and scattering (que putos datos poner)
 
 
  	// ******************************************* EL MARAVILLOSO PENE *********************************************************
@@ -56,35 +56,35 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 	// Pruebas sin mas
 	//***************************SNOWMAN*******************************************
 	Material ref = Reflective();
-	m = BRDF(0.7, 0.2, 1, RGB((float)255/255, (float)255/255, (float)255/255));	
+	m = BRDF(0.7, 0.2, 1, RGB((float)0/255, (float)0/255, (float)255/255));	
 	//body
 	Sphere body(Point(0,-7,13), 3, make_shared<BRDF>(m));
-	scene.add(make_shared<Sphere>(body));
+	//scene.add(make_shared<Sphere>(body));
 	Sphere body2(Point(0,-2.8,13), 2.5, make_shared<BRDF>(m));
 	scene.add(make_shared<Sphere>(body2));
 	Sphere body3(Point(0,0.4,13), 1.8, make_shared<BRDF>(m));
-	scene.add(make_shared<Sphere>(body3));
+	//scene.add(make_shared<Sphere>(body3));
 	m = BRDF(0.6, 0.1, 1, RGB((float)0/255, (float)0/255, (float)0/255));	
 	//arms
 	Cylinder rightArm(Disk(Direction(1, 1, 0), Point(2, -1.5, 13), 0.3), 4, make_shared<BRDF>(m));
-	scene.add(make_shared<Cylinder>(rightArm));
+	//scene.add(make_shared<Cylinder>(rightArm));
 	Cylinder leftArm(Disk(Direction(-1, 1, 0), Point(-2, -1.5, 13), 0.3), 4, make_shared<BRDF>(m));
-	scene.add(make_shared<Cylinder>(leftArm));
+	//scene.add(make_shared<Cylinder>(leftArm));
 	//eyes
 	Sphere leftEye(Point(-0.7,0.8,11.2), 0.2, make_shared<BRDF>(m));
-	scene.add(make_shared<Sphere>(leftEye));
+	//scene.add(make_shared<Sphere>(leftEye));
 	Sphere rightEye(Point(0.7,0.8,11.2), 0.2, make_shared<BRDF>(m));
-	scene.add(make_shared<Sphere>(rightEye));
+	//scene.add(make_shared<Sphere>(rightEye));
 	//buttons
 	Sphere button1(Point(0,-2.2,10), 0.4, make_shared<BRDF>(m));
-	scene.add(make_shared<Sphere>(button1));
+	//scene.add(make_shared<Sphere>(button1));
 	Sphere button2(Point(0,-1.1,10), 0.4, make_shared<BRDF>(m));
-	scene.add(make_shared<Sphere>(button2));
+	//scene.add(make_shared<Sphere>(button2));
 	Sphere button3(Point(0,-3.4,10), 0.4, make_shared<BRDF>(m));
-	scene.add(make_shared<Sphere>(button3));
+	//scene.add(make_shared<Sphere>(button3));
 	//mouth
 	Cylinder mouth(Disk(Direction(1, 0, 0), Point(-0.5, -0.2, 11), 0.1), 1.1, make_shared<BRDF>(m));
-	scene.add(make_shared<Cylinder>(mouth));
+	//scene.add(make_shared<Cylinder>(mouth));
 	Parallelepiped paralele(new Triangle(Point(-8, -9.9, 14), Point(-8, -9.9, 18), Point(-2, -9.9, 18)),
 					new Triangle(Point(-8, -9.9, 14), Point(-2, -9.9 ,14), Point(-2, -9.9, 18)), 12, make_shared<BRDF>(m));
 	//scene.add(make_shared<Parallelepiped>(paralele));

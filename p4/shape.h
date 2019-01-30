@@ -103,6 +103,7 @@ public:
 	~Light();
 	Light(float p);
 	Light(float p, RGB color);
+	RGB getColor();
 	RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth);
 	float getIntensity();
 };
@@ -121,6 +122,7 @@ class Scene{
 protected:
 	vector<shared_ptr<Shape>> objects;
 	vector<shared_ptr<PointLight>> lights;
+	float sigmaT, sigmaS, sigmaA; //extinction and scattering
 public:
 	Scene();
 	~Scene();
@@ -129,6 +131,9 @@ public:
 	Scene(vector<shared_ptr<Shape>> objects, vector<shared_ptr<PointLight>> lights);
 	void add(shared_ptr<Shape> s);
 	void add(shared_ptr<PointLight> l);
+	void addPM(float sigmaT, float sigmaS);
+	float getSigmaT();
+	float getSigmaS();
 	vector<shared_ptr<Shape>> getObjects();
 	vector<shared_ptr<PointLight>> getLights();
 };

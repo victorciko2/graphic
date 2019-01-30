@@ -148,9 +148,7 @@ RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth)
 	if(maxDepth == 1){
 		return dirLight;
 	}
-	//cout << "el color directo es : " << dirLight.showAsString() << endl; 
 	if(rnd < kd){ //difuse
-		//cout << "Difuse" << endl;
 		Direction any(1, 1, 1); any.normalize();
 		Direction axis = n ^ any; axis.normalize();
 		CoordinateSystem coor(axis, n, axis^n, hit);
@@ -171,7 +169,6 @@ RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth)
 				   Li[2] * rgb[2] + dirLight[2]);
 	}
 	else if(rnd < kd + ks){//specular
-		//cout << "Specular" << endl; 
 		Direction axis = n ^ refPerfect; axis.normalize();
 		CoordinateSystem coor(axis, refPerfect, axis ^ refPerfect, hit);
 		float eO = distribution(gen);
@@ -309,7 +306,9 @@ RGB Refractive::getColor(Direction n, Point origin, Point hit, Scene scene, int 
 	}
 }
 
-
+RGB Light::getColor(){
+	return this->color;
+}
 //n is the surface normal
 //color arriving to the surface from the light
 RGB Light::getColor(Direction n, Point origin, Point hit, Scene scene, int depth){
@@ -369,6 +368,19 @@ void Scene::add(shared_ptr<Shape> s){
 
 void Scene::add(shared_ptr<PointLight> l){
 	this->lights.push_back(l);
+}
+
+void Scene::addPM(float sigmaT, float sigmaS){
+	this->sigmaT = sigmaT;
+	this->sigmaS = sigmaS;
+}
+
+float Scene::getSigmaT(){
+	return this->sigmaT;
+}
+
+float Scene::getSigmaS(){
+	return this->sigmaS;
 }
 
 vector<shared_ptr<Shape>> Scene::getObjects(){
@@ -465,10 +477,7 @@ shared_ptr<Shape> Ray::collision(Scene scene, Point& intersection, float& dist){
 		shared_ptr<Shape> o;
 		o = es[i];
 		dist2 = es[i]->collision(this->dir, this->p, collision);
-		//es[i]->show();
-		//cout << "a distancia: " << dist2 << " collision: " << collision << endl;
 		if(collision && dist2 < minDist && dist2 > 0){
-			//cout << "entro" << endl;
 			minDist = dist2;
 			minInter = this->dir * minDist + this->p;
 			min = o;
@@ -479,13 +488,109 @@ shared_ptr<Shape> Ray::collision(Scene scene, Point& intersection, float& dist){
 	return min;
 }
 
+random_device rd;
+mt19937 gen = mt19937 (rd());
+uniform_real_distribution<float> rnd = uniform_real_distribution<float>(0, 1);
+float FLT_MAX = numeric_limits<float>::max();
+
+float sampleDistance(Scene scene, float dist){
+	float p = rnd(gen);
+	if(p <= 0.7){
+		float r = rnd(gen);
+		if(r == 0 || r == 1){
+			return FLT_MAX;
+		}
+		return dist * r;
+	}
+	return FLT_MAX;
+}
+
+Direction scatteredDirection(){
+	Direction direction = Direction();
+	float theta, phi;
+	theta = 2 * M_PI * rnd(gen);
+	phi = acos(1 - 2 * rnd(gen));
+	direction = Direction(sin(phi) * cos(theta), sin(phi) * sin(theta), cos(phi));
+	direction.normalize();
+	return direction;
+}
+
+RGB addLights(Scene scene, Ray ray){
+	RGB dirLight = RGB(0,0,0);
+	vector<shared_ptr<PointLight>> lights = scene.getLights();
+	for(int i = 0; i < lights.size(); i++){
+		PointLight pl = *lights[i];
+		float dist = (ray.getPoint() - pl.getOrigin()).modulus();
+		Direction dirAux = pl.getOrigin() - ray.getPoint();
+		dirAux.normalize();
+		Ray r = Ray(dirAux, ray.getPoint() + dirAux * 0.1f); 
+		Point collision;
+		float shadowDist = -1;
+		shared_ptr<Shape> object = r.collision(scene, collision, shadowDist); 
+		if(object == nullptr || shadowDist > dist || shadowDist < 0 ){
+			float p = pl.getMaterial()->getIntensity();
+			float a;
+			//HABRA QUE MIRARLO
+			if(dist < 1){
+				a = p;
+			}
+			else{
+				a = abs(p / (dist * dist));
+			}
+			RGB rgbL = pl.getMaterial()->getColor();
+			dirLight = RGB(
+				dirLight[0] + rgbL[0] * a * scene.getSigmaS(),
+				dirLight[1] + rgbL[1] * a * scene.getSigmaS(),
+				dirLight[2] + rgbL[2] * a * scene.getSigmaS());
+		}
+	}
+	return dirLight;
+}
+
 RGB Ray::tracePath(Scene scene, int depth){
 	float minDist;
 	Point minInter;
 	shared_ptr<Shape> min = collision(scene, minInter, minDist);
 	if(min != nullptr){
-		return min->getColor(min->getNormal(minInter),
-				p, minInter, scene, depth);
+		//calculate scatterevent
+		if(scene.getSigmaT()!= 0){
+			float l = sampleDistance(scene, minDist);
+			if(l != FLT_MAX){// scatter event 
+				random_device rd2;
+				mt19937 gen2 = mt19937 (rd2());
+				uniform_real_distribution<float> rnd2 = uniform_real_distribution<float>(0, scene.getSigmaT() + scene.getSigmaS());
+				if(rnd2(gen2) <= scene.getSigmaS()/*||true*/){
+					Ray r = Ray(scatteredDirection(), this->p + this->dir * l);
+					float tr = exp(l * -scene.getSigmaT());
+					RGB dirLight = addLights(scene, r);
+					RGB dirLTr = RGB(dirLight[0] * tr, dirLight[1] * tr, dirLight[2] * tr); 
+					RGB L = r.tracePath(scene, depth + 1); 
+					return RGB(dirLTr[0] + L[0], dirLTr[1] + L[1], dirLTr[2] + L[2]);
+				}
+				else{
+					Ray r = Ray(scatteredDirection(), this->p + this->dir * l);
+					float tr = exp(l * -scene.getSigmaT());
+					RGB dirLight = addLights(scene, r);
+					RGB dirLTr = RGB(dirLight[0] * tr * scene.getSigmaT(),
+							dirLight[1] * tr * scene.getSigmaT(), dirLight[2] * tr * scene.getSigmaT()); 
+					RGB L = r.tracePath(scene, depth + 1); 
+					return RGB(dirLTr[0] + L[0], dirLTr[1] + L[1], dirLTr[2] + L[2]);
+				}
+				 
+			}
+			else{
+				RGB rgb = min->getColor(min->getNormal(minInter),
+							p, minInter, scene, depth); 
+	 			float tr = exp(minDist * scene.getSigmaT());
+				rgb = RGB(rgb[0] * tr, rgb[1] * tr, rgb[2] * tr);
+				return rgb;
+			}
+		}
+		else{
+			return min->getColor(min->getNormal(minInter),
+						p, minInter, scene, depth); 
+		}
+		
 	}
 	else{
 		return {0,0,0};
