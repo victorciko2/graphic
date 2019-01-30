@@ -500,7 +500,7 @@ float FLT_MAX = numeric_limits<float>::max();
 
 float sampleDistance(Scene scene, float dist){
 	float p = rnd(gen);
-	float t = log(1 - p)/scene.getSigmaT();
+	float t = -log(1 - p)/scene.getSigmaT();
 	if(t > dist){ // cae fuera de la caja
 		return FLT_MAX; 
 	}
@@ -543,12 +543,12 @@ RGB addLights(Scene scene, Ray ray){
 			}
 			RGB rgbL = pl.getMaterial()->getColor();
 			dirLight = RGB(
-				dirLight[0] + rgbL[0] * a * scene.getSigmaS(),
-				dirLight[1] + rgbL[1] * a * scene.getSigmaS(),
-				dirLight[2] + rgbL[2] * a * scene.getSigmaS());
+				dirLight[0] + rgbL[0] * a,
+				dirLight[1] + rgbL[1] * a,
+				dirLight[2] + rgbL[2] * a);
 		}
 	}
-	dirLight = RGB(dirLight[0] * (1/(4*M_PI)), dirLight[1] * (1/(4*M_PI)), dirLight[2] * (1/(4*M_PI)));
+	dirLight = RGB(dirLight[0], dirLight[1], dirLight[2]);
 	return dirLight; 
 }
 
@@ -560,26 +560,26 @@ RGB Ray::tracePath(Scene scene, int depth){
 		//calculate scatterevent
 		if(scene.getSigmaT() != 0){
 			float l = sampleDistance(scene, minDist);
-			if(l != FLT_MAX){// scatter event 
+			if(l != FLT_MAX){ //scatter event 
 				random_device rd2;
 				mt19937 gen2 = mt19937 (rd2());
 				uniform_real_distribution<float> rnd2 = uniform_real_distribution<float>(0, 1);
-				if(rnd2(gen2) < scene.getSigmaS() / scene.getSigmaT()/*||true*/){//scatter
+				if(rnd2(gen2) < scene.getSigmaS() / scene.getSigmaT()){ //scatter
 					Ray r = Ray(scatteredDirection(), this->p + this->dir * l);
 					float tr = exp(l * -scene.getSigmaT());
 					RGB dirLight = addLights(scene, r);
-					RGB dirLTr = RGB(dirLight[0] * tr, dirLight[1] * tr, dirLight[2] * tr); 
+					RGB dirLTr = RGB(dirLight[0] * tr * scene.getSigmaS(), dirLight[1] * tr * scene.getSigmaS(), dirLight[2] * tr * scene.getSigmaS()); 
 					RGB L = r.tracePath(scene, depth + 1); 
-					return RGB(-dirLTr[0] + L[0], -dirLTr[1] + L[1], -dirLTr[2] + L[2]);
+					return RGB(dirLTr[0] + L[0], dirLTr[1] + L[1], dirLTr[2] + L[2]);
 				}
 				else{ //absorcion
 					Ray r = Ray(this->dir, this->p + this->dir * l);
 					float tr = exp(l * -scene.getSigmaT());
 					RGB dirLight = addLights(scene, r);
-					RGB dirLTr = RGB(dirLight[0] * tr * scene.getSigmaT(),
-							dirLight[1] * tr * scene.getSigmaT(), dirLight[2] * tr * scene.getSigmaT()); 
+					RGB dirLTr = RGB(dirLight[0] * tr * scene.getSigmaA(),
+							dirLight[1] * tr * scene.getSigmaA(), dirLight[2] * tr * scene.getSigmaA()); 
 					RGB L = r.tracePath(scene, depth + 1); 
-					return RGB(-dirLTr[0] + L[0], -dirLTr[1] + L[1], -dirLTr[2] + L[2]);
+					return RGB(dirLTr[0] + L[0], dirLTr[1] + L[1], dirLTr[2] + L[2]);
 				}
 				 
 			}
