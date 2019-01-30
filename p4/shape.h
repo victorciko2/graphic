@@ -33,6 +33,19 @@ public:
 	virtual float getIntensity();
 	virtual void show();
 	virtual bool getRefractive();
+	virtual bool getEmissive();
+};
+
+class Emission : public Material {
+protected:
+	float p;
+public:
+	Emission();
+	Emission(float p, RGB color);
+	float getP();
+	void setP(float p);
+	RGB getColor(Direction n, Point origin, Point hit, Scene scene, int depth);
+	bool getEmissive();
 };
 
 class BRDF : public Material{
@@ -123,6 +136,7 @@ protected:
 	vector<shared_ptr<Shape>> objects;
 	vector<shared_ptr<PointLight>> lights;
 	float sigmaT, sigmaS, sigmaA; //extinction and scattering and absorcion
+	RGB albedo;
 public:
 	Scene();
 	~Scene();
@@ -132,9 +146,11 @@ public:
 	void add(shared_ptr<Shape> s);
 	void add(shared_ptr<PointLight> l);
 	void addPM(float sigmaA, float sigmaS);
+	void addAlbedo(RGB albedo);
 	float getSigmaT();
 	float getSigmaS();
 	float getSigmaA();
+	RGB getAlbedo();
 	vector<shared_ptr<Shape>> getObjects();
 	vector<shared_ptr<PointLight>> getLights();
 };

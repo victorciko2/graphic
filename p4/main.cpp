@@ -25,23 +25,44 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 	Shape shape;
 	vector<shared_ptr<Shape>> shapes;
 	vector<shared_ptr<PointLight>> lights;
+
 	// CORNELL BOX
 	Plane left(Direction(1, 0, 0), Point(-10, 0, 10), make_shared<BRDF>(BRDF(0.7, 0, 100, RGB((float)255/255, 0, 0)))); //LEFT
-	//shapes.push_back(make_shared<Plane>(shape));	
 	scene.add(make_shared<Plane>(left));
+
 	Plane right(Direction(-1, 0, 0), Point(10, 0, -10), make_shared<BRDF>(BRDF(0.7, 0, 100, RGB(0, (float)255/255, 0)))); //RIGHT
 	scene.add(make_shared<Plane>(right));
+
 	Plane down(Direction(0, 1, 0), Point(0,-10, 10), make_shared<BRDF>(BRDF(0.7, 0, 100, RGB((float)230/255, (float)230/255, (float)230/255)))); //DOWN
 	scene.add(make_shared<Plane>(down));
+
 	Plane up(Direction(0, -1, 0), Point(0, 10, 10), make_shared<BRDF>(BRDF(0.7, 0, 100, RGB((float)140/255, (float)140/255, (float)140/255)))); //UP
 	scene.add(make_shared<Plane>(up));
+
 	Plane back(Direction(0, 0, -1), Point(0, 0, 20), make_shared<BRDF>(BRDF(0.7, 0, 100, RGB((float)191/255, (float)191/255, (float)191/255)))); //BACK
-	
 	scene.add(make_shared<Plane>(back));
-	scene.addPM(0.07, 0.05);//absorcion and scattering (que putos datos poner)
+
+	scene.addAlbedo(RGB(1, 1, 1));
+	scene.addPM(0.03, 0.02);//absorcion and scattering (que putos datos poner)
+
+	// ******************************************* LA FIESTA *********************************************************
+	
+	/*Emission ma = Emission(1000, RGB(1,1,1));
+	
+	Sphere algo(Point(8, 8, 12), 0.5, make_shared<Emission>(ma));
+	scene.add(make_shared<Sphere>(algo));
+
+	Sphere algo2(Point(8, 8, 16), 0.5, make_shared<Emission>(ma));
+	scene.add(make_shared<Sphere>(algo2));
+
+	Sphere algo3(Point(-8, 8, 12), 0.5, make_shared<Emission>(ma));
+	scene.add(make_shared<Sphere>(algo3));
+
+	Sphere algo4(Point(-8, 8, 16), 0.5, make_shared<Emission>(ma));
+	scene.add(make_shared<Sphere>(algo4));*/
 
  	// ******************************************* EL MARAVILLOSO PENE *********************************************************
-	BRDF m = BRDF(0.7, 0.1, 1, RGB((float)252/255, (float)123/255, (float)220/255));
+	/*BRDF m = BRDF(0.7, 0.1, 1, RGB((float)252/255, (float)123/255, (float)220/255));
 	shape = Sphere(Point(2.5, -7, 17), 3, make_shared<Material>(m)); //RIGHT BALL
 	//scene.add(make_shared<Shape>(shape));
 	shape = Sphere(Point(-2.5, -7, 17), 3, make_shared<Material>(m)); //LEFT BALL
@@ -52,16 +73,18 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 	//scene.add(make_shared<Shape>(shape));
 	m = BRDF(0.8, 0.1, 1, RGB((float)173/255, (float)83/255, (float)151/255));
 	shape = Sphere(Point(0, 6.5, 17), 3, make_shared<Material>(m)); //TOP
-	//scene.add(make_shared<Shape>(shape)); 
+	//scene.add(make_shared<Shape>(shape)); */
 	// Pruebas sin mas
 	//***************************SNOWMAN*******************************************
-	Material ref = Reflective();
-	m = BRDF(0.7, 0.2, 1, RGB((float)0/255, (float)0/255, (float)255/255));	
+	/*Material ref = Reflective();
 	//body
-	Sphere body(Point(0,-7,13), 3, make_shared<BRDF>(m));
-	//scene.add(make_shared<Sphere>(body));
+	*/
+	/*Sphere body(Point(0,-7,13), 3, make_shared<BRDF>(m));
+	scene.add(make_shared<Sphere>(body));*/
+	
+	BRDF m = BRDF(0.7, 0.2, 1, RGB((float)0/255, (float)0/255, (float)255/255));	
 	Sphere body2(Point(0,-2.8,13), 2.5, make_shared<BRDF>(m));
-	scene.add(make_shared<Sphere>(body2));
+	scene.add(make_shared<Sphere>(body2));/*
 	Sphere body3(Point(0,0.4,13), 1.8, make_shared<BRDF>(m));
 	//scene.add(make_shared<Sphere>(body3));
 	m = BRDF(0.6, 0.1, 1, RGB((float)0/255, (float)0/255, (float)0/255));	
@@ -88,6 +111,8 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 	Parallelepiped paralele(new Triangle(Point(-8, -9.9, 14), Point(-8, -9.9, 18), Point(-2, -9.9, 18)),
 					new Triangle(Point(-8, -9.9, 14), Point(-2, -9.9 ,14), Point(-2, -9.9, 18)), 12, make_shared<BRDF>(m));
 	//scene.add(make_shared<Parallelepiped>(paralele));
+
+	*/
 	
 	PointLight pl = PointLight(Point(0, 8, 10), make_shared<Light>(Light(250, RGB(1,1,1))));
 	scene.add(make_shared<PointLight>(pl));
