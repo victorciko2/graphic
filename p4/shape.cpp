@@ -64,36 +64,24 @@ void Emission::setP(float p){
 
 
 
-const int maxDepth = 20;
+const int maxDepth = 40;
 
 RGB Emission::getColor(Direction n, Point origin, Point hit, Scene scene, int depth){
-	if(depth >= maxDepth){
-		return {0, 0, 0};
-	}
 
-	RGB dirLight(0, 0, 0);
 	float dist = (hit - origin).modulus();
-	Direction dirAux = origin - hit; dirAux.normalize();
-	Ray r = Ray(dirAux, hit + dirAux * 0.1f); 
-	Point collision;
-	float shadowDist = -1;
-	shared_ptr<Shape> object = r.collision(scene, collision, shadowDist); 
-	if(object == nullptr || shadowDist > dist || shadowDist < 0 ){
-		float p = getP();
-		float a;
-		if(dist < 1){
-			a = p * abs(n * dirAux);
-		}
-		else{
-			a = abs(p / (dist * dist)) * abs(n * dirAux);
-		}
-		RGB rgbL = this->color;
-		dirLight = RGB(
-			rgbL[0] * a,
-			rgbL[1] * a,
-			rgbL[2] * a);
+	float result;
+
+	RGB emissionColor = this->color;
+	Direction d = origin - hit;
+	d.normalize();
+	n.normalize();
+	if(dist < 1){
+		result = this->p * abs(n * d);
 	}
-	return dirLight;
+	else{
+		result = abs(this->p / (dist * dist)) * abs(n * d);
+	}
+	return RGB(emissionColor[0] * result, emissionColor[1] * result, emissionColor[2] * result);
 }
 
 BRDF::BRDF(){
@@ -183,7 +171,7 @@ RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth)
 				dirLight[1] + rgbL[1] * a * ((rgb[1]/M_PI) + ks * (alpha + 2) / 2 / M_PI * pow(abs(refPerfect * origin2hit), alpha)),
 				dirLight[2] + rgbL[2] * a * ((rgb[2]/M_PI) + ks * (alpha + 2) / 2 / M_PI * pow(abs(refPerfect * origin2hit), alpha)));
 		}
-		if(object != nullptr && object->getMaterial()->getRefractive()){
+		/*if(object != nullptr && object->getMaterial()->getRefractive()){
 			dirAux = pl.getOrigin() - hit; dirAux.normalize();
 			bool mierda;
 			float dist2 = object->collision(dirAux, hit, mierda);
@@ -201,14 +189,7 @@ RGB BRDF::getColor(Direction n, Point origin, Point hit, Scene scene, int depth)
 				dirLight[0] + rgbL[0] * a * ((rgb[0]/M_PI) + ks * (alpha + 2) / 2 / M_PI * pow(abs(refPerfect * origin2hit), alpha)),
 				dirLight[1] + rgbL[1] * a * ((rgb[1]/M_PI) + ks * (alpha + 2) / 2 / M_PI * pow(abs(refPerfect * origin2hit), alpha)),
 				dirLight[2] + rgbL[2] * a * ((rgb[2]/M_PI) + ks * (alpha + 2) / 2 / M_PI * pow(abs(refPerfect * origin2hit), alpha)));
-		}
-		else if (object != nullptr && object->getMaterial()->getEmissive()){
-			RGB rgbL = object->getMaterial()->getColor(dirAux, hit, collision, scene, depth);
-			dirLight = RGB(
-				dirLight[0] + rgbL[0],
-				dirLight[1] + rgbL[1],
-				dirLight[2] + rgbL[2]);
-		}
+		}*/
 	}
 	if(maxDepth == 1){
 		return dirLight;
@@ -281,12 +262,17 @@ Reflective::Reflective(){}
 Reflective::~Reflective(void){}
 
 RGB Reflective::getColor(Direction n, Point origin, Point hit, Scene scene, int depth){
-	Direction wo = hit - origin; wo.normalize();
-	float Or = acos((n * wo) / (wo.modulus() * n.modulus()));
-	Direction wi = wo - (n * (wo * n) * 2); wi.normalize();
-	Ray dif = Ray(wi, hit + wi * 0.1f);
-	RGB Li = dif.tracePath(scene, depth + 1);
-	return Li;
+	if (depth <= maxDepth){
+		Direction wo = hit - origin; wo.normalize();
+		float Or = acos((n * wo) / (wo.modulus() * n.modulus()));
+		Direction wi = wo - (n * (wo * n) * 2); wi.normalize();
+		Ray dif = Ray(wi, hit + wi * 0.1f);
+		RGB Li = dif.tracePath(scene, depth + 1);
+		return Li;
+	}
+	else {
+		return RGB(0, 0, 0);
+	}
 }
 
 void Reflective::show(){
@@ -435,6 +421,10 @@ void Scene::add(shared_ptr<PointLight> l){
 	this->lights.push_back(l);
 }
 
+void Scene::addEmissive(shared_ptr<Shape> e){
+	this->emissiveObjects.push_back(e);
+}
+
 void Scene::addPM(float sigmaA, float sigmaS){
 	this->sigmaA = sigmaA;
 	this->sigmaS = sigmaS;
@@ -467,6 +457,10 @@ vector<shared_ptr<Shape>> Scene::getObjects(){
 
 vector<shared_ptr<PointLight>> Scene::getLights(){
 	return this->lights;
+}
+
+vector<shared_ptr<Shape>> Scene::getEmissiveObjects(){
+	return this->emissiveObjects;
 }
 
 Shape::Shape(){

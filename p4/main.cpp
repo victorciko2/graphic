@@ -17,6 +17,10 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 		cout << "ERROR: Use " << argv[0] << " numPaths width height fileName" << endl; 
 		return -1;
 	}
+
+	// Contar tiempo
+	auto timeStart = std::chrono::high_resolution_clock::now();
+
 	int	numPaths = atoi(argv[1]);
 	int pixelX = atoi(argv[2]);
 	int pixelY = atoi(argv[3]);
@@ -26,6 +30,8 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 	vector<shared_ptr<Shape>> shapes;
 	vector<shared_ptr<PointLight>> lights;
 
+	Emission ma = Emission(2500, RGB(1,1,1));
+	Reflective re = Reflective();
 	// CORNELL BOX
 	Plane left(Direction(1, 0, 0), Point(-10, 0, 10), make_shared<BRDF>(BRDF(0.7, 0, 100, RGB((float)255/255, 0, 0)))); //LEFT
 	scene.add(make_shared<Plane>(left));
@@ -42,39 +48,82 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 	Plane back(Direction(0, 0, -1), Point(0, 0, 20), make_shared<BRDF>(BRDF(0.7, 0, 100, RGB((float)191/255, (float)191/255, (float)191/255)))); //BACK
 	scene.add(make_shared<Plane>(back));
 
-	scene.addAlbedo(RGB(1, 1, 1));
-	scene.addPM(0.03, 0.02);//absorcion and scattering (que putos datos poner)
-
-	// ******************************************* LA FIESTA *********************************************************
+	// scene.addAlbedo(RGB(1, 1, 1));
+	// scene.addPM(0, 0);//absorcion and scattering (que putos datos poner)
+	/*BRDF m = BRDF(0.4, 0.4, 100, RGB(0, 0, 1));
 	
-	/*Emission ma = Emission(1000, RGB(1,1,1));
-	
-	Sphere algo(Point(8, 8, 12), 0.5, make_shared<Emission>(ma));
-	scene.add(make_shared<Sphere>(algo));
+	Triangle t(Point(-2, -4, 10), Point(-2, -4, 12), Point(2, -4, 12), make_shared<BRDF>(m));
+	scene.add(make_shared<Triangle>(t));*/
 
-	Sphere algo2(Point(8, 8, 16), 0.5, make_shared<Emission>(ma));
+	/*BRDF m = BRDF(0, 0.7, 100, RGB((float)59/255, (float)29/255, 0));
+	*/
+
+	/*BRDF m = BRDF(0.4, 0.4, 100, RGB((float)234/255, (float)190/255, (float)63/255));*/
+	/*Sphere algo(Point(-5, -2, 10), 2, make_shared<Emission>(ma));
+	scene.add(make_shared<Sphere>(algo));*/
+	
+	/*Parallelepiped paralele(new Triangle(Point(-8, -9.9, 14), Point(-8, -9.9, 18), Point(-2, -9.9, 18)),
+					new Triangle(Point(-8, -9.9, 14), Point(-2, -9.9 ,14), Point(-2, -9.9, 18)), 12, make_shared<Refractive>(re));
+	scene.add(make_shared<Parallelepiped>(paralele));*/
+	/*BRDF m = BRDF(0.4, 0.4, 100, RGB(0, 0, 1));
+	Cylinder cyl1(Disk(Direction(1, 1, 0), Point(0, 0, 10), 1), 4, make_shared<Reflective>(re));
+	scene.add(make_shared<Cylinder>(cyl1));*/
+
+
+	Triangle t = Triangle(Point(3+1, 4, 13), Point(0+1, 4, 15), Point(1.5+1, 1, 14), make_shared<Emission>(ma));
+	scene.add(make_shared<Triangle>(t));
+
+	/*BRDF m = BRDF(0.4, 0.4, 100, RGB(0, 0, 1));
+	Sphere algo2(Point(7, -2, 10), 2, make_shared<BRDF>(m));
+	scene.add(make_shared<Sphere>(algo2));*/
+
+	/*Sphere algo2(Point(-7.5, 0, 10), 2, make_shared<Reflective>(m));
 	scene.add(make_shared<Sphere>(algo2));
 
-	Sphere algo3(Point(-8, 8, 12), 0.5, make_shared<Emission>(ma));
+	Sphere algo3(Point(2.5, 0, 10), 2, make_shared<Reflective>(m));
 	scene.add(make_shared<Sphere>(algo3));
 
-	Sphere algo4(Point(-8, 8, 16), 0.5, make_shared<Emission>(ma));
+	Sphere algo4(Point(7.5, 0, 10), 2, make_shared<Reflective>(m));
 	scene.add(make_shared<Sphere>(algo4));*/
 
- 	// ******************************************* EL MARAVILLOSO PENE *********************************************************
+
+	/*Reflective m = Reflective();
+	Cylinder rightArm(Disk(Direction(-1, 1, 0), Point(2, -1.5, 13), 4), 7, make_shared<Reflective>(m));
+	scene.add(make_shared<Cylinder>(rightArm));*/
+
+	/*Cylinder cyl1(Disk(Direction(0, 1, 0), Point(5, -10, 12), 0.15), 11.55, make_shared<BRDF>(m));
+	scene.add(make_shared<Cylinder>(cyl1));
+
+	Cylinder cyl2(Disk(Direction(0, 1, 0), Point(5, -10, 16), 0.15), 11.55, make_shared<BRDF>(m));
+	scene.add(make_shared<Cylinder>(cyl2));
+
+	Cylinder cyl3(Disk(Direction(0, 1, 0), Point(-5, -10, 12), 0.15), 11.55, make_shared<BRDF>(m));
+	scene.add(make_shared<Cylinder>(cyl3));
+
+	Cylinder cyl4(Disk(Direction(0, 1, 0), Point(-5, -10, 16), 0.15), 11.55, make_shared<BRDF>(m));
+	scene.add(make_shared<Cylinder>(cyl4));*/
+
+	//Cylinder cyl1(Disk(Direction(0, -1, 0), Point(7.5, -10, 12), 1), 4, make_shared<BRDF>(m));
+	//scene.add(make_shared<Cylinder>(cyl1));
+
 	/*BRDF m = BRDF(0.7, 0.1, 1, RGB((float)252/255, (float)123/255, (float)220/255));
 	shape = Sphere(Point(2.5, -7, 17), 3, make_shared<Material>(m)); //RIGHT BALL
 	//scene.add(make_shared<Shape>(shape));
 	shape = Sphere(Point(-2.5, -7, 17), 3, make_shared<Material>(m)); //LEFT BALL
 	//scene.add(make_shared<Shape>(shape));
 	m = BRDF(0.7, 0.1, 1, RGB((float)214/255, (float)104/255, (float)187/255));
+
 	shape = Cylinder(Disk(Direction(0, 1, 0), Point(0,-6.5, 18.5), 1.5), 
 				Disk(Direction(0,1,0), Point(0, 8, 18), 3), make_shared<Material>(m));
-	//scene.add(make_shared<Shape>(shape));
-	m = BRDF(0.8, 0.1, 1, RGB((float)173/255, (float)83/255, (float)151/255));
+
+	*/
+	//Disk disquito(Direction(0, -1, 0), Point(0, 9.8, 10), 3, make_shared<Emission>(ma));
+	// scene.add(make_shared<Disk>(disquito));
+	
+	/*m = BRDF(0.8, 0.1, 1, RGB((float)173/255, (float)83/255, (float)151/255));
 	shape = Sphere(Point(0, 6.5, 17), 3, make_shared<Material>(m)); //TOP
 	//scene.add(make_shared<Shape>(shape)); */
-	// Pruebas sin mas
+
 	//***************************SNOWMAN*******************************************
 	/*Material ref = Reflective();
 	//body
@@ -82,9 +131,10 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 	/*Sphere body(Point(0,-7,13), 3, make_shared<BRDF>(m));
 	scene.add(make_shared<Sphere>(body));*/
 	
-	BRDF m = BRDF(0.7, 0.2, 1, RGB((float)0/255, (float)0/255, (float)255/255));	
-	Sphere body2(Point(0,-2.8,13), 2.5, make_shared<BRDF>(m));
-	scene.add(make_shared<Sphere>(body2));/*
+	/*Refractive m = Refractive(4, true);	
+	Sphere body2(Point(0,-2.8,13), 2.5, make_shared<Refractive>(m));
+	scene.add(make_shared<Sphere>(body2));*/
+	/*
 	Sphere body3(Point(0,0.4,13), 1.8, make_shared<BRDF>(m));
 	//scene.add(make_shared<Sphere>(body3));
 	m = BRDF(0.6, 0.1, 1, RGB((float)0/255, (float)0/255, (float)0/255));	
@@ -114,8 +164,14 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 
 	*/
 	
-	PointLight pl = PointLight(Point(0, 8, 10), make_shared<Light>(Light(250, RGB(1,1,1))));
+	/*PointLight pl = PointLight(Point(0, 8, 10), make_shared<Light>(Light(250, RGB(1,1,1))));
+	scene.add(make_shared<PointLight>(pl));*/
+/*
+	PointLight pl = PointLight(Point(3.5, 8, 10), make_shared<Light>(Light(150, RGB(1,1,1))));
 	scene.add(make_shared<PointLight>(pl));
+	PointLight pl2 = PointLight(Point(-3.5, 8, 10), make_shared<Light>(Light(150, RGB(1,1,1))));
+	scene.add(make_shared<PointLight>(pl2));*/
+
 	// MAIN CODE
 	Camera camera = Camera(Point(0, 0, 0), Direction(0, 0, 10), Direction(10, 0, 0), pixelX, pixelY);	camera.setL(camera.getL() * -1);
 	ofstream o(f + ".ppm");
@@ -140,6 +196,7 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
   	Ray r;
   	int depth = 0;
   	RGB result;
+  	float contador = 0;
 	for(int i = 0; i < camera.getY(); i++){
 		for(int j = 0; j < camera.getX(); j++){
 			mean = RGB(0, 0, 0);
@@ -166,8 +223,13 @@ int main(int argc, char* argv[]){//may the normal vector point outwards
 			o << (int) mean[0] << " " << (int) mean[1] << " " << (int) mean[2] << " ";
 		}
 		o << endl;
-		cout << i << endl;
+		contador = (float) i;
+		fprintf(stderr,"\r%5.2f%%", 100.*contador/(camera.getY()-1));
 	}
+	cout << endl;
 	o.close();
+	auto timeEnd = std::chrono::high_resolution_clock::now(); 
+    auto passedTime = std::chrono::duration<double, std::milli>(timeEnd - timeStart).count(); 
+    fprintf(stderr, "\rTiempo: %.2f (seg)\n", passedTime / 1000);
 	return 0;
 }

@@ -71,7 +71,7 @@ float Sphere::getRadius(){
 
 float Sphere::collision(Direction d, Point o, bool& collision){  // cambiar radio por float
 	d.normalize();
-	float a = d * d;
+	float a = d * d; // producto escalar
 	float b = 2 * (d * (o - this->center));
 	float c = (o - this->center)*(o - this->center) - radius * radius;
 	float t0, t1;

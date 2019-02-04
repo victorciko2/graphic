@@ -134,6 +134,7 @@ public:
 class Scene{
 protected:
 	vector<shared_ptr<Shape>> objects;
+	vector<shared_ptr<Shape>> emissiveObjects;
 	vector<shared_ptr<PointLight>> lights;
 	float sigmaT, sigmaS, sigmaA; //extinction and scattering and absorcion
 	RGB albedo;
@@ -145,6 +146,7 @@ public:
 	Scene(vector<shared_ptr<Shape>> objects, vector<shared_ptr<PointLight>> lights);
 	void add(shared_ptr<Shape> s);
 	void add(shared_ptr<PointLight> l);
+	void addEmissive(shared_ptr<Shape> e);
 	void addPM(float sigmaA, float sigmaS);
 	void addAlbedo(RGB albedo);
 	float getSigmaT();
@@ -153,6 +155,7 @@ public:
 	RGB getAlbedo();
 	vector<shared_ptr<Shape>> getObjects();
 	vector<shared_ptr<PointLight>> getLights();
+	vector<shared_ptr<Shape>> getEmissiveObjects();
 };
 
 class Ray{

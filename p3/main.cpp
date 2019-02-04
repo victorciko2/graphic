@@ -22,8 +22,8 @@ int main(){
 	shape = new Plane(Direction(0, 0, 1), Point(0, 0, 40), RGB(191, 191, 191)); //BACK
 	list.push_back(shape);
 
-	shape = new Parallelepiped(new Triangle(Point(15, -10, 20), Point(15, -20, 30), Point(15, -10, 40), RGB(255, 0, 0)),
-					new Triangle(Point(15, -10, 20), Point(15, 0, 30), Point(15, -10, 40), RGB(0, 0, 180)), 4, RGB(255, 0, 0));
+	shape = new Parallelepiped(new Triangle(Point(5, -10, 20), Point(5, -20, 30), Point(5, -10, 40), RGB(255, 0, 0)),
+					new Triangle(Point(5, -10, 20), Point(5, 0, 30), Point(5, -10, 40), RGB(0, 0, 180)), 4, RGB(255, 165, 0));
 	list.push_back(shape);
 
  	// ******************************************* EL MARAVILLOSO PENE *********************************************************
@@ -34,12 +34,17 @@ int main(){
 	list.push_back(shape);
 	shape = new Cylinder(Disk(Direction(0, 1, 0), Point(0, -13, 35), 6, RGB(255, 255, 255)), 
 				Disk(Direction(0,1,0), Point(0, 15, 35), 6, RGB(255,255,255)), RGB(214, 104, 187));
-	list.push_back(shape);
-	shape = new Sphere(Point(0, 15, 35), 6, RGB(173, 83, 151)); //TOP
+	list.push_back(shape);*/
+	/*shape = new Cylinder(Disk(Direction(-1, 1, 0), Point(0, -7, 30), 6, RGB(102, 0, 77)),
+				Disk(Direction(-1, 1, 0), Point(0, -7, 30) + Direction(-1, 1, 0)*14, 6, RGB(102, 0, 77)), RGB(102, 0, 77));
+	// shape = new Sphere(Point(0, 0, 30), 6, RGB(0, 0, 255)); //TOP
 	list.push_back(shape); */
 
-	Camera camera = Camera(Point(0, 0, 0), Direction(0, 0, 10), Direction(10, 0, 0), 1080, 1080);	camera.setL(camera.getL() * -1);
-	ofstream o("prueba.ppm");
+	/*shape = new Triangle(Point(15, -10, 20), Point(-15, -20, 30), Point(-15, 10, 40), RGB(0, 0, 255));
+	list.push_back(shape);*/
+
+	Camera camera = Camera(Point(0, 0, 0), Direction(0, 0, 10), Direction(10, 0, 0), 3000, 3000);	camera.setL(camera.getL() * -1);
+	ofstream o("prueba6.ppm");
 	o << "P3" << endl;
 	o << camera.getX() << " " << camera.getY() << endl;
 	o << "255" << endl;
